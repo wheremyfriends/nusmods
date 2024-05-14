@@ -475,10 +475,7 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
   const { modules } = state.moduleBank;
   const { selectedLessons } = state.app;
 
-  console.log("TIMETABLE: ", timetable)
-  // const timetableWithLessons = hydrateSemTimetableWithLessons(timetable, modules, semester);
   const timetableWithLessons = hydrateSemTimetableWithMultiLessons(timetable, selectedLessons, modules, semester);
-  console.log("TIMETABLE2: ", timetableWithLessons)
 
   // Determine the key to check for hidden modules based on readOnly status
   const hiddenModulesKey = readOnly ? HIDDEN_IMPORTED_SEM : semester;
