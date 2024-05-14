@@ -103,6 +103,38 @@ export function modifyLesson(activeLesson: Lesson) {
   };
 }
 
+// Enter edit mode to select and deselect lessons with the same moduleCode and lessonType
+export const EDIT_LESSON = 'EDIT_LESSON' as const;
+export function editLesson(moduleCode: ModuleCode, lessonType: LessonType) {
+  return {
+    type: EDIT_LESSON,
+    payload: {
+      moduleCode,
+      lessonType,
+    },
+  };
+}
+
+export const CANCEL_EDIT_LESSON = 'CANCEL_EDIT_LESSON' as const;
+export function cancelEditLesson() {
+  return {
+    type: CANCEL_EDIT_LESSON,
+    payload: null,
+  };
+}
+
+// Select or deselect lessons when in edit mode
+export const TOGGLE_SELECT_LESSON = 'TOGGLE_SELECT_LESSON' as const;
+export function toggleSelectLesson(semester: Semester, lesson: Lesson) {
+  return {
+    type: TOGGLE_SELECT_LESSON,
+    payload: {
+      semester,
+      lesson,
+    }
+  };
+}
+
 export const CHANGE_LESSON = 'CHANGE_LESSON' as const;
 export function setLesson(
   semester: Semester,

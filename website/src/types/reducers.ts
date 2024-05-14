@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import { RegPeriodType, ScheduleType } from 'config';
 
 import { Mode } from './settings';
-import { ColorIndex, Lesson, TimetableConfig } from './timetables';
+import { ColorIndex, Lesson, EditingLesson, SemTimetableMultiConfig, TimetableConfig } from './timetables';
 import {
   Faculty,
   Module,
@@ -51,6 +51,8 @@ export type NotificationData = { readonly message: string } & NotificationOption
 export type AppState = {
   readonly activeSemester: Semester;
   readonly activeLesson: Lesson | null;
+  readonly editingLesson: EditingLesson | null;
+  readonly selectedLessons: SemTimetableMultiConfig;
   readonly isOnline: boolean;
   readonly isFeedbackModalOpen: boolean;
   readonly notifications: NotificationData[];

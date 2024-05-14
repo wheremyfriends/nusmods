@@ -3,7 +3,7 @@ import { Actions } from 'types/actions';
 import config from 'config';
 
 import { forceRefreshPrompt } from 'utils/debug';
-import { MODIFY_LESSON, CHANGE_LESSON, CANCEL_MODIFY_LESSON } from 'actions/timetables';
+import { MODIFY_LESSON, EDIT_LESSON, TOGGLE_SELECT_LESSON, CHANGE_LESSON, CANCEL_MODIFY_LESSON, CANCEL_EDIT_LESSON } from 'actions/timetables';
 import { SELECT_SEMESTER } from 'actions/settings';
 import {
   OPEN_NOTIFICATION,
@@ -12,12 +12,15 @@ import {
   SET_ONLINE_STATUS,
   TOGGLE_FEEDBACK_MODAL,
 } from 'actions/app';
+import { areLessonsSelected } from 'utils/modules';
 
 const defaultAppState = (): AppState => ({
   // Default to the current semester from config.
   activeSemester: config.semester,
   // The lesson being modified on the timetable.
   activeLesson: null,
+  editingLesson: null,
+  selectedLessons: {},
   isOnline: navigator.onLine,
   isFeedbackModalOpen: false,
   promptRefresh: forceRefreshPrompt(),
@@ -31,6 +34,42 @@ function app(state: AppState = defaultAppState(), action: Actions): AppState {
       return {
         ...state,
         activeSemester: action.payload,
+      };
+    case TOGGLE_SELECT_LESSON:
+      const lesson = action.payload.lesson;
+      const moduleCode = lesson.moduleCode;
+      const lessonType = lesson.lessonType;
+      const classNo = lesson.classNo;
+
+      // Module might not yet exist in selectedLessons, use empty array
+      const oldLessonType = (state.selectedLessons[moduleCode]?.[lessonType] || []);
+      // Select or deselect lesson by adding or removing it from array
+      const newLessonType = areLessonsSelected(lesson, state.selectedLessons) ?
+        oldLessonType.filter(e => e !== classNo) :
+        [...oldLessonType, classNo];
+      return {
+        ...state,
+        selectedLessons: {
+          ...state.selectedLessons,
+          [moduleCode]: {
+            ...state.selectedLessons[moduleCode],
+            [lessonType]: newLessonType
+          }
+        }
+      };
+    case EDIT_LESSON:
+      return {
+        ...state,
+        editingLesson: {
+          moduleCode: action.payload.moduleCode,
+          lessonType: action.payload.lessonType,
+        },
+      };
+
+    case CANCEL_EDIT_LESSON:
+      return {
+        ...state,
+        editingLesson: null,
       };
     case MODIFY_LESSON:
       return {

@@ -4,27 +4,33 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 
 import { ColorMapping, HORIZONTAL, ModulesMap, TimetableOrientation } from 'types/reducers';
-import { Module, ModuleCode, Semester } from 'types/modules';
+import { Module, ModuleCode, LessonType, Semester } from 'types/modules';
 import {
   ColoredLesson,
   Lesson,
+  EditingLesson,
   ModifiableLesson,
   SemTimetableConfig,
   SemTimetableConfigWithLessons,
+  SemTimetableMultiConfig,
   TimetableArrangement,
 } from 'types/timetables';
 
 import {
   addModule,
   cancelModifyLesson,
+  cancelEditLesson,
   changeLesson,
   HIDDEN_IMPORTED_SEM,
   modifyLesson,
+  editLesson,
+  toggleSelectLesson,
   removeModule,
   resetTimetable,
 } from 'actions/timetables';
 import {
   areLessonsSameClass,
+  areLessonsSelected,
   formatExamDate,
   getExamDate,
   getModuleTimetable,
@@ -36,6 +42,7 @@ import {
   getLessonIdentifier,
   getSemesterModules,
   hydrateSemTimetableWithLessons,
+  hydrateSemTimetableWithMultiLessons,
   lessonsForLessonType,
   timetableLessonsArray,
 } from 'utils/timetables';
@@ -71,8 +78,10 @@ type OwnProps = {
 type Props = OwnProps & {
   // From Redux
   timetableWithLessons: SemTimetableConfigWithLessons;
+  selectedLessons: SemTimetableMultiConfig;
   modules: ModulesMap;
   activeLesson: Lesson | null;
+  editingLesson: EditingLesson | null;
   timetableOrientation: TimetableOrientation;
   showTitle: boolean;
   hiddenInTimetable: ModuleCode[];
@@ -82,8 +91,11 @@ type Props = OwnProps & {
   removeModule: (semester: Semester, moduleCode: ModuleCode) => void;
   resetTimetable: (semester: Semester) => void;
   modifyLesson: (lesson: Lesson) => void;
+  editLesson: (moduleCode: ModuleCode, lessonType: LessonType) => void;
+  toggleSelectLesson: (semester:Semester, lesson: Lesson) => void;
   changeLesson: (semester: Semester, lesson: Lesson) => void;
   cancelModifyLesson: () => void;
+  cancelEditLesson: () => void;
 };
 
 type State = {
@@ -148,6 +160,14 @@ class TimetableContent extends React.Component<Props, State> {
     }
   };
 
+  cancelEditLesson = () => {
+    if (this.props.editingLesson) {
+      this.props.cancelEditLesson();
+
+      // resetScrollPosition();
+    }
+  };
+
   cancelModifyLesson = () => {
     if (this.props.activeLesson) {
       this.props.cancelModifyLesson();
@@ -160,16 +180,12 @@ class TimetableContent extends React.Component<Props, State> {
     this.props.hiddenInTimetable.includes(moduleCode);
 
   modifyCell = (lesson: ModifiableLesson, position: ClientRect) => {
-    if (lesson.isAvailable) {
-      this.props.changeLesson(this.props.semester, lesson);
 
-      resetScrollPosition();
-    } else if (lesson.isActive) {
-      this.props.cancelModifyLesson();
-
-      resetScrollPosition();
+    if (lesson.isActive) {
+      this.props.toggleSelectLesson(this.props.semester, lesson);
     } else {
-      this.props.modifyLesson(lesson);
+      // Enter edit mode for the module and lesson type
+      this.props.editLesson(lesson.moduleCode, lesson.lessonType);
 
       this.modifiedCell = {
         position,
@@ -279,6 +295,8 @@ class TimetableContent extends React.Component<Props, State> {
       modules,
       colors,
       activeLesson,
+      editingLesson,
+      selectedLessons,
       timetableOrientation,
       showTitle,
       readOnly,
@@ -287,20 +305,23 @@ class TimetableContent extends React.Component<Props, State> {
 
     const { showExamCalendar } = this.state;
 
-    let timetableLessons: Lesson[] = timetableLessonsArray(this.props.timetableWithLessons)
+    const filteredTimetableWithLessons = {
+      ...this.props.timetableWithLessons,
+    };
+
+    if (editingLesson)
+      // Remove duplicates
+      filteredTimetableWithLessons[editingLesson.moduleCode][editingLesson.lessonType].length = 0;
+
+    let timetableLessons: Lesson[] = timetableLessonsArray(filteredTimetableWithLessons)
       // Do not process hidden modules
       .filter((lesson) => !this.isHiddenInTimetable(lesson.moduleCode));
 
-    if (activeLesson) {
-      const { moduleCode } = activeLesson;
-      // Remove activeLesson because it will appear again
-      timetableLessons = timetableLessons.filter(
-        (lesson) => !areLessonsSameClass(lesson, activeLesson),
-      );
-
+    if (editingLesson) {
+      const { moduleCode, lessonType } = editingLesson;
       const module = modules[moduleCode];
       const moduleTimetable = getModuleTimetable(module, semester);
-      lessonsForLessonType(moduleTimetable, activeLesson.lessonType).forEach((lesson) => {
+      lessonsForLessonType(moduleTimetable, lessonType).forEach((lesson) => {
         const modifiableLesson: Lesson & {
           isActive?: boolean;
           isAvailable?: boolean;
@@ -311,11 +332,11 @@ class TimetableContent extends React.Component<Props, State> {
           title: module.title,
         };
 
-        if (areLessonsSameClass(modifiableLesson, activeLesson)) {
-          modifiableLesson.isActive = true;
-        } else if (lesson.lessonType === activeLesson.lessonType) {
-          modifiableLesson.isAvailable = true;
-        }
+        // Blink animation
+        modifiableLesson.isActive = true;
+        // Transparency
+        modifiableLesson.isAvailable = areLessonsSelected(modifiableLesson, selectedLessons) ? false : true;
+
         timetableLessons.push(modifiableLesson);
       });
     }
@@ -355,8 +376,8 @@ class TimetableContent extends React.Component<Props, State> {
         className={classnames('page-container', styles.container, {
           verticalMode: isVerticalOrientation,
         })}
-        onClick={this.cancelModifyLesson}
-        onKeyUp={(e) => e.key === 'Escape' && this.cancelModifyLesson()} // Quit modifying when Esc is pressed
+        // onClick={this.cancelModifyLesson}
+        onKeyUp={(e) => e.key === 'Escape' && this.cancelEditLesson()} // Quit modifying when Esc is pressed
       >
         <Title>Timetable</Title>
 
@@ -452,7 +473,12 @@ class TimetableContent extends React.Component<Props, State> {
 function mapStateToProps(state: StoreState, ownProps: OwnProps) {
   const { semester, timetable, readOnly } = ownProps;
   const { modules } = state.moduleBank;
-  const timetableWithLessons = hydrateSemTimetableWithLessons(timetable, modules, semester);
+  const { selectedLessons } = state.app;
+
+  console.log("TIMETABLE: ", timetable)
+  // const timetableWithLessons = hydrateSemTimetableWithLessons(timetable, modules, semester);
+  const timetableWithLessons = hydrateSemTimetableWithMultiLessons(timetable, selectedLessons, modules, semester);
+  console.log("TIMETABLE2: ", timetableWithLessons)
 
   // Determine the key to check for hidden modules based on readOnly status
   const hiddenModulesKey = readOnly ? HIDDEN_IMPORTED_SEM : semester;
@@ -464,6 +490,8 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
     timetableWithLessons,
     modules,
     activeLesson: state.app.activeLesson,
+    editingLesson: state.app.editingLesson,
+    selectedLessons: state.app.selectedLessons,
     timetableOrientation: state.theme.timetableOrientation,
     showTitle: state.theme.showTitle,
     hiddenInTimetable,
@@ -475,6 +503,9 @@ export default connect(mapStateToProps, {
   removeModule,
   resetTimetable,
   modifyLesson,
+  editLesson,
+  toggleSelectLesson,
   changeLesson,
   cancelModifyLesson,
+  cancelEditLesson,
 })(TimetableContent);

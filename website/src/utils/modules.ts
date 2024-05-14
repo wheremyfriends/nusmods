@@ -11,7 +11,7 @@ import type {
 
 import config from 'config';
 import { NBSP, noBreak } from 'utils/react';
-import { Lesson } from 'types/timetables';
+import { Lesson, SemTimetableMultiConfig } from 'types/timetables';
 import { toSingaporeTime } from './timify';
 
 // Look for strings that look like module codes - eg.
@@ -32,6 +32,11 @@ export function getModuleSemesterData(
 // Returns a flat array of lessons of a module for the corresponding semester.
 export function getModuleTimetable(module: Module, semester: Semester): readonly RawLesson[] {
   return _.get(getModuleSemesterData(module, semester), 'timetable', []);
+}
+
+// Is the lesson already selected and stored in selectedLessons?
+export function areLessonsSelected(lesson: Lesson, selectedLessons: SemTimetableMultiConfig): boolean {
+  return (selectedLessons[lesson.moduleCode]?.[lesson.lessonType] || []).includes(lesson.classNo);
 }
 
 // Do these two lessons belong to the same class?

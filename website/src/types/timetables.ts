@@ -5,9 +5,24 @@ export type ModuleLessonConfig = {
   [lessonType: string]: ClassNo;
 };
 
+//  ModuleLessonMultiConfig is a mapping of lessonType to ClassNo array for a module.
+export type ModuleLessonMultiConfig = {
+  [lessonType: string]: ClassNo[];
+};
+
 // SemTimetableConfig is the timetable data for each semester.
 export type SemTimetableConfig = {
   [moduleCode: string]: ModuleLessonConfig;
+};
+
+// SemTimetableMultiConfig is the timetable data for each semester that supports multiple ClassNo.
+export type SemTimetableMultiConfig = {
+  [moduleCode: string]: ModuleLessonMultiConfig;
+};
+
+export type EditingLesson = {
+  readonly moduleCode: ModuleCode;
+  readonly lessonType: LessonType;
 };
 
 //  ModuleLessonConfigWithLessons is a mapping of lessonType to an array of Lessons for a module.
