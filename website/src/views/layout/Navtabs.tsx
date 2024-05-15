@@ -38,22 +38,6 @@ const Navtabs: FC = () => {
         <Calendar />
         <span className={styles.title}>Timetable</span>
       </NavLink>
-      {showCPExTab && (
-        <NavLink {...tabProps} to="/cpex">
-          <Target />
-          <span className={styles.title}>CPEx</span>
-        </NavLink>
-      )}
-      {beta && (
-        <NavLink
-          {...tabProps}
-          className={classnames(tabProps.className, styles.hiddenOnMobile)}
-          to="/planner"
-        >
-          <Trello />
-          <span className={styles.title}>Planner</span>
-        </NavLink>
-      )}
       <div className={styles.divider} />
     </nav>
   );
