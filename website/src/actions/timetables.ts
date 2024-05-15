@@ -105,12 +105,11 @@ export function modifyLesson(activeLesson: Lesson) {
 
 // Enter edit mode to select and deselect lessons with the same moduleCode and lessonType
 export const EDIT_LESSON = 'EDIT_LESSON' as const;
-export function editLesson(moduleCode: ModuleCode, lessonType: LessonType) {
+export function editLesson(lesson: Lesson) {
   return {
     type: EDIT_LESSON,
     payload: {
-      moduleCode,
-      lessonType,
+      lesson
     },
   };
 }

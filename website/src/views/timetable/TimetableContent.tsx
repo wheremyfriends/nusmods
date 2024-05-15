@@ -91,7 +91,7 @@ type Props = OwnProps & {
   removeModule: (semester: Semester, moduleCode: ModuleCode) => void;
   resetTimetable: (semester: Semester) => void;
   modifyLesson: (lesson: Lesson) => void;
-  editLesson: (moduleCode: ModuleCode, lessonType: LessonType) => void;
+  editLesson: (lesson: Lesson) => void;
   toggleSelectLesson: (semester:Semester, lesson: Lesson) => void;
   changeLesson: (semester: Semester, lesson: Lesson) => void;
   cancelModifyLesson: () => void;
@@ -185,7 +185,7 @@ class TimetableContent extends React.Component<Props, State> {
       this.props.toggleSelectLesson(this.props.semester, lesson);
     } else {
       // Enter edit mode for the module and lesson type
-      this.props.editLesson(lesson.moduleCode, lesson.lessonType);
+      this.props.editLesson(lesson);
 
       this.modifiedCell = {
         position,
