@@ -96,6 +96,7 @@ const TimetableCell: React.FC<Props> = (props) => {
     ? {
         onClick: (e: React.MouseEvent) => {
           e.preventDefault();
+          e.stopPropagation(); // Do not propagate click to Timetable component below
           onClick(e.currentTarget.getBoundingClientRect());
         },
       }
