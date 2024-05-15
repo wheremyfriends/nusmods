@@ -57,7 +57,6 @@ import { TombstoneModule } from 'types/views';
 import Timetable from './Timetable';
 import TimetableActions from './TimetableActions';
 import TimetableModulesTable from './TimetableModulesTable';
-import ExamCalendar from './ExamCalendar';
 import ModulesTableFooter from './ModulesTableFooter';
 import styles from './TimetableContent.scss';
 
@@ -396,30 +395,19 @@ class TimetableContent extends React.Component<Props, State> {
               'col-md-8': isVerticalOrientation,
             })}
           >
-            {showExamCalendar ? (
-              <ExamCalendar
-                semester={semester}
-                modules={addedModules.map((module) => ({
-                  ...module,
-                  colorIndex: this.props.colors[module.moduleCode],
-                  hiddenInTimetable: this.isHiddenInTimetable(module.moduleCode),
-                }))}
+            <div
+              className={styles.timetableWrapper}
+              onScroll={this.onScroll}
+              ref={this.timetableRef}
+            >
+              <Timetable
+                lessons={arrangedLessonsWithModifiableFlag}
+                isVerticalOrientation={isVerticalOrientation}
+                isScrolledHorizontally={this.state.isScrolledHorizontally}
+                showTitle={isShowingTitle}
+                onModifyCell={this.modifyCell}
               />
-            ) : (
-              <div
-                className={styles.timetableWrapper}
-                onScroll={this.onScroll}
-                ref={this.timetableRef}
-              >
-                <Timetable
-                  lessons={arrangedLessonsWithModifiableFlag}
-                  isVerticalOrientation={isVerticalOrientation}
-                  isScrolledHorizontally={this.state.isScrolledHorizontally}
-                  showTitle={isShowingTitle}
-                  onModifyCell={this.modifyCell}
-                />
-              </div>
-            )}
+            </div>
           </div>
           <div
             className={classnames({
