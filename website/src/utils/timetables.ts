@@ -39,6 +39,7 @@ import {
   ModuleLessonConfig,
   SemTimetableConfig,
   SemTimetableConfigWithLessons,
+  SemTimetableMultiConfig,
   TimetableArrangement,
   TimetableDayArrangement,
   TimetableDayFormat,
@@ -105,6 +106,49 @@ export function randomModuleLessonConfig(lessons: readonly RawLesson[]): ModuleL
       (first(sample(group)) as RawLesson).classNo,
   );
 }
+
+
+// Return matching lessons for given module ClassNo and LessonType
+export function lessonsFromClassNo(classNoArray: ClassNo[], lessonType: LessonType, module: Module, lessons: readonly RawLesson[]) {
+  const newLessons = lessons.filter(
+    (lesson: RawLesson): boolean =>
+      lesson.lessonType === lessonType && classNoArray.includes(lesson.classNo),
+  );
+
+  return newLessons.map(
+    (lesson: RawLesson): Lesson => ({
+      ...lesson,
+      moduleCode: module.moduleCode,
+      title: module.title,
+    }),
+  );
+}
+
+export function hydrateSemTimetableWithMultiLessons(
+  semTimetableConfig: SemTimetableConfig,
+  semTimetableMultiConfig: SemTimetableMultiConfig,
+  modules: ModulesMap,
+  semester: Semester,
+): SemTimetableConfigWithLessons {
+  return mapValues(
+    semTimetableConfig,
+    (moduleLessonConfig: ModuleLessonConfig, moduleCode: ModuleCode) => {
+      const module: Module = modules[moduleCode];
+      if (!module) return EMPTY_OBJECT;
+      const lessons = getModuleTimetable(module, semester);
+
+      return mapValues(moduleLessonConfig,
+        (classNo: ClassNo, lessonType: LessonType) => {
+          // Fetch from selectedLessons if module was selected, otherwise fetch from default timetable
+          const multiClassNo = semTimetableMultiConfig[moduleCode]?.[lessonType] || [];
+          const classNoArray = multiClassNo.length === 0 ? [classNo] : multiClassNo;
+          return lessonsFromClassNo(classNoArray, lessonType, module, lessons);
+        }
+      )
+    },
+  );
+}
+
 
 // Replaces ClassNo in SemTimetableConfig with Array<Lesson>
 export function hydrateSemTimetableWithLessons(
