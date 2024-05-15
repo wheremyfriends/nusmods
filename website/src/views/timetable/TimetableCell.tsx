@@ -112,7 +112,7 @@ const TimetableCell: React.FC<Props> = (props) => {
       hoverable: !!onClick,
       [styles.clickable]: !!onClick,
       [styles.available]: lesson.isAvailable,
-      [styles.active]: lesson.isActive,
+      [styles.active]: lesson.isActive && !lesson.isAvailable,
       // Local hover style for the timetable planner timetable,
       [styles.hover]: isHoveredOver,
       // Global hover style for module page timetable
