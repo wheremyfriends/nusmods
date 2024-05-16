@@ -12,7 +12,6 @@ import {
   SET_ONLINE_STATUS,
   TOGGLE_FEEDBACK_MODAL,
 } from 'actions/app';
-import { areLessonsSelected } from 'utils/modules';
 
 const defaultAppState = (): AppState => ({
   // Default to the current semester from config.
@@ -20,7 +19,6 @@ const defaultAppState = (): AppState => ({
   // The lesson being modified on the timetable.
   activeLesson: null,
   editingLesson: null,
-  selectedLessons: {},
   isOnline: navigator.onLine,
   isFeedbackModalOpen: false,
   promptRefresh: forceRefreshPrompt(),
@@ -30,64 +28,28 @@ const defaultAppState = (): AppState => ({
 // This reducer is for storing state pertaining to the UI.
 function app(state: AppState = defaultAppState(), action: Actions): AppState {
   switch (action.type) {
-    case SELECT_SEMESTER:
-      return {
-        ...state,
-        activeSemester: action.payload,
-      };
-    case TOGGLE_SELECT_LESSON:
-      {
-        const lesson = action.payload.lesson;
-        const moduleCode = lesson.moduleCode;
-        const lessonType = lesson.lessonType;
-        const classNo = lesson.classNo;
-
-        // Module might not yet exist in selectedLessons, use empty array
-        const oldLessonType = state.selectedLessons[moduleCode]?.[lessonType] || [];
-        // Select or deselect lesson by adding or removing it from array
-        const newLessonType = areLessonsSelected(action.payload.lesson, state.selectedLessons) ?
-          oldLessonType.filter(e => e !== classNo) :
-          [...oldLessonType, classNo];
-        // Prevent deselecting every lesson
-        if (newLessonType.length === 0) return state;
-        return {
-          ...state,
-          selectedLessons: {
-            ...state.selectedLessons,
-            [moduleCode]: {
-              ...state.selectedLessons[moduleCode],
-              [lessonType]: newLessonType
-            }
-          }
-        };
-      }
     case EDIT_LESSON:
       {
         const lesson = action.payload.lesson;
         const moduleCode = lesson.moduleCode;
         const lessonType = lesson.lessonType;
-        const classNo = lesson.classNo;
-        const oldLT = state.selectedLessons[moduleCode]?.[lessonType] || [];
-        const newLT = oldLT.length === 0 ? [classNo] : oldLT;
         return {
           ...state,
           editingLesson: {
             moduleCode: moduleCode,
             lessonType: lessonType,
           },
-          selectedLessons: {
-            ...state.selectedLessons,
-            [moduleCode]: {
-              ...state.selectedLessons[moduleCode],
-              [lessonType]: newLT,
-            }
-          }
         };
       }
     case CANCEL_EDIT_LESSON:
       return {
         ...state,
         editingLesson: null,
+      };
+    case SELECT_SEMESTER:
+      return {
+        ...state,
+        activeSemester: action.payload,
       };
     case MODIFY_LESSON:
       return {

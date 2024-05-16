@@ -14,6 +14,7 @@ import {
   SemTimetableConfigWithLessons,
   SemTimetableMultiConfig,
   TimetableArrangement,
+  TimetableMultiConfig,
 } from 'types/timetables';
 
 import {
@@ -30,7 +31,7 @@ import {
 } from 'actions/timetables';
 import {
   areLessonsSameClass,
-  areLessonsSelected,
+  isLessonSelected,
   formatExamDate,
   getExamDate,
   getModuleTimetable,
@@ -75,7 +76,7 @@ type OwnProps = {
 type Props = OwnProps & {
   // From Redux
   timetableWithLessons: SemTimetableConfigWithLessons;
-  selectedLessons: SemTimetableMultiConfig;
+  multiLessons: TimetableMultiConfig;
   modules: ModulesMap;
   activeLesson: Lesson | null;
   editingLesson: EditingLesson | null;
@@ -89,7 +90,7 @@ type Props = OwnProps & {
   resetTimetable: (semester: Semester) => void;
   modifyLesson: (lesson: Lesson) => void;
   editLesson: (lesson: Lesson) => void;
-  toggleSelectLesson: (semester:Semester, lesson: Lesson) => void;
+  toggleSelectLesson: (semester: Semester, lesson: Lesson) => void;
   changeLesson: (semester: Semester, lesson: Lesson) => void;
   cancelModifyLesson: () => void;
   cancelEditLesson: () => void;
@@ -293,7 +294,7 @@ class TimetableContent extends React.Component<Props, State> {
       colors,
       activeLesson,
       editingLesson,
-      selectedLessons,
+      multiLessons,
       timetableOrientation,
       showTitle,
       readOnly,
@@ -332,7 +333,7 @@ class TimetableContent extends React.Component<Props, State> {
         // Blink animation
         modifiableLesson.isActive = true;
         // Transparency
-        modifiableLesson.isAvailable = areLessonsSelected(modifiableLesson, selectedLessons) ? false : true;
+        modifiableLesson.isAvailable = isLessonSelected(modifiableLesson, multiLessons[semester]) ? false : true;
 
         timetableLessons.push(modifiableLesson);
       });
@@ -453,9 +454,9 @@ class TimetableContent extends React.Component<Props, State> {
 function mapStateToProps(state: StoreState, ownProps: OwnProps) {
   const { semester, timetable, readOnly } = ownProps;
   const { modules } = state.moduleBank;
-  const { selectedLessons } = state.app;
+  const { multiLessons } = state.timetables;
 
-  const timetableWithLessons = hydrateSemTimetableWithMultiLessons(timetable, selectedLessons, modules, semester);
+  const timetableWithLessons = hydrateSemTimetableWithMultiLessons(timetable, multiLessons[semester], modules, semester);
 
   // Determine the key to check for hidden modules based on readOnly status
   const hiddenModulesKey = readOnly ? HIDDEN_IMPORTED_SEM : semester;
@@ -468,7 +469,7 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
     modules,
     activeLesson: state.app.activeLesson,
     editingLesson: state.app.editingLesson,
-    selectedLessons: state.app.selectedLessons,
+    multiLessons: state.timetables.multiLessons,
     timetableOrientation: state.theme.timetableOrientation,
     showTitle: state.theme.showTitle,
     hiddenInTimetable,

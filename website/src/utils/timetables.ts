@@ -51,6 +51,7 @@ import { ExamClashes } from 'types/views';
 import { getTimeAsDate } from './timify';
 import { getModuleTimetable, getExamDate, getExamDuration } from './modules';
 import { deltas } from './array';
+import { resetTimetable } from 'actions/timetables';
 
 type lessonTypeAbbrev = { [lessonType: string]: string };
 export const LESSON_TYPE_ABBREV: lessonTypeAbbrev = {
@@ -139,8 +140,8 @@ export function hydrateSemTimetableWithMultiLessons(
 
       return mapValues(moduleLessonConfig,
         (classNo: ClassNo, lessonType: LessonType) => {
-          // Fetch from selectedLessons if module was selected, otherwise fetch from default timetable
-          const multiClassNo = semTimetableMultiConfig[moduleCode]?.[lessonType] || [];
+          // Fetch from semTimetableMultiConfig if module was selected, otherwise fetch from default timetable
+          const multiClassNo = semTimetableMultiConfig?.[moduleCode]?.[lessonType] || [];
           const classNoArray = multiClassNo.length === 0 ? [classNo] : multiClassNo;
           return lessonsFromClassNo(classNoArray, lessonType, module, lessons);
         }

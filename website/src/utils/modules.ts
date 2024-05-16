@@ -34,9 +34,9 @@ export function getModuleTimetable(module: Module, semester: Semester): readonly
   return _.get(getModuleSemesterData(module, semester), 'timetable', []);
 }
 
-// Is the lesson already selected and stored in selectedLessons?
-export function areLessonsSelected(lesson: Lesson, selectedLessons: SemTimetableMultiConfig): boolean {
-  return (selectedLessons[lesson.moduleCode]?.[lesson.lessonType] || []).includes(lesson.classNo);
+// Is the lesson already selected and stored?
+export function isLessonSelected(lesson: Lesson, semTimetableMultiConfig: SemTimetableMultiConfig): boolean {
+  return (semTimetableMultiConfig[lesson.moduleCode]?.[lesson.lessonType] || []).includes(lesson.classNo);
 }
 
 // Do these two lessons belong to the same class?

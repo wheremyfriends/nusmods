@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import { RegPeriodType, ScheduleType } from 'config';
 
 import { Mode } from './settings';
-import { ColorIndex, Lesson, EditingLesson, SemTimetableMultiConfig, TimetableConfig } from './timetables';
+import { ColorIndex, Lesson, EditingLesson, SemTimetableMultiConfig, TimetableConfig, TimetableMultiConfig } from './timetables';
 import {
   Faculty,
   Module,
@@ -52,7 +52,6 @@ export type AppState = {
   readonly activeSemester: Semester;
   readonly activeLesson: Lesson | null;
   readonly editingLesson: EditingLesson | null;
-  readonly selectedLessons: SemTimetableMultiConfig;
   readonly isOnline: boolean;
   readonly isFeedbackModalOpen: boolean;
   readonly notifications: NotificationData[];
@@ -116,6 +115,7 @@ export type SemesterColorMap = { [semester: string]: ColorMapping };
 export type HiddenModulesMap = { [semester: string]: ModuleCode[] };
 
 export type TimetablesState = {
+  readonly multiLessons: TimetableMultiConfig;
   readonly lessons: TimetableConfig;
   readonly colors: SemesterColorMap;
   readonly hidden: HiddenModulesMap;
