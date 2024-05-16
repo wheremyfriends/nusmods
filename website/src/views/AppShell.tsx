@@ -17,9 +17,7 @@ import {
   fetchTimetableModules as fetchTimetableModulesAction,
   validateTimetable,
 } from 'actions/timetables';
-import Footer from 'views/layout/Footer';
 import Navtabs from 'views/layout/Navtabs';
-import GlobalSearchContainer from 'views/layout/GlobalSearchContainer';
 import Notification from 'views/components/notfications/Notification';
 import ErrorBoundary from 'views/errors/ErrorBoundary';
 import ErrorPage from 'views/errors/ErrorPage';
@@ -140,9 +138,6 @@ const AppShell: FC = ({ children }) => {
         </NavLink>
 
         <div className={styles.navRight}>
-          <ErrorBoundary>
-            <GlobalSearchContainer />
-          </ErrorBoundary>
 
           <div className={styles.weekText}>{weekText}</div>
         </div>
@@ -168,10 +163,6 @@ const AppShell: FC = ({ children }) => {
 
       <ErrorBoundary>
         <Notification />
-      </ErrorBoundary>
-
-      <ErrorBoundary>
-        <Footer />
       </ErrorBoundary>
 
       <ErrorBoundary>

@@ -11,7 +11,6 @@ import elements from 'views/elements';
 import config from 'config';
 import ResetTimetable from './ResetTimetable';
 import ShareTimetable from './ShareTimetable';
-import ExportMenu from './ExportMenu';
 
 import styles from './TimetableActions.scss';
 
@@ -62,36 +61,9 @@ const TimetableActions: React.FC<Props> = (props) => (
         </button>
       )}
 
-      {config.examAvailabilitySet.has(props.semester) && (
-        <button
-          type="button"
-          className={classnames(
-            styles.calendarBtn,
-            elements.examCalendarBtn,
-            'btn-outline-primary btn btn-svg',
-          )}
-          onClick={props.toggleExamCalendar}
-        >
-          {props.showExamCalendar ? (
-            <>
-              <Grid className="svg svg-small" /> Timetable
-            </>
-          ) : (
-            <>
-              <Calendar className="svg svg-small" /> Exam Calendar
-            </>
-          )}
-        </button>
-      )}
     </div>
 
     <div className={styles.buttonGroup} role="group" aria-label="Timetable exporting">
-      <ExportMenu semester={props.semester} timetable={props.timetable} />
-      <ShareTimetable
-        semester={props.semester}
-        timetable={props.timetable}
-        hiddenModules={props.hiddenModules}
-      />
       <ResetTimetable resetTimetable={props.resetTimetable} />
     </div>
   </div>
