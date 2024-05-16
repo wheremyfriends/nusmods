@@ -229,7 +229,7 @@ function timetables(
             [semester]: {
               ...state.multiLessons[semester],
               [moduleCode]: {
-                ...state.multiLessons[moduleCode],
+                ...state.multiLessons[semester][moduleCode],
                 [lessonType]: newClassNoArray
               }
             }
