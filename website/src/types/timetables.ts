@@ -25,7 +25,7 @@ export type TimetableMultiConfig = {
   [semester: string]: SemTimetableMultiConfig;
 };
 
-export type EditingLesson = {
+export type EditingType = {
   readonly moduleCode: ModuleCode;
   readonly lessonType: LessonType;
 };

@@ -3,7 +3,7 @@ import { Actions } from 'types/actions';
 import config from 'config';
 
 import { forceRefreshPrompt } from 'utils/debug';
-import { MODIFY_LESSON, EDIT_LESSON, TOGGLE_SELECT_LESSON, CHANGE_LESSON, CANCEL_MODIFY_LESSON, CANCEL_EDIT_LESSON } from 'actions/timetables';
+import { MODIFY_LESSON, CHANGE_LESSON, CANCEL_MODIFY_LESSON } from 'actions/timetables';
 import { SELECT_SEMESTER } from 'actions/settings';
 import {
   OPEN_NOTIFICATION,
@@ -18,7 +18,6 @@ const defaultAppState = (): AppState => ({
   activeSemester: config.semester,
   // The lesson being modified on the timetable.
   activeLesson: null,
-  editingLesson: null,
   isOnline: navigator.onLine,
   isFeedbackModalOpen: false,
   promptRefresh: forceRefreshPrompt(),
@@ -28,24 +27,6 @@ const defaultAppState = (): AppState => ({
 // This reducer is for storing state pertaining to the UI.
 function app(state: AppState = defaultAppState(), action: Actions): AppState {
   switch (action.type) {
-    case EDIT_LESSON:
-      {
-        const lesson = action.payload.lesson;
-        const moduleCode = lesson.moduleCode;
-        const lessonType = lesson.lessonType;
-        return {
-          ...state,
-          editingLesson: {
-            moduleCode: moduleCode,
-            lessonType: lessonType,
-          },
-        };
-      }
-    case CANCEL_EDIT_LESSON:
-      return {
-        ...state,
-        editingLesson: null,
-      };
     case SELECT_SEMESTER:
       return {
         ...state,

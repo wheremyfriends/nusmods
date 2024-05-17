@@ -8,7 +8,7 @@ import { Module, ModuleCode, LessonType, Semester } from 'types/modules';
 import {
   ColoredLesson,
   Lesson,
-  EditingLesson,
+  EditingType,
   ModifiableLesson,
   SemTimetableConfig,
   SemTimetableConfigWithLessons,
@@ -20,11 +20,11 @@ import {
 import {
   addModule,
   cancelModifyLesson,
-  cancelEditLesson,
   changeLesson,
   HIDDEN_IMPORTED_SEM,
   modifyLesson,
   editLesson,
+  cancelEditLesson,
   toggleSelectLesson,
   removeModule,
   resetTimetable,
@@ -79,7 +79,7 @@ type Props = OwnProps & {
   multiLessons: TimetableMultiConfig;
   modules: ModulesMap;
   activeLesson: Lesson | null;
-  editingLesson: EditingLesson | null;
+  editingType: EditingType | null;
   timetableOrientation: TimetableOrientation;
   showTitle: boolean;
   hiddenInTimetable: ModuleCode[];
@@ -89,7 +89,7 @@ type Props = OwnProps & {
   removeModule: (semester: Semester, moduleCode: ModuleCode) => void;
   resetTimetable: (semester: Semester) => void;
   modifyLesson: (lesson: Lesson) => void;
-  editLesson: (lesson: Lesson) => void;
+  editLesson: (semester: Semester, lesson: Lesson) => void;
   toggleSelectLesson: (semester: Semester, lesson: Lesson) => void;
   changeLesson: (semester: Semester, lesson: Lesson) => void;
   cancelModifyLesson: () => void;
@@ -159,7 +159,7 @@ class TimetableContent extends React.Component<Props, State> {
   };
 
   cancelEditLesson = () => {
-    if (this.props.editingLesson) {
+    if (this.props.editingType) {
       this.props.cancelEditLesson();
 
       // resetScrollPosition();
@@ -183,7 +183,7 @@ class TimetableContent extends React.Component<Props, State> {
       this.props.toggleSelectLesson(this.props.semester, lesson);
     } else {
       // Enter edit mode for the module and lesson type
-      this.props.editLesson(lesson);
+      this.props.editLesson(this.props.semester, lesson);
 
       this.modifiedCell = {
         position,
@@ -293,7 +293,7 @@ class TimetableContent extends React.Component<Props, State> {
       modules,
       colors,
       activeLesson,
-      editingLesson,
+      editingType,
       multiLessons,
       timetableOrientation,
       showTitle,
@@ -307,16 +307,16 @@ class TimetableContent extends React.Component<Props, State> {
       ...this.props.timetableWithLessons,
     };
 
-    if (editingLesson)
+    if (editingType)
       // Remove duplicates
-      filteredTimetableWithLessons[editingLesson.moduleCode][editingLesson.lessonType].length = 0;
+      filteredTimetableWithLessons[editingType.moduleCode][editingType.lessonType].length = 0;
 
     let timetableLessons: Lesson[] = timetableLessonsArray(filteredTimetableWithLessons)
       // Do not process hidden modules
       .filter((lesson) => !this.isHiddenInTimetable(lesson.moduleCode));
 
-    if (editingLesson) {
-      const { moduleCode, lessonType } = editingLesson;
+    if (editingType) {
+      const { moduleCode, lessonType } = editingType;
       const module = modules[moduleCode];
       const moduleTimetable = getModuleTimetable(module, semester);
       lessonsForLessonType(moduleTimetable, lessonType).forEach((lesson) => {
@@ -468,7 +468,7 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
     timetableWithLessons,
     modules,
     activeLesson: state.app.activeLesson,
-    editingLesson: state.app.editingLesson,
+    editingType: state.timetables.editingType,
     multiLessons: state.timetables.multiLessons,
     timetableOrientation: state.theme.timetableOrientation,
     showTitle: state.theme.showTitle,

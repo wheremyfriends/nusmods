@@ -103,13 +103,15 @@ export function modifyLesson(activeLesson: Lesson) {
   };
 }
 
+
 // Enter edit mode to select and deselect lessons with the same moduleCode and lessonType
 export const EDIT_LESSON = 'EDIT_LESSON' as const;
-export function editLesson(lesson: Lesson) {
+export function editLesson(semester: Semester, lesson: Lesson) {
   return {
     type: EDIT_LESSON,
     payload: {
-      lesson
+      semester,
+      lesson,
     },
   };
 }

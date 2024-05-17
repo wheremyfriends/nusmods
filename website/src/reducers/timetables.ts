@@ -21,6 +21,8 @@ import {
   SET_TIMETABLE,
   SHOW_LESSON_IN_TIMETABLE,
   TOGGLE_SELECT_LESSON,
+  CANCEL_EDIT_LESSON,
+  EDIT_LESSON,
 } from 'actions/timetables';
 import { getNewColor } from 'utils/colors';
 import { SET_EXPORTED_DATA } from 'actions/constants';
@@ -191,6 +193,7 @@ function mergeSemTimetable(
 
 export const defaultTimetableState: TimetablesState = {
   multiLessons: {},
+  editingType: null,
   lessons: {},
   colors: {},
   hidden: {},
@@ -203,17 +206,42 @@ function timetables(
   action: Actions,
 ): TimetablesState {
   // All normal timetable actions should specify their semester
-  if (!action.payload) {
-    return state;
-  }
   switch (action.type) {
+    case EDIT_LESSON:
+      {
+        const { semester } = action.payload;
+        const { moduleCode, lessonType, classNo } = action.payload.lesson;
+
+        const multiLessons = mergeSemTimetable(state.lessons, state.multiLessons);
+        const oldClassNoArray = multiLessons[semester]?.[moduleCode]?.[lessonType] || [];
+        const newClassNoArray = oldClassNoArray.length === 0 ? [classNo] : oldClassNoArray;
+        return {
+          ...state,
+          editingType: {
+            moduleCode: moduleCode,
+            lessonType: lessonType,
+          },
+          multiLessons: {
+            ...multiLessons,
+            [semester]: {
+              ...multiLessons[semester],
+              [moduleCode]: {
+                ...multiLessons[semester][moduleCode],
+                [lessonType]: newClassNoArray
+              }
+            }
+          }
+        };
+      }
+    case CANCEL_EDIT_LESSON:
+      return {
+        ...state,
+        editingType: null,
+      }
     case TOGGLE_SELECT_LESSON:
       {
-        const lesson = action.payload.lesson;
-        const semester = action.payload.semester;
-        const moduleCode = lesson.moduleCode;
-        const lessonType = lesson.lessonType;
-        const classNo = lesson.classNo;
+        const { semester } = action.payload;
+        const { moduleCode, lessonType, classNo } = action.payload.lesson;
 
         // Select or deselect lesson by adding or removing it from array
         const oldClassNoArray = state.multiLessons[semester]?.[moduleCode]?.[lessonType] || [];
