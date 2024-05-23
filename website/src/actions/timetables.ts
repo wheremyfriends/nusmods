@@ -14,6 +14,8 @@ import {
   validateTimetableModules,
 } from 'utils/timetables';
 import { getModuleTimetable } from 'utils/modules';
+import { apolloClient } from 'views/timetable/TimetableContent';
+import { gql } from '@apollo/client';
 
 // Actions that should not be used directly outside of thunks
 export const SET_TIMETABLE = 'SET_TIMETABLE' as const;
@@ -44,6 +46,53 @@ export const Internal = {
     };
   },
 };
+
+const CREATE_LESSON = gql`
+  mutation CreateLesson($roomID: String!, $name: String!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
+    createLesson(roomID: $roomID, name: $name, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
+  }
+`;
+
+// Realtime implementation which will mutate to GraphQL instead of modifying local timetable
+export function addModuleRT(semester: Semester, moduleCode: ModuleCode) {
+  return (dispatch: Dispatch, getState: GetState) =>
+    dispatch(fetchModule(moduleCode)).then(() => {
+      const module: Module = getState().moduleBank.modules[moduleCode];
+      if (!module) {
+        dispatch(
+          openNotification(`Cannot load ${moduleCode}`, {
+            action: {
+              text: 'Retry',
+              handler: () => {
+                dispatch(addModuleRT(semester, moduleCode));
+              },
+            },
+          }),
+        );
+
+        return;
+      }
+
+      const lessons = getModuleTimetable(module, semester);
+      const moduleLessonConfig = randomModuleLessonConfig(lessons);
+
+      for (const [lessonType, classNo] of Object.entries(moduleLessonConfig)) {
+        apolloClient
+          .mutate({
+            mutation: CREATE_LESSON,
+            variables: {
+              roomID: "room1", // TODO: Use variable roomID and name
+              name: "ks",
+              moduleCode: moduleCode,
+              lessonType: lessonType,
+              classNo: classNo
+            }
+          })
+          // .then((result) => console.log(result));
+      }
+    });
+}
+
 
 export function addModule(semester: Semester, moduleCode: ModuleCode) {
   return (dispatch: Dispatch, getState: GetState) =>
@@ -83,6 +132,17 @@ export function removeModule(semester: Semester, moduleCode: ModuleCode) {
   };
 }
 
+export const RESET_SELECTIONS = 'RESET_SELECTIONS' as const;
+export function resetInternalSelections(semester: Semester) {
+  return {
+    type: RESET_SELECTIONS,
+    payload: {
+      semester,
+    },
+  };
+}
+
+
 export const RESET_TIMETABLE = 'RESET_TIMETABLE' as const;
 export function resetTimetable(semester: Semester) {
   return {
@@ -116,6 +176,32 @@ export function editLesson(semester: Semester, lesson: Lesson) {
   };
 }
 
+export const ADD_SELECTED_MODULE = 'ADD_SELECTED_MODULE' as const;
+export function selectLesson(semester: Semester, moduleCode: ModuleCode, lessonType: LessonType, classNo: ClassNo) {
+  return {
+    type: ADD_SELECTED_MODULE,
+    payload: {
+      semester,
+      moduleCode,
+      lessonType,
+      classNo,
+    },
+  };
+}
+
+export const REMOVE_SELECTED_MODULE = 'REMOVE_SELECTED_MODULE' as const;
+export function deselectLesson(semester: Semester, moduleCode: ModuleCode, lessonType: LessonType, classNo: ClassNo) {
+  return {
+    type: REMOVE_SELECTED_MODULE,
+    payload: {
+      semester,
+      moduleCode,
+      lessonType,
+      classNo,
+    },
+  };
+}
+
 export const CANCEL_EDIT_LESSON = 'CANCEL_EDIT_LESSON' as const;
 export function cancelEditLesson() {
   return {
@@ -125,16 +211,16 @@ export function cancelEditLesson() {
 }
 
 // Select or deselect lessons when in edit mode
-export const TOGGLE_SELECT_LESSON = 'TOGGLE_SELECT_LESSON' as const;
-export function toggleSelectLesson(semester: Semester, lesson: Lesson) {
-  return {
-    type: TOGGLE_SELECT_LESSON,
-    payload: {
-      semester,
-      lesson,
-    }
-  };
-}
+// export const TOGGLE_SELECT_LESSON = 'TOGGLE_SELECT_LESSON' as const;
+// export function toggleSelectLesson(semester: Semester, lesson: Lesson) {
+//   return {
+//     type: TOGGLE_SELECT_LESSON,
+//     payload: {
+//       semester,
+//       lesson,
+//     }
+//   };
+// }
 
 export const CHANGE_LESSON = 'CHANGE_LESSON' as const;
 export function setLesson(

@@ -86,3 +86,11 @@ export type HoverLesson = {
 };
 
 export type ColorIndex = number;
+
+export type LessonChange = {
+  readonly action: String;
+  readonly classNo: ClassNo;
+  readonly lessonType: LessonType;
+  readonly moduleCode: ModuleCode;
+  readonly name: String;
+}

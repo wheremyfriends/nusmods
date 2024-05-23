@@ -37,3 +37,7 @@ export const REDO = 'REDO' as const;
 /** export constant(s) * */
 
 export const SET_EXPORTED_DATA = 'SET_EXPORTED_DATA' as const;
+
+export const CREATE = 'CREATE' as const; 
+export const UPDATE = 'UPDATE' as const; 
+export const DELETE = 'DELETE' as const; 
