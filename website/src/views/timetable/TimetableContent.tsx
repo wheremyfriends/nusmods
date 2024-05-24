@@ -92,9 +92,9 @@ export const DELETE_LESSON = gql`
   }
   `;
 
-export const DELETE_LESSONS = gql`
-  mutation DeleteLessons($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!) {
-    deleteLessons(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode)
+export const DELETE_MODULE = gql`
+  mutation DeleteModule($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!) {
+    deleteModule(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode)
   }
   `;
 
@@ -383,7 +383,7 @@ class TimetableContent extends React.Component<Props, State> {
   removeModuleRT = (moduleCode: ModuleCode) => {
     apolloClient
       .mutate({
-        mutation: DELETE_LESSONS,
+        mutation: DELETE_MODULE,
         variables: {
           roomID: "room1", // TODO: Use variable roomID and name
           name: "ks",
