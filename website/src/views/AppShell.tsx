@@ -101,24 +101,24 @@ function useFetchModuleListAndTimetableModules(): {
 }
 
 const AppShell: FC = ({ children }) => {
-  const { moduleListError, refetchModuleListAndTimetableModules } =
-    useFetchModuleListAndTimetableModules();
+  // const { moduleListError, refetchModuleListAndTimetableModules } =
+  //   useFetchModuleListAndTimetableModules();
 
   // Enable Matomo analytics
-  const history = useHistory();
-  useEffect(() => trackPageView(history), [history]);
+  // const history = useHistory();
+  // useEffect(() => trackPageView(history), [history]);
 
-  const moduleList = useSelector((state: State) => state.moduleBank.moduleList);
-  const isModuleListReady = moduleList.length;
+  // const moduleList = useSelector((state: State) => state.moduleBank.moduleList);
+  // const isModuleListReady = moduleList.length;
 
   const mode = useSelector((state: State) => state.settings.mode);
   const isDarkMode = mode === DARK_MODE;
 
   const theme = useSelector((state: State) => state.theme.id);
 
-  if (!isModuleListReady && moduleListError) {
-    return <ApiError dataName="course information" retry={refetchModuleListAndTimetableModules} />;
-  }
+  // if (!isModuleListReady && moduleListError) {
+  //   return <ApiError dataName="course information" retry={refetchModuleListAndTimetableModules} />;
+  // }
 
   return (
     <div className="app-container">
@@ -147,13 +147,9 @@ const AppShell: FC = ({ children }) => {
         <Navtabs />
 
         <main className="main-content">
-          {isModuleListReady ? (
-            <ErrorBoundary errorPage={() => <ErrorPage showReportDialog />}>
-              {children}
-            </ErrorBoundary>
-          ) : (
-            <LoadingSpinner />
-          )}
+          <ErrorBoundary errorPage={() => <ErrorPage showReportDialog />}>
+            {children}
+          </ErrorBoundary>
         </main>
       </div>
 

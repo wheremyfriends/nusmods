@@ -321,12 +321,6 @@ class TimetableContent extends React.Component<Props, State> {
     }
   };
 
-  isModuleInTimetable = (
-    moduleCode: ModuleCode,
-    timetable: SemTimetableConfig,
-  ): boolean => {
-    return !!get(timetable, moduleCode);
-  }
 
   handleLessonChange = (lessonChange: LessonChange) => {
     // TODO: Include semester param
@@ -337,10 +331,11 @@ class TimetableContent extends React.Component<Props, State> {
     if (semester != activeSemester)
       return;
 
-    console.log(lessonChange)
     switch (action) {
       case Action.CREATE_LESSON: {
-        if (!this.isModuleInTimetable(moduleCode, this.props.timetable)) {
+        // Presence of moduleCode should guarantee module is being/already added
+        // Prevents multiple adding
+        if (_.isEmpty(this.props.multiLessons[semester]?.[moduleCode])) {
           this.addModule(semester, moduleCode);
         }
 
