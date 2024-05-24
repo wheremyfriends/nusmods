@@ -74,16 +74,21 @@ import { openNotification } from 'actions/app';
 import { fetchModule } from 'actions/moduleBank';
 import type { Dispatch, GetState } from 'types/redux';
 
-
-const CREATE_LESSON = gql`
-  mutation CreateLesson($roomID: String!, $name: String!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
-    createLesson(roomID: $roomID, name: $name, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
+export const CREATE_USER = gql`
+  mutation CreateUser($roomID: String!, $name: String!) {
+    createUser(roomID: $roomID, name: $name)
   }
-  `;
+`;
 
-const DELETE_LESSON = gql`
-  mutation DeleteLesson($roomID: String!, $name: String!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
-    deleteLesson(roomID: $roomID, name: $name, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
+export const CREATE_LESSON = gql`
+  mutation CreateLesson($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
+    createLesson(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
+  }
+`;
+
+export const DELETE_LESSON = gql`
+  mutation DeleteLesson($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
+    deleteLesson(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
   }
   `;
 
@@ -97,6 +102,16 @@ export const apolloClient = new ApolloClient({
   link: wsLink,
   cache: new InMemoryCache(),
 });
+
+// apolloClient
+//   .mutate({
+//     mutation: CREATE_USER,
+//     variables: {
+//       roomID: "room1", // TODO: Use variable roomID and name
+//       name: "ks",
+//     }
+//   })
+// // .then((result) => console.log(result));
 
 type ModifiedCell = {
   className: string;
@@ -127,7 +142,6 @@ type Props = OwnProps & {
   addModule: (semester: Semester, moduleCode: ModuleCode) => void;
   addModuleRT: (semester: Semester, moduleCode: ModuleCode) => void;
   removeModule: (semester: Semester, moduleCode: ModuleCode) => void;
-  // removeModuleRT: (semester: Semester, moduleCode: ModuleCode) => void;
   resetTimetable: (semester: Semester) => void;
   resetInternalSelections: (semester: Semester) => void;
   modifyLesson: (lesson: Lesson) => void;
@@ -191,6 +205,7 @@ class TimetableContent extends React.Component<Props, State> {
     lessonChange(roomID: $roomID) {
       action
       name
+      semester
       moduleCode
       lessonType
       classNo
@@ -207,7 +222,7 @@ class TimetableContent extends React.Component<Props, State> {
           self.handleLessonChange(data.data.lessonChange);
         }
       }, error(error) {
-        console.log("ERROR", error);
+        console.log("Apollo subscribe error", error);
       },
       complete() {
       },
@@ -281,6 +296,7 @@ class TimetableContent extends React.Component<Props, State> {
             variables: {
               roomID: "room1", // TODO: Use variable roomID and name
               name: "ks",
+              semester: semester,
               moduleCode: moduleCode,
               lessonType: lessonType,
               classNo: classNo
@@ -309,8 +325,11 @@ class TimetableContent extends React.Component<Props, State> {
   handleLessonChange = (lessonChange: LessonChange) => {
     // TODO: Include semester param
     // TODO: Check if request is intended for correct user via name
-    const { action, classNo, lessonType, moduleCode, name } = lessonChange;
-    const semester = this.props.semester;
+    const { action, name, semester, moduleCode, lessonType, classNo } = lessonChange;
+    const activeSemester = this.props.semester;
+
+    if (semester != activeSemester)
+      return;
 
     switch (action) {
       case CREATE: {
@@ -345,7 +364,7 @@ class TimetableContent extends React.Component<Props, State> {
     this.props.addModuleRT(semester, moduleCode);
   };
 
-  // Called from dropdown
+  // Old functionality, still used for adding to module table
   addModule = (semester: Semester, moduleCode: ModuleCode) => {
     this.props.addModule(semester, moduleCode);
     this.resetTombstone();
@@ -353,7 +372,6 @@ class TimetableContent extends React.Component<Props, State> {
 
   removeModuleRT = (moduleCodeToRemove: ModuleCode) => {
     // TODO: Implement GraphQL remove entire module and UNDO
-    this.removeModule(moduleCodeToRemove);
   }
 
   removeModule = (moduleCodeToRemove: ModuleCode) => {

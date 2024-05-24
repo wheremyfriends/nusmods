@@ -14,7 +14,7 @@ import {
   validateTimetableModules,
 } from 'utils/timetables';
 import { getModuleTimetable } from 'utils/modules';
-import { apolloClient } from 'views/timetable/TimetableContent';
+import { CREATE_LESSON, apolloClient } from 'views/timetable/TimetableContent';
 import { gql } from '@apollo/client';
 
 // Actions that should not be used directly outside of thunks
@@ -47,11 +47,6 @@ export const Internal = {
   },
 };
 
-const CREATE_LESSON = gql`
-  mutation CreateLesson($roomID: String!, $name: String!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
-    createLesson(roomID: $roomID, name: $name, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
-  }
-`;
 
 // Realtime implementation which will mutate to GraphQL instead of modifying local timetable
 export function addModuleRT(semester: Semester, moduleCode: ModuleCode) {
@@ -83,12 +78,13 @@ export function addModuleRT(semester: Semester, moduleCode: ModuleCode) {
             variables: {
               roomID: "room1", // TODO: Use variable roomID and name
               name: "ks",
+              semester: semester,
               moduleCode: moduleCode,
               lessonType: lessonType,
               classNo: classNo
             }
           })
-          // .then((result) => console.log(result));
+        // .then((result) => console.log(result));
       }
     });
 }

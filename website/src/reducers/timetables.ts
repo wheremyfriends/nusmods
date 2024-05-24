@@ -250,11 +250,6 @@ export const defaultTimetableState: TimetablesState = {
 };
 
 
-const CREATE_USER = gql`
-  mutation CreateUser($roomID: String!, $name: String!) {
-    createUser(roomID: $roomID, name: $name)
-  }
-`;
 
 
 function isModuleInTimetable(
