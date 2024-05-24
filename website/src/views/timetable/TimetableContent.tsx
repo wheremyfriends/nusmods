@@ -69,10 +69,10 @@ import { ApolloClient, InMemoryCache, ApolloProvider, gql, FetchResult } from '@
 
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
-import { CREATE, UPDATE, DELETE } from 'actions/constants';
 import { openNotification } from 'actions/app';
 import { fetchModule } from 'actions/moduleBank';
 import type { Dispatch, GetState } from 'types/redux';
+import { Action } from 'actions/constants';
 
 export const CREATE_USER = gql`
   mutation CreateUser($roomID: String!, $name: String!) {
@@ -89,6 +89,12 @@ export const CREATE_LESSON = gql`
 export const DELETE_LESSON = gql`
   mutation DeleteLesson($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
     deleteLesson(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
+  }
+  `;
+
+export const DELETE_LESSONS = gql`
+  mutation DeleteLessons($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!) {
+    deleteLessons(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode)
   }
   `;
 
@@ -331,8 +337,9 @@ class TimetableContent extends React.Component<Props, State> {
     if (semester != activeSemester)
       return;
 
+    console.log(lessonChange)
     switch (action) {
-      case CREATE: {
+      case Action.CREATE_LESSON: {
         if (!this.isModuleInTimetable(moduleCode, this.props.timetable)) {
           this.addModule(semester, moduleCode);
         }
@@ -341,12 +348,15 @@ class TimetableContent extends React.Component<Props, State> {
         return;
       }
 
-      case DELETE: {
+      case Action.DELETE_LESSON: {
         this.deselectLesson(semester, moduleCode, lessonType, classNo);
         return;
 
       }
-      case UPDATE:
+      case Action.DELETE_MODULE: {
+        this.removeModuleLocal(moduleCode);
+        return;
+      }
       default:
         return;
     }
@@ -370,21 +380,38 @@ class TimetableContent extends React.Component<Props, State> {
     this.resetTombstone();
   };
 
-  removeModuleRT = (moduleCodeToRemove: ModuleCode) => {
+  removeModuleRT = (moduleCode: ModuleCode) => {
+    apolloClient
+      .mutate({
+        mutation: DELETE_LESSONS,
+        variables: {
+          roomID: "room1", // TODO: Use variable roomID and name
+          name: "ks",
+          semester: this.props.semester,
+          moduleCode: moduleCode,
+        }
+      })
+    // .then((result) => console.log(result));
+  }
+
+  removeModuleLocal = (moduleCode: ModuleCode) => {
     // TODO: Implement GraphQL remove entire module and UNDO
+    this.removeModule(moduleCode);
   }
 
   removeModule = (moduleCodeToRemove: ModuleCode) => {
     // Save the index of the module before removal so the tombstone can be inserted into
     // the correct position
-    const index = this.addedModules().findIndex(
-      ({ moduleCode }) => moduleCode === moduleCodeToRemove,
-    );
+    // const index = this.addedModules().findIndex(
+    //   ({ moduleCode }) => moduleCode === moduleCodeToRemove,
+    // );
     this.props.removeModule(this.props.semester, moduleCodeToRemove);
-    const moduleWithColor = this.toModuleWithColor(this.addedModules()[index]);
+    
+    // Does not work with RT as addedModules uses this.props.timetableWithLessons which has been merged with RT lessons
+    // const moduleWithColor = this.toModuleWithColor(this.addedModules()[index]);
 
     // A tombstone is displayed in place of a deleted module
-    this.setState({ tombstone: { ...moduleWithColor, index } });
+    // this.setState({ tombstone: { ...moduleWithColor, index } });
   };
 
   resetInternalSelections = () => {

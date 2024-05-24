@@ -416,7 +416,11 @@ function timetables(
         if (!isModuleInTimetable(action.payload.moduleCode, state.lessons, action.payload.semester))
           return state;
         else
-          return produceTimetableState(action.payload.semester, state, action);
+        {
+          const newState = produceTimetableState(action.payload.semester, state, action);
+          newState.multiLessons[action.payload.semester][action.payload.moduleCode] = {};
+          return newState;
+        }
       }
     case SELECT_MODULE_COLOR:
     case CHANGE_LESSON:

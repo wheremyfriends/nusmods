@@ -55,7 +55,7 @@ class ModulesSelectContainer extends Component<Props> {
               isOnline ? 'Add course to timetable' : 'You need to be online to add courses'
             }
             disabled={!isOnline}
-            onRemoveModule={this.props.removeModule}
+            onRemoveModule={()=>{}} // TODO: Need to call removeModuleRT
           />
         )}
       </Online>
