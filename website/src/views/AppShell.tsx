@@ -81,15 +81,15 @@ function useFetchModuleListAndTimetableModules(): {
 
     // Fetch the module data of the existing modules in the timetable and ensure all
     // lessons are filled
-    const timetables = store.getState().timetables.lessons;
-    each(timetables, (timetable, semesterString) => {
-      const semester = Number(semesterString);
-      moduleListPromise.then(() => {
-        // Wait for module list to be fetched before trying to fetch timetable modules
-        // TODO: There may be a more optimal way to do this
-        fetchTimetableModules(timetable, semester);
-      });
-    });
+    // const timetables = store.getState().timetables.lessons;
+    // each(timetables, (timetable, semesterString) => {
+    //   const semester = Number(semesterString);
+    //   moduleListPromise.then(() => {
+    //     // Wait for module list to be fetched before trying to fetch timetable modules
+    //     // TODO: There may be a more optimal way to do this
+    //     fetchTimetableModules(timetable, semester);
+    //   });
+    // });
   }, [fetchModuleList, fetchTimetableModules, store]);
 
   useEffect(() => fetchModuleListAndTimetableModules(), [fetchModuleListAndTimetableModules]);

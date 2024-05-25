@@ -37,3 +37,12 @@ export const REDO = 'REDO' as const;
 /** export constant(s) * */
 
 export const SET_EXPORTED_DATA = 'SET_EXPORTED_DATA' as const;
+
+export enum Action {
+  CREATE_LESSON = "CREATE_LESSON",
+  DELETE_LESSON = "DELETE_LESSON",
+  DELETE_MODULE = "DELETE_MODULE",
+  CREATE_USER = "CREATE_USER",
+  UPDATE_USER = "UPDATE_USER",
+  DELETE_USER = "DELETE_USER",
+}

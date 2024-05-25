@@ -1,10 +1,10 @@
 import * as React from 'react';
 import classnames from 'classnames';
-import { connect } from 'react-redux';
-import _ from 'lodash';
+import { connect, useDispatch } from 'react-redux';
+import _, { get } from 'lodash';
 
-import { ColorMapping, HORIZONTAL, ModulesMap, TimetableOrientation } from 'types/reducers';
-import { Module, ModuleCode, LessonType, Semester } from 'types/modules';
+import { ColorMapping, HORIZONTAL, ModulesMap, TimetableOrientation, NotificationOptions } from 'types/reducers';
+import { Module, ModuleCode, LessonType, Semester, ClassNo } from 'types/modules';
 import {
   ColoredLesson,
   Lesson,
@@ -15,19 +15,19 @@ import {
   SemTimetableMultiConfig,
   TimetableArrangement,
   TimetableMultiConfig,
+  LessonChange,
 } from 'types/timetables';
 
 import {
-  addModule,
   cancelModifyLesson,
   changeLesson,
   HIDDEN_IMPORTED_SEM,
   modifyLesson,
   editLesson,
   cancelEditLesson,
-  toggleSelectLesson,
-  removeModule,
+  // toggleSelectLesson,
   resetTimetable,
+  addModuleRT,
 } from 'actions/timetables';
 import {
   areLessonsSameClass,
@@ -45,6 +45,7 @@ import {
   hydrateSemTimetableWithLessons,
   hydrateSemTimetableWithMultiLessons,
   lessonsForLessonType,
+  randomModuleLessonConfig,
   timetableLessonsArray,
 } from 'utils/timetables';
 import { resetScrollPosition } from 'utils/react';
@@ -59,6 +60,50 @@ import TimetableModulesTable from './TimetableModulesTable';
 import ModulesTableFooter from './ModulesTableFooter';
 import styles from './TimetableContent.scss';
 
+import { ApolloClient, InMemoryCache, ApolloProvider, gql, FetchResult } from '@apollo/client';
+
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+import { createClient } from 'graphql-ws';
+import { openNotification } from 'actions/app';
+import { fetchModule } from 'actions/moduleBank';
+import type { Dispatch, GetState } from 'types/redux';
+import { Action } from 'actions/constants';
+
+export const CREATE_USER = gql`
+  mutation CreateUser($roomID: String!, $name: String!) {
+    createUser(roomID: $roomID, name: $name)
+  }
+`;
+
+export const CREATE_LESSON = gql`
+  mutation CreateLesson($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
+    createLesson(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
+  }
+`;
+
+export const DELETE_LESSON = gql`
+  mutation DeleteLesson($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
+    deleteLesson(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
+  }
+  `;
+
+export const DELETE_MODULE = gql`
+  mutation DeleteModule($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!) {
+    deleteModule(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode)
+  }
+  `;
+
+// TODO: Proper URL variable
+const wsLink = new GraphQLWsLink(createClient({
+  url: 'ws://localhost:4000/graphql',
+}));
+
+export const apolloClient = new ApolloClient({
+  uri: 'http://localhost:4000/graphql/',
+  link: wsLink,
+  cache: new InMemoryCache(),
+});
+
 type ModifiedCell = {
   className: string;
   position: ClientRect;
@@ -71,6 +116,7 @@ type OwnProps = {
   semester: Semester;
   timetable: SemTimetableConfig;
   colors: ColorMapping;
+  roomID: String;
 };
 
 type Props = OwnProps & {
@@ -85,15 +131,15 @@ type Props = OwnProps & {
   hiddenInTimetable: ModuleCode[];
 
   // Actions
-  addModule: (semester: Semester, moduleCode: ModuleCode) => void;
-  removeModule: (semester: Semester, moduleCode: ModuleCode) => void;
+  addModuleRT: (semester: Semester, moduleCode: ModuleCode, roomID: String) => void;
   resetTimetable: (semester: Semester) => void;
   modifyLesson: (lesson: Lesson) => void;
   editLesson: (semester: Semester, lesson: Lesson) => void;
-  toggleSelectLesson: (semester: Semester, lesson: Lesson) => void;
+  // toggleSelectLesson: (semester: Semester, lesson: Lesson) => void;
   changeLesson: (semester: Semester, lesson: Lesson) => void;
   cancelModifyLesson: () => void;
   cancelEditLesson: () => void;
+  openNotification: (message: string, options: NotificationOptions) => void;
 };
 
 type State = {
@@ -101,6 +147,7 @@ type State = {
   showExamCalendar: boolean;
   tombstone: TombstoneModule | null;
 };
+
 
 /**
  * When a module is modified, we want to ensure the selected timetable cell
@@ -125,6 +172,7 @@ function maintainScrollPosition(container: HTMLElement, modifiedCell: ModifiedCe
   window.scroll(0, y);
   container.scrollLeft = x; // eslint-disable-line no-param-reassign
 }
+
 
 class TimetableContent extends React.Component<Props, State> {
   override state: State = {
@@ -180,7 +228,34 @@ class TimetableContent extends React.Component<Props, State> {
   modifyCell = (lesson: ModifiableLesson, position: ClientRect) => {
 
     if (lesson.isActive) {
-      this.props.toggleSelectLesson(this.props.semester, lesson);
+      // this.props.toggleSelectLesson(this.props.semester, lesson);
+      const { semester, roomID } = this.props;
+      const { moduleCode, lessonType, classNo } = lesson;
+
+      // Prevent deselecting all lessons
+      if (!lesson.isAvailable && (this.props.multiLessons[semester]?.[moduleCode]?.[lessonType] || [])
+        .filter(e => e !== classNo).length === 0) {
+        this.props.openNotification(`Must select at least one ${lessonType} for ${moduleCode}`,
+          {
+            timeout: 12000,
+            overwritable: true,
+          });
+      } else {
+        const MUTATION = lesson.isAvailable ? CREATE_LESSON : DELETE_LESSON;
+        apolloClient
+          .mutate({
+            mutation: MUTATION,
+            variables: {
+              roomID: roomID, // TODO: Use variable roomID and name
+              name: "ks",
+              semester: semester,
+              moduleCode: moduleCode,
+              lessonType: lessonType,
+              classNo: classNo
+            }
+          })
+        // .then((result) => console.log(result));
+      }
     } else {
       // Enter edit mode for the module and lesson type
       this.props.editLesson(this.props.semester, lesson);
@@ -192,23 +267,25 @@ class TimetableContent extends React.Component<Props, State> {
     }
   };
 
-  addModule = (semester: Semester, moduleCode: ModuleCode) => {
-    this.props.addModule(semester, moduleCode);
-    this.resetTombstone();
+
+  addModuleRT = (semester: Semester, moduleCode: ModuleCode) => {
+    this.props.addModuleRT(semester, moduleCode, this.props.roomID);
   };
 
-  removeModule = (moduleCodeToRemove: ModuleCode) => {
-    // Save the index of the module before removal so the tombstone can be inserted into
-    // the correct position
-    const index = this.addedModules().findIndex(
-      ({ moduleCode }) => moduleCode === moduleCodeToRemove,
-    );
-    this.props.removeModule(this.props.semester, moduleCodeToRemove);
-    const moduleWithColor = this.toModuleWithColor(this.addedModules()[index]);
+  // Centralized function to send deleteModule mutation
+  removeModuleRT = (moduleCode: ModuleCode) => {
+    apolloClient
+      .mutate({
+        mutation: DELETE_MODULE,
+        variables: {
+          roomID: this.props.roomID, // TODO: Use variable roomID and name
+          name: "ks",
+          semester: this.props.semester,
+          moduleCode: moduleCode,
+        }
+      });
+  }
 
-    // A tombstone is displayed in place of a deleted module
-    this.setState({ tombstone: { ...moduleWithColor, index } });
-  };
 
   resetTimetable = () => {
     this.props.resetTimetable(this.props.semester);
@@ -237,7 +314,7 @@ class TimetableContent extends React.Component<Props, State> {
       modules={modules.map(this.toModuleWithColor)}
       horizontalOrientation={horizontalOrientation}
       semester={this.props.semester}
-      onRemoveModule={this.removeModule}
+      onRemoveModule={this.removeModuleRT}
       readOnly={this.props.readOnly}
       tombstone={tombstone}
       resetTombstone={this.resetTombstone}
@@ -315,6 +392,7 @@ class TimetableContent extends React.Component<Props, State> {
       // Do not process hidden modules
       .filter((lesson) => !this.isHiddenInTimetable(lesson.moduleCode));
 
+    // TODO: Set editingType to null when abruptly exiting from edit mode
     if (editingType) {
       const { moduleCode, lessonType } = editingType;
       const module = modules[moduleCode];
@@ -427,8 +505,8 @@ class TimetableContent extends React.Component<Props, State> {
                   <ModulesSelectContainer
                     semester={semester}
                     timetable={this.props.timetable}
-                    addModule={this.addModule}
-                    removeModule={this.removeModule}
+                    addModule={this.addModuleRT}
+                    removeModuleRT={this.removeModuleRT}
                   />
                 )}
               </div>
@@ -452,7 +530,7 @@ class TimetableContent extends React.Component<Props, State> {
 }
 
 function mapStateToProps(state: StoreState, ownProps: OwnProps) {
-  const { semester, timetable, readOnly } = ownProps;
+  const { semester, timetable, readOnly, roomID } = ownProps;
   const { modules } = state.moduleBank;
   const { multiLessons } = state.timetables;
 
@@ -467,6 +545,7 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
     timetable,
     timetableWithLessons,
     modules,
+    roomID,
     activeLesson: state.app.activeLesson,
     editingType: state.timetables.editingType,
     multiLessons: state.timetables.multiLessons,
@@ -477,13 +556,13 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
 }
 
 export default connect(mapStateToProps, {
-  addModule,
-  removeModule,
+  addModuleRT,
   resetTimetable,
   modifyLesson,
   editLesson,
-  toggleSelectLesson,
+  // toggleSelectLesson,
   changeLesson,
   cancelModifyLesson,
   cancelEditLesson,
+  openNotification
 })(TimetableContent);

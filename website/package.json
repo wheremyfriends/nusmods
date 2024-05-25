@@ -124,6 +124,7 @@
     "webpack-merge": "5.9.0"
   },
   "dependencies": {
+    "@apollo/client": "^3.10.4",
     "@authenio/samlify-node-xmllint": "2.0.0",
     "@material/fab": "0.40.1",
     "@material/snackbar": "0.40.1",
@@ -140,6 +141,8 @@
     "core-js": "3.32.1",
     "date-fns": "2.30.0",
     "downshift": "6.1.12",
+    "graphql": "^16.8.1",
+    "graphql-ws": "^5.16.0",
     "ical-generator": "https://github.com/nusmodifications/ical-generator.git#a2aa62ed",
     "immer": "8.0.4",
     "json2mq": "0.2.0",

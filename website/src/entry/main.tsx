@@ -40,3 +40,5 @@ if (
 if (NUSMODS_ENV === 'production') {
   initializeMamoto();
 }
+
+export default store;

@@ -8,7 +8,7 @@ import NotFoundPage from 'views/errors/NotFoundPage';
 const Routes: React.FC = () => (
   <Switch>
     <Redirect exact from="/" to="/timetable" />
-    <Route path="/timetable/:semester?/:action?" component={TimetableContainer} />
+    <Route path="/timetable/:semester?/:roomID?" component={TimetableContainer} />
 
     {/* 404 page */}
     <Route component={NotFoundPage} />

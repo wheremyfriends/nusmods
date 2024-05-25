@@ -16,6 +16,14 @@ each(config.shortSemesterNames, (name, semester) => {
   toSemester[path] = Number(semester);
 });
 
+export function generateRoomID() {
+  return "room1"; // TODO: Implement generator
+}
+
+export function timetablePageWithRoomID(semester: Semester, roomID: String): string {
+  return `${timetablePage(semester)}/${roomID}`;
+}
+
 // Semester -> Timetable path
 export function timetablePage(semester: Semester): string {
   return `/timetable/${fromSemester[semester]}`;

@@ -3,7 +3,7 @@ import produce from 'immer';
 import { createMigrate } from 'redux-persist';
 
 import { PersistConfig } from 'storage/persistReducer';
-import { ModuleCode } from 'types/modules';
+import { ModuleCode, Semester } from 'types/modules';
 import { ModuleLessonConfig, SemTimetableConfig, SemTimetableMultiConfig, TimetableConfig, TimetableMultiConfig } from 'types/timetables';
 import { ColorMapping, TimetablesState } from 'types/reducers';
 
@@ -20,14 +20,15 @@ import {
   SET_LESSON_CONFIG,
   SET_TIMETABLE,
   SHOW_LESSON_IN_TIMETABLE,
-  TOGGLE_SELECT_LESSON,
   CANCEL_EDIT_LESSON,
   EDIT_LESSON,
+  ADD_SELECTED_MODULE,
+  REMOVE_SELECTED_MODULE,
+  RESET_ALL_TIMETABLES,
 } from 'actions/timetables';
 import { getNewColor } from 'utils/colors';
 import { SET_EXPORTED_DATA } from 'actions/constants';
 import { Actions } from '../types/actions';
-import { isLessonSelected } from 'utils/modules';
 
 export const persistConfig = {
   /* eslint-disable no-useless-computed-key */
@@ -100,8 +101,11 @@ function moduleLessonConfig(
   }
 }
 
+
+
 // Map of ModuleCode to module lesson config.
 const DEFAULT_SEM_TIMETABLE_CONFIG: SemTimetableConfig = {};
+const DEFAULT_SEM_TIMETABLE_MULTI_CONFIG: SemTimetableMultiConfig = {};
 function semTimetable(
   state: SemTimetableConfig = DEFAULT_SEM_TIMETABLE_CONFIG,
   action: Actions,
@@ -201,36 +205,84 @@ export const defaultTimetableState: TimetablesState = {
   archive: {},
 };
 
+
+
+
+function isModuleInTimetable(
+  moduleCode: ModuleCode,
+  timetable: TimetableConfig,
+  semester: Semester
+): boolean {
+  return !!get(timetable[semester], moduleCode);
+}
+
+function produceTimetableState(semester: Semester, state: TimetablesState, action: Actions) {
+  return produce(state, (draft) => {
+    draft.lessons[semester] = semTimetable(draft.lessons[semester], action);
+    draft.colors[semester] = semColors(state.colors[semester], action);
+    draft.hidden[semester] = semHiddenModules(state.hidden[semester], action);
+  });
+}
+
 function timetables(
   state: TimetablesState = defaultTimetableState,
   action: Actions,
 ): TimetablesState {
   // All normal timetable actions should specify their semester
   switch (action.type) {
+    case ADD_SELECTED_MODULE: {
+      const { semester, moduleCode, lessonType, classNo } = action.payload;
+
+      const oldClassNoArray = state.multiLessons[semester]?.[moduleCode]?.[lessonType] || [];
+      // Prevent duplicates
+      if (oldClassNoArray.includes(classNo))
+        return state;
+
+      return {
+        ...state,
+        multiLessons: {
+          ...state.multiLessons,
+          [semester]: {
+            ...state.multiLessons[semester],
+            [moduleCode]: {
+              ...state.multiLessons[semester]?.[moduleCode],
+              [lessonType]: [...oldClassNoArray, classNo]
+            }
+          }
+        }
+      };
+    }
+    case REMOVE_SELECTED_MODULE: {
+      const { semester, moduleCode, lessonType, classNo } = action.payload;
+
+      const newClassNoArray = (state.multiLessons[semester]?.[moduleCode]?.[lessonType] || [])
+        .filter(e => e !== classNo);
+
+      return {
+        ...state,
+        multiLessons: {
+          ...state.multiLessons,
+          [semester]: {
+            ...state.multiLessons[semester],
+            [moduleCode]: {
+              ...state.multiLessons[semester]?.[moduleCode],
+              [lessonType]: newClassNoArray
+            }
+          }
+        }
+      };
+    }
     case EDIT_LESSON:
       {
         const { semester } = action.payload;
         const { moduleCode, lessonType, classNo } = action.payload.lesson;
 
-        const multiLessons = mergeSemTimetable(state.lessons, state.multiLessons);
-        const oldClassNoArray = multiLessons[semester]?.[moduleCode]?.[lessonType] || [];
-        const newClassNoArray = oldClassNoArray.length === 0 ? [classNo] : oldClassNoArray;
         return {
           ...state,
           editingType: {
             moduleCode: moduleCode,
             lessonType: lessonType,
           },
-          multiLessons: {
-            ...multiLessons,
-            [semester]: {
-              ...multiLessons[semester],
-              [moduleCode]: {
-                ...multiLessons[semester][moduleCode],
-                [lessonType]: newClassNoArray
-              }
-            }
-          }
         };
       }
     case CANCEL_EDIT_LESSON:
@@ -238,32 +290,7 @@ function timetables(
         ...state,
         editingType: null,
       }
-    case TOGGLE_SELECT_LESSON:
-      {
-        const { semester } = action.payload;
-        const { moduleCode, lessonType, classNo } = action.payload.lesson;
 
-        // Select or deselect lesson by adding or removing it from array
-        const oldClassNoArray = state.multiLessons[semester]?.[moduleCode]?.[lessonType] || [];
-        const newClassNoArray = isLessonSelected(action.payload.lesson, state.multiLessons[semester]) ?
-          oldClassNoArray.filter(e => e !== classNo) :
-          [...oldClassNoArray, classNo];
-        // Prevent deselecting every lesson
-        if (newClassNoArray.length === 0) return state;
-        return {
-          ...state,
-          multiLessons: {
-            ...state.multiLessons,
-            [semester]: {
-              ...state.multiLessons[semester],
-              [moduleCode]: {
-                ...state.multiLessons[semester][moduleCode],
-                [lessonType]: newClassNoArray
-              }
-            }
-          }
-        };
-      }
     case SET_TIMETABLE: {
       const { semester, timetable, colors, hiddenModules } = action.payload;
 
@@ -277,10 +304,20 @@ function timetables(
       });
     }
 
+    case RESET_ALL_TIMETABLES: {
+      return produce(state, (draft) => {
+        draft.multiLessons = {};
+        draft.lessons = {};
+        draft.colors = {};
+        draft.hidden = {};
+      });
+    }
+
     case RESET_TIMETABLE: {
       const { semester } = action.payload;
 
       return produce(state, (draft) => {
+        draft.multiLessons[semester] = DEFAULT_SEM_TIMETABLE_MULTI_CONFIG;
         draft.lessons[semester] = DEFAULT_SEM_TIMETABLE_CONFIG;
         draft.colors[semester] = DEFAULT_SEM_COLOR_MAP;
         draft.hidden[semester] = DEFAULT_HIDDEN_STATE;
@@ -288,19 +325,30 @@ function timetables(
     }
 
     case ADD_MODULE:
+      {
+        // Prevent double adding
+        if (isModuleInTimetable(action.payload.moduleCode, state.lessons, action.payload.semester))
+          return state;
+        else
+          return produceTimetableState(action.payload.semester, state, action);
+      }
     case REMOVE_MODULE:
+      {
+        // Prevent double removing (likely not required)
+        if (!isModuleInTimetable(action.payload.moduleCode, state.lessons, action.payload.semester))
+          return state;
+        else {
+          const newState = produceTimetableState(action.payload.semester, state, action);
+          newState.multiLessons[action.payload.semester][action.payload.moduleCode] = {};
+          return newState;
+        }
+      }
     case SELECT_MODULE_COLOR:
     case CHANGE_LESSON:
     case SET_LESSON_CONFIG:
     case HIDE_LESSON_IN_TIMETABLE:
     case SHOW_LESSON_IN_TIMETABLE: {
-      const { semester } = action.payload;
-
-      return produce(state, (draft) => {
-        draft.lessons[semester] = semTimetable(draft.lessons[semester], action);
-        draft.colors[semester] = semColors(state.colors[semester], action);
-        draft.hidden[semester] = semHiddenModules(state.hidden[semester], action);
-      });
+      return produceTimetableState(action.payload.semester, state, action);
     }
 
     case SET_EXPORTED_DATA: {

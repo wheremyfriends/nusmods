@@ -14,6 +14,7 @@ import {
   validateTimetableModules,
 } from 'utils/timetables';
 import { getModuleTimetable } from 'utils/modules';
+import { CREATE_LESSON, apolloClient } from 'views/timetable/TimetableContent';
 
 // Actions that should not be used directly outside of thunks
 export const SET_TIMETABLE = 'SET_TIMETABLE' as const;
@@ -44,6 +45,49 @@ export const Internal = {
     };
   },
 };
+
+
+// Realtime implementation which will mutate to GraphQL instead of modifying local timetable
+export function addModuleRT(semester: Semester, moduleCode: ModuleCode, roomID: String) {
+  return (dispatch: Dispatch, getState: GetState) =>
+    dispatch(fetchModule(moduleCode)).then(() => {
+      const module: Module = getState().moduleBank.modules[moduleCode];
+      if (!module) {
+        dispatch(
+          openNotification(`Cannot load ${moduleCode}`, {
+            action: {
+              text: 'Retry',
+              handler: () => {
+                dispatch(addModuleRT(semester, moduleCode, roomID));
+              },
+            },
+          }),
+        );
+
+        return;
+      }
+
+      const lessons = getModuleTimetable(module, semester);
+      const moduleLessonConfig = randomModuleLessonConfig(lessons);
+
+      for (const [lessonType, classNo] of Object.entries(moduleLessonConfig)) {
+        apolloClient
+          .mutate({
+            mutation: CREATE_LESSON,
+            variables: {
+              roomID: roomID, // TODO: Use variable roomID and name
+              name: "ks",
+              semester: semester,
+              moduleCode: moduleCode,
+              lessonType: lessonType,
+              classNo: classNo
+            }
+          })
+        // .then((result) => console.log(result));
+      }
+    });
+}
+
 
 export function addModule(semester: Semester, moduleCode: ModuleCode) {
   return (dispatch: Dispatch, getState: GetState) =>
@@ -83,6 +127,15 @@ export function removeModule(semester: Semester, moduleCode: ModuleCode) {
   };
 }
 
+export const RESET_ALL_TIMETABLES = 'RESET_ALL_TIMETABLES' as const;
+export function resetAllTimetables() {
+  return {
+    type: RESET_ALL_TIMETABLES,
+    payload: null,
+  };
+}
+
+
 export const RESET_TIMETABLE = 'RESET_TIMETABLE' as const;
 export function resetTimetable(semester: Semester) {
   return {
@@ -116,23 +169,37 @@ export function editLesson(semester: Semester, lesson: Lesson) {
   };
 }
 
+export const ADD_SELECTED_MODULE = 'ADD_SELECTED_MODULE' as const;
+export function selectLesson(semester: Semester, moduleCode: ModuleCode, lessonType: LessonType, classNo: ClassNo) {
+  return {
+    type: ADD_SELECTED_MODULE,
+    payload: {
+      semester,
+      moduleCode,
+      lessonType,
+      classNo,
+    },
+  };
+}
+
+export const REMOVE_SELECTED_MODULE = 'REMOVE_SELECTED_MODULE' as const;
+export function deselectLesson(semester: Semester, moduleCode: ModuleCode, lessonType: LessonType, classNo: ClassNo) {
+  return {
+    type: REMOVE_SELECTED_MODULE,
+    payload: {
+      semester,
+      moduleCode,
+      lessonType,
+      classNo,
+    },
+  };
+}
+
 export const CANCEL_EDIT_LESSON = 'CANCEL_EDIT_LESSON' as const;
 export function cancelEditLesson() {
   return {
     type: CANCEL_EDIT_LESSON,
     payload: null,
-  };
-}
-
-// Select or deselect lessons when in edit mode
-export const TOGGLE_SELECT_LESSON = 'TOGGLE_SELECT_LESSON' as const;
-export function toggleSelectLesson(semester: Semester, lesson: Lesson) {
-  return {
-    type: TOGGLE_SELECT_LESSON,
-    payload: {
-      semester,
-      lesson,
-    }
   };
 }
 
