@@ -20,7 +20,7 @@ type OwnProps = {
 type Props = OwnProps & {
   moduleList: ModuleSelectList;
   addModule: (semester: Semester, moduleCode: ModuleCode) => void;
-  removeModule: (moduleCode: ModuleCode) => void;
+  removeModuleRT: (moduleCode: ModuleCode) => void;
   popNotification: () => void;
 };
 
@@ -55,7 +55,7 @@ class ModulesSelectContainer extends Component<Props> {
               isOnline ? 'Add course to timetable' : 'You need to be online to add courses'
             }
             disabled={!isOnline}
-            onRemoveModule={()=>{}} // TODO: Need to call removeModuleRT
+            onRemoveModule={this.props.removeModuleRT} // TODO: Need to call removeModuleRT
           />
         )}
       </Online>

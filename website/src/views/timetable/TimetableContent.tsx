@@ -65,7 +65,7 @@ import TimetableModulesTable from './TimetableModulesTable';
 import ModulesTableFooter from './ModulesTableFooter';
 import styles from './TimetableContent.scss';
 
-import { ApolloClient, InMemoryCache, ApolloProvider, gql, FetchResult } from '@apollo/client';
+import { ApolloClient, InMemoryCache, ApolloProvider, gql, FetchResult, useMutation } from '@apollo/client';
 
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
@@ -73,6 +73,7 @@ import { openNotification } from 'actions/app';
 import { fetchModule } from 'actions/moduleBank';
 import type { Dispatch, GetState } from 'types/redux';
 import { Action } from 'actions/constants';
+import { DELETE_MODULE } from './TimetableContainer';
 
 export const CREATE_USER = gql`
   mutation CreateUser($roomID: String!, $name: String!) {
@@ -89,12 +90,6 @@ export const CREATE_LESSON = gql`
 export const DELETE_LESSON = gql`
   mutation DeleteLesson($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
     deleteLesson(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
-  }
-  `;
-
-export const DELETE_MODULE = gql`
-  mutation DeleteModule($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!) {
-    deleteModule(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode)
   }
   `;
 
@@ -143,6 +138,7 @@ type Props = OwnProps & {
   timetableOrientation: TimetableOrientation;
   showTitle: boolean;
   hiddenInTimetable: ModuleCode[];
+  // roomID: String | null;
 
   // Actions
   addModule: (semester: Semester, moduleCode: ModuleCode) => void;
@@ -159,6 +155,7 @@ type Props = OwnProps & {
   selectLesson: (semester: Semester, moduleCode: ModuleCode, lessonType: LessonType, classNo: ClassNo) => void;
   deselectLesson: (semester: Semester, moduleCode: ModuleCode, lessonType: LessonType, classNo: ClassNo) => void;
   openNotification: (message: string, options: NotificationOptions) => void;
+  // deleteModule: (variables: any) => Promise<any>;
 };
 
 type State = {
@@ -200,40 +197,40 @@ class TimetableContent extends React.Component<Props, State> {
     tombstone: null,
   };
 
-  constructor(props: any) {
-    super(props);
-    this.resetTimetable();
-    this.resetInternalSelections();
-    const self = this;
-    apolloClient.subscribe({
-      query: gql`
-  subscription LessonChange($roomID: String!) {
-    lessonChange(roomID: $roomID) {
-      action
-      name
-      semester
-      moduleCode
-      lessonType
-      classNo
-    }
-  }
-  `,
-      variables: {
-        roomID: "room1",
-      },
-    }).subscribe({
-      next(data) {
-        // console.log("data", data);
-        if (data.data) {
-          self.handleLessonChange(data.data.lessonChange);
-        }
-      }, error(error) {
-        console.log("Apollo subscribe error", error);
-      },
-      complete() {
-      },
-    })
-  }
+  // constructor(props: any) {
+    // super(props);
+    // this.resetTimetable();
+    // this.resetInternalSelections();
+    // const self = this;
+  //   apolloClient.subscribe({
+  //     query: gql`
+  // subscription LessonChange($roomID: String!) {
+  //   lessonChange(roomID: $roomID) {
+  //     action
+  //     name
+  //     semester
+  //     moduleCode
+  //     lessonType
+  //     classNo
+  //   }
+  // }
+  // `,
+  //     variables: {
+  //       roomID: "room1",
+  //     },
+  //   }).subscribe({
+  //     next(data) {
+  //       // console.log("data", data);
+  //       if (data.data) {
+  //         self.handleLessonChange(data.data.lessonChange);
+  //       }
+  //     }, error(error) {
+  //       console.log("Apollo subscribe error", error);
+  //     },
+  //     complete() {
+  //     },
+  //   })
+  // }
 
   timetableRef = React.createRef<HTMLDivElement>();
 
@@ -322,41 +319,6 @@ class TimetableContent extends React.Component<Props, State> {
   };
 
 
-  handleLessonChange = (lessonChange: LessonChange) => {
-    // TODO: Include semester param
-    // TODO: Check if request is intended for correct user via name
-    const { action, name, semester, moduleCode, lessonType, classNo } = lessonChange;
-    const activeSemester = this.props.semester;
-
-    if (semester != activeSemester)
-      return;
-
-    switch (action) {
-      case Action.CREATE_LESSON: {
-        // Presence of moduleCode should guarantee module is being/already added
-        // Prevents multiple adding
-        if (_.isEmpty(this.props.multiLessons[semester]?.[moduleCode])) {
-          this.addModule(semester, moduleCode);
-        }
-
-        this.selectLesson(semester, moduleCode, lessonType, classNo);
-        return;
-      }
-
-      case Action.DELETE_LESSON: {
-        this.deselectLesson(semester, moduleCode, lessonType, classNo);
-        return;
-
-      }
-      case Action.DELETE_MODULE: {
-        this.removeModuleLocal(moduleCode);
-        return;
-      }
-      default:
-        return;
-    }
-  }
-
   deselectLesson = (semester: Semester, moduleCode: ModuleCode, lessonType: LessonType, classNo: ClassNo) => {
     this.props.deselectLesson(semester, moduleCode, lessonType, classNo);
   }
@@ -375,18 +337,26 @@ class TimetableContent extends React.Component<Props, State> {
     this.resetTombstone();
   };
 
+
   removeModuleRT = (moduleCode: ModuleCode) => {
-    apolloClient
-      .mutate({
-        mutation: DELETE_MODULE,
-        variables: {
-          roomID: "room1", // TODO: Use variable roomID and name
-          name: "ks",
-          semester: this.props.semester,
-          moduleCode: moduleCode,
-        }
-      })
-    // .then((result) => console.log(result));
+    apolloClient.mutate({
+      mutation: DELETE_MODULE,
+      variables: {
+        roomID: "room1", // TODO: Use variable roomID and name
+        name: "ks",
+        semester: this.props.semester,
+        moduleCode: moduleCode,
+      }
+
+    })
+    // this.props.deleteModule({
+    //   variables: {
+    //       roomID: this.props.roomID, // TODO: Use variable roomID and name
+    //       name: "ks",
+    //       semester: this.props.semester,
+    //       moduleCode: moduleCode,
+    //   }
+    // });
   }
 
   removeModuleLocal = (moduleCode: ModuleCode) => {
@@ -632,7 +602,7 @@ class TimetableContent extends React.Component<Props, State> {
                     semester={semester}
                     timetable={this.props.timetable}
                     addModule={this.addModuleRT}
-                    removeModule={this.removeModuleRT}
+                    removeModuleRT={this.removeModuleRT}
                   />
                 )}
               </div>
@@ -677,6 +647,7 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
     timetableOrientation: state.theme.timetableOrientation,
     showTitle: state.theme.showTitle,
     hiddenInTimetable,
+    // roomID: state.app.roomID,
   };
 }
 
