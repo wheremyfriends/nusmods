@@ -52,38 +52,6 @@ const KeyboardShortcuts: React.FC = () => {
       Mousetrap.bind(key, action);
     }
 
-    // Navigation
-    bind('y', NAVIGATION, 'Go to today', () => {
-      history.push('/today');
-    });
-
-    bind('t', NAVIGATION, 'Go to timetable', () => {
-      history.push('/timetable');
-    });
-
-    bind('m', NAVIGATION, 'Go to course finder', () => {
-      history.push('/courses');
-    });
-
-    bind('v', NAVIGATION, 'Go to venues page', () => {
-      history.push('/venues');
-    });
-
-    bind('s', NAVIGATION, 'Go to settings', () => {
-      history.push('/settings');
-    });
-
-    bind('/', NAVIGATION, 'Open global search', (e) => {
-      if (ComponentMap.globalSearchInput) {
-        ComponentMap.globalSearchInput.focus();
-
-        // Prevents the '/' character from being entered into the global search bar
-        e.preventDefault();
-      }
-    });
-
-    bind('?', NAVIGATION, 'Show this help', () => setHelpShown(!helpShown));
-
     // Timetable shortcuts
     bind('o', TIMETABLE, 'Switch timetable orientation', () => {
       dispatch(toggleTimetableOrientation());
@@ -137,11 +105,6 @@ const KeyboardShortcuts: React.FC = () => {
     bind('c', APPEARANCE, 'Next Theme', () => {
       dispatch(cycleTheme(1));
       notifyThemeChange();
-    });
-
-    // ???
-    Mousetrap.bind('up up down down left right left right b a', () => {
-      history.push('/tetris');
     });
 
     return () => {
