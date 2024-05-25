@@ -15,7 +15,7 @@ import {
 } from 'utils/timetables';
 import { getModuleTimetable } from 'utils/modules';
 import { CREATE_LESSON, apolloClient } from 'views/timetable/TimetableContent';
-import { gql, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
 
 // Actions that should not be used directly outside of thunks
 export const SET_TIMETABLE = 'SET_TIMETABLE' as const;
@@ -71,19 +71,7 @@ export function addModuleRT(semester: Semester, moduleCode: ModuleCode) {
       const lessons = getModuleTimetable(module, semester);
       const moduleLessonConfig = randomModuleLessonConfig(lessons);
 
-      // const [createLesson] = useMutation(CREATE_LESSON);
-
       for (const [lessonType, classNo] of Object.entries(moduleLessonConfig)) {
-      // createLesson({
-      //       variables: {
-      //         roomID: getState().app.roomID, // TODO: Use variable roomID and name
-      //         name: "ks",
-      //         semester: semester,
-      //         moduleCode: moduleCode,
-      //         lessonType: lessonType,
-      //         classNo: classNo
-      //       }
-      // })
         apolloClient
           .mutate({
             mutation: CREATE_LESSON,
@@ -96,7 +84,7 @@ export function addModuleRT(semester: Semester, moduleCode: ModuleCode) {
               classNo: classNo
             }
           })
-      //   // .then((result) => console.log(result));
+        // .then((result) => console.log(result));
       }
     });
 }
@@ -273,16 +261,6 @@ export function cancelModifyLesson() {
   return {
     type: CANCEL_MODIFY_LESSON,
     payload: null,
-  };
-}
-
-export const SET_ROOM_ID = 'SET_ROOM_ID' as const;
-export function setRoomID(roomID: String) {
-  return {
-    type: SET_ROOM_ID,
-    payload: {
-      roomID
-    },
   };
 }
 

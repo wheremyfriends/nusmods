@@ -7,20 +7,13 @@ import classnames from 'classnames';
 import type { ModuleCode, Semester } from 'types/modules';
 import type { ColorMapping } from 'types/reducers';
 import type { State } from 'types/state';
-import type { LessonChange, SemTimetableConfig } from 'types/timetables';
+import type { SemTimetableConfig } from 'types/timetables';
 
 import { selectSemester } from 'actions/settings';
 import { getSemesterTimetableColors, getSemesterTimetableLessons } from 'selectors/timetables';
 import {
-  addModule,
-  deselectLesson,
   fetchTimetableModules,
-  removeModule,
-  resetInternalSelections,
-  resetTimetable,
-  selectLesson,
   setHiddenModulesFromImport,
-  setRoomID,
   setTimetable,
 } from 'actions/timetables';
 import { openNotification } from 'actions/app';
@@ -36,30 +29,6 @@ import useScrollToTop from 'views/hooks/useScrollToTop';
 import TimetableContent from './TimetableContent';
 
 import styles from './TimetableContainer.scss';
-import { gql, useMutation, useSubscription } from '@apollo/client';
-import store from 'entry/main';
-import { Action } from 'actions/constants';
-import _ from 'lodash';
-
-const LESSON_CHANGE_SUBSCRIPTION = gql`
-  subscription LessonChange($roomID: String!) {
-    lessonChange(roomID: $roomID) {
-      action
-      name
-      semester
-      moduleCode
-      lessonType
-      classNo
-    }
-  }
-  `;
-
-export const DELETE_MODULE = gql`
-  mutation DeleteModule($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!) {
-    deleteModule(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode)
-  }
-  `;
-
 
 type Params = {
   action: string;
@@ -164,46 +133,6 @@ const TimetableHeader: FC<{
   );
 };
 
-function handleLessonChange(lessonChange: LessonChange) {
-    // TODO: Include semester param
-    // TODO: Check if request is intended for correct user via name
-    const state = store.getState();
-    const dispatch = store.dispatch;
-    const { action, name, semester, moduleCode, lessonType, classNo } = lessonChange;
-
-    // const activeSemester = state.app.activeSemester;
-    // TODO: Update all semesters
-    // if (semester != activeSemester)
-    //   return;
-
-    console.log(lessonChange)
-    switch (action) {
-      case Action.CREATE_LESSON: {
-        // Presence of moduleCode should guarantee module is being/already added
-        // Prevents multiple adding
-        if (_.isEmpty(state.timetables.multiLessons[semester]?.[moduleCode])) {
-          dispatch(addModule(semester, moduleCode)); // TODO: define typed dispatch
-        }
-
-        dispatch(selectLesson(semester, moduleCode, lessonType, classNo));
-        return;
-      }
-
-      case Action.DELETE_LESSON: {
-        dispatch(deselectLesson(semester, moduleCode, lessonType, classNo));
-        return;
-
-      }
-      case Action.DELETE_MODULE: {
-        dispatch(removeModule(semester, moduleCode));
-        return;
-      }
-      default:
-        return;
-  }
-
-}
-
 /**
  * Manages semester switching and sync/shared timetables
  * - Checks if the semester path param is valid and display a 404 page if it is not
@@ -211,9 +140,7 @@ function handleLessonChange(lessonChange: LessonChange) {
  * - Create the UI for the user to confirm their actions
  */
 export const TimetableContainerComponent: FC = () => {
-
   const params = useParams<Params>();
-  const dispatch = useDispatch();
 
   const semester = semesterForTimetablePage(params.semester);
 
@@ -222,24 +149,6 @@ export const TimetableContainerComponent: FC = () => {
   const getModule = useSelector(getModuleCondensed);
   const modules = useSelector(({ moduleBank }: State) => moduleBank.modules);
   const activeSemester = useSelector(({ app }: State) => app.activeSemester);
-
-  // TODO: retrieve roomID from params
-  const roomID = "room1";
-
-  console.log("SUB")
-  useSubscription(
-    LESSON_CHANGE_SUBSCRIPTION,
-    {
-      variables: {
-        roomID: roomID
-      },
-      onData: (data) => handleLessonChange(data.data.data.lessonChange),
-    },
-  );
-
-  dispatch(setRoomID(roomID));
-
-  // const [deleteModule] = useMutation(DELETE_MODULE);
 
   const location = useLocation();
   const [importedTimetable, setImportedTimetable] = useState(() =>
@@ -251,6 +160,7 @@ export const TimetableContainerComponent: FC = () => {
     [semester, params.action, location.search],
   );
 
+  const dispatch = useDispatch();
   useEffect(() => {
     if (importedTimetable) {
       dispatch(fetchTimetableModules([importedTimetable]));
@@ -302,7 +212,6 @@ export const TimetableContainerComponent: FC = () => {
       semester={semester}
       timetable={displayedTimetable}
       colors={filledColors}
-      // deleteModule={deleteModule}
       header={
         <>
           <SharingHeader
