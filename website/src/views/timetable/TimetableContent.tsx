@@ -303,6 +303,7 @@ class TimetableContent extends React.Component<Props, State> {
     this.resetTombstone();
   };
 
+  // Centralized function to send deleteModule mutation
   removeModuleRT = (moduleCode: ModuleCode) => {
     apolloClient
       .mutate({
@@ -313,8 +314,7 @@ class TimetableContent extends React.Component<Props, State> {
           semester: this.props.semester,
           moduleCode: moduleCode,
         }
-      })
-    // .then((result) => console.log(result));
+      });
   }
 
   removeModuleLocal = (moduleCode: ModuleCode) => {
@@ -560,7 +560,7 @@ class TimetableContent extends React.Component<Props, State> {
                     semester={semester}
                     timetable={this.props.timetable}
                     addModule={this.addModuleRT}
-                    removeModule={this.removeModuleRT}
+                    removeModuleRT={this.removeModuleRT}
                   />
                 )}
               </div>
