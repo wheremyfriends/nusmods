@@ -19,7 +19,6 @@ import {
 } from 'types/timetables';
 
 import {
-  addModule,
   cancelModifyLesson,
   changeLesson,
   HIDDEN_IMPORTED_SEM,
@@ -27,11 +26,8 @@ import {
   editLesson,
   cancelEditLesson,
   // toggleSelectLesson,
-  removeModule,
   resetTimetable,
   resetInternalSelections,
-  selectLesson,
-  deselectLesson,
   addModuleRT,
 } from 'actions/timetables';
 import {
@@ -136,9 +132,7 @@ type Props = OwnProps & {
   hiddenInTimetable: ModuleCode[];
 
   // Actions
-  addModule: (semester: Semester, moduleCode: ModuleCode) => void;
   addModuleRT: (semester: Semester, moduleCode: ModuleCode, roomID: String) => void;
-  removeModule: (semester: Semester, moduleCode: ModuleCode) => void;
   resetTimetable: (semester: Semester) => void;
   resetInternalSelections: (semester: Semester) => void;
   modifyLesson: (lesson: Lesson) => void;
@@ -147,8 +141,6 @@ type Props = OwnProps & {
   changeLesson: (semester: Semester, lesson: Lesson) => void;
   cancelModifyLesson: () => void;
   cancelEditLesson: () => void;
-  selectLesson: (semester: Semester, moduleCode: ModuleCode, lessonType: LessonType, classNo: ClassNo) => void;
-  deselectLesson: (semester: Semester, moduleCode: ModuleCode, lessonType: LessonType, classNo: ClassNo) => void;
   openNotification: (message: string, options: NotificationOptions) => void;
 };
 
@@ -195,7 +187,6 @@ class TimetableContent extends React.Component<Props, State> {
     super(props);
     this.resetTimetable();
     this.resetInternalSelections();
-    const self = this;
   }
 
   timetableRef = React.createRef<HTMLDivElement>();
@@ -285,22 +276,8 @@ class TimetableContent extends React.Component<Props, State> {
   };
 
 
-  deselectLesson = (semester: Semester, moduleCode: ModuleCode, lessonType: LessonType, classNo: ClassNo) => {
-    this.props.deselectLesson(semester, moduleCode, lessonType, classNo);
-  }
-
-  selectLesson = (semester: Semester, moduleCode: ModuleCode, lessonType: LessonType, classNo: ClassNo) => {
-    this.props.selectLesson(semester, moduleCode, lessonType, classNo);
-  };
-
   addModuleRT = (semester: Semester, moduleCode: ModuleCode) => {
     this.props.addModuleRT(semester, moduleCode, this.props.roomID);
-  };
-
-  // Old functionality, still used for adding to module table
-  addModule = (semester: Semester, moduleCode: ModuleCode) => {
-    this.props.addModule(semester, moduleCode);
-    this.resetTombstone();
   };
 
   // Centralized function to send deleteModule mutation
@@ -316,26 +293,6 @@ class TimetableContent extends React.Component<Props, State> {
         }
       });
   }
-
-  removeModuleLocal = (moduleCode: ModuleCode) => {
-    // TODO: Implement GraphQL remove entire module and UNDO
-    this.removeModule(moduleCode);
-  }
-
-  removeModule = (moduleCodeToRemove: ModuleCode) => {
-    // Save the index of the module before removal so the tombstone can be inserted into
-    // the correct position
-    // const index = this.addedModules().findIndex(
-    //   ({ moduleCode }) => moduleCode === moduleCodeToRemove,
-    // );
-    this.props.removeModule(this.props.semester, moduleCodeToRemove);
-    
-    // Does not work with RT as addedModules uses this.props.timetableWithLessons which has been merged with RT lessons
-    // const moduleWithColor = this.toModuleWithColor(this.addedModules()[index]);
-
-    // A tombstone is displayed in place of a deleted module
-    // this.setState({ tombstone: { ...moduleWithColor, index } });
-  };
 
   resetInternalSelections = () => {
     this.props.resetInternalSelections(this.props.semester);
@@ -610,9 +567,7 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
 }
 
 export default connect(mapStateToProps, {
-  addModule,
   addModuleRT,
-  removeModule,
   resetTimetable,
   resetInternalSelections,
   modifyLesson,
@@ -621,7 +576,5 @@ export default connect(mapStateToProps, {
   changeLesson,
   cancelModifyLesson,
   cancelEditLesson,
-  selectLesson,
-  deselectLesson,
   openNotification
 })(TimetableContent);
