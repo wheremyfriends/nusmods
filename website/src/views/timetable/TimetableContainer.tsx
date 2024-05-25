@@ -192,7 +192,7 @@ export const TimetableContainerComponent: FC = () => {
   }
 
   if (!roomID) {
-    return <Redirect to={`${timetablePage(semester)}/${generateRoomID()}`} />;
+    return <Redirect to={timetablePageWithRoomID(semester, generateRoomID())} />;
   }
 
   // 2. If we are importing a timetable, check that all imported modules are
