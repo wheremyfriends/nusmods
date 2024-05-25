@@ -74,18 +74,6 @@ import { fetchModule } from 'actions/moduleBank';
 import type { Dispatch, GetState } from 'types/redux';
 import { Action } from 'actions/constants';
 
-export const LESSON_CHANGE_SUBSCRIPTION = gql`
-  subscription LessonChange($roomID: String!) {
-    lessonChange(roomID: $roomID) {
-      action
-      name
-      semester
-      moduleCode
-      lessonType
-      classNo
-    }
-  }
-  `
 export const CREATE_USER = gql`
   mutation CreateUser($roomID: String!, $name: String!) {
     createUser(roomID: $roomID, name: $name)
@@ -208,23 +196,6 @@ class TimetableContent extends React.Component<Props, State> {
     this.resetTimetable();
     this.resetInternalSelections();
     const self = this;
-    apolloClient.subscribe({
-      query: LESSON_CHANGE_SUBSCRIPTION,
-      variables: {
-        roomID: this.props.roomID,
-      },
-    }).subscribe({
-      next(data) {
-        // console.log("data", data);
-        if (data.data) {
-          self.handleLessonChange(data.data.lessonChange);
-        }
-      }, error(error) {
-        console.log("Apollo subscribe error", error);
-      },
-      complete() {
-      },
-    })
   }
 
   timetableRef = React.createRef<HTMLDivElement>();
@@ -313,41 +284,6 @@ class TimetableContent extends React.Component<Props, State> {
     }
   };
 
-
-  handleLessonChange = (lessonChange: LessonChange) => {
-    // TODO: Include semester param
-    // TODO: Check if request is intended for correct user via name
-    const { action, name, semester, moduleCode, lessonType, classNo } = lessonChange;
-    const activeSemester = this.props.semester;
-
-    if (semester != activeSemester)
-      return;
-
-    switch (action) {
-      case Action.CREATE_LESSON: {
-        // Presence of moduleCode should guarantee module is being/already added
-        // Prevents multiple adding
-        if (_.isEmpty(this.props.multiLessons[semester]?.[moduleCode])) {
-          this.addModule(semester, moduleCode);
-        }
-
-        this.selectLesson(semester, moduleCode, lessonType, classNo);
-        return;
-      }
-
-      case Action.DELETE_LESSON: {
-        this.deselectLesson(semester, moduleCode, lessonType, classNo);
-        return;
-
-      }
-      case Action.DELETE_MODULE: {
-        this.removeModuleLocal(moduleCode);
-        return;
-      }
-      default:
-        return;
-    }
-  }
 
   deselectLesson = (semester: Semester, moduleCode: ModuleCode, lessonType: LessonType, classNo: ClassNo) => {
     this.props.deselectLesson(semester, moduleCode, lessonType, classNo);
