@@ -38,42 +38,6 @@ import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
 import { apolloClient } from 'views/timetable/TimetableContent';
 
-const LESSON_SUBSCRIPTION = `
-  subscription LessonChange($roomID: String!) {
-    lessonChange(roomID: $roomID) {
-      action
-      name
-      moduleCode
-      lessonType
-      classNo
-    }
-  }
-`;
-// wsLink.client.subscribe({
-//   query: LESSON_SUBSCRIPTION,
-//   variables: {
-//     roomID: "room1",
-//   },
-// }, {
-//   next(value) {
-//     console.log(value);
-//   }, error(error) {
-//     console.log(error);
-//   },
-//   complete() {
-//   },
-// })
-
-
-// client.subscribe({
-//   query: LESSON_SUBSCRIPTION,
-//   variables: {
-//     roomID: "room1",
-//   },
-// }).subscribe((data) => {
-//   console.log(data);
-// })
-
 export const persistConfig = {
   /* eslint-disable no-useless-computed-key */
   migrate: createMigrate({

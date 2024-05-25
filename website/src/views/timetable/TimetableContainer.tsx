@@ -21,7 +21,7 @@ import { undo } from 'actions/undoHistory';
 import { getModuleCondensed } from 'selectors/moduleBank';
 import { deserializeHidden, deserializeTimetable } from 'utils/timetables';
 import { fillColorMapping } from 'utils/colors';
-import { semesterForTimetablePage, TIMETABLE_SHARE, timetablePage } from 'views/routes/paths';
+import { generateRoomID, semesterForTimetablePage, TIMETABLE_SHARE, timetablePage } from 'views/routes/paths';
 import deferComponentRender from 'views/hocs/deferComponentRender';
 import SemesterSwitcher from 'views/components/semester-switcher/SemesterSwitcher';
 import LoadingSpinner from 'views/components/LoadingSpinner';
@@ -31,7 +31,7 @@ import TimetableContent from './TimetableContent';
 import styles from './TimetableContainer.scss';
 
 type Params = {
-  action: string;
+  roomID: string;
   semester: string;
 };
 const TimetableHeader: FC<{
@@ -71,13 +71,13 @@ export const TimetableContainerComponent: FC = () => {
   const params = useParams<Params>();
 
   const semester = semesterForTimetablePage(params.semester);
+  const roomID = params.roomID;
 
   const timetable = useSelector(getSemesterTimetableLessons)(semester);
   const colors = useSelector(getSemesterTimetableColors)(semester);
   const getModule = useSelector(getModuleCondensed);
   const modules = useSelector(({ moduleBank }: State) => moduleBank.modules);
   const activeSemester = useSelector(({ app }: State) => app.activeSemester);
-
   const location = useLocation();
 
   const dispatch = useDispatch();
@@ -98,9 +98,13 @@ export const TimetableContainerComponent: FC = () => {
 
   useScrollToTop();
 
-  // 1. If the URL doesn't look correct, we'll direct the user to the home page
-  if (semester == null) { // || (params.action && params.action !== TIMETABLE_SHARE)) {
+  // Early returns must be placed last
+  if (semester == null) {
     return <Redirect to={timetablePage(activeSemester)} />;
+  }
+
+  if (!roomID) {
+    return <Redirect to={`${timetablePage(semester)}/${generateRoomID()}`} />;
   }
 
   // 2. If we are importing a timetable, check that all imported modules are
@@ -115,9 +119,13 @@ export const TimetableContainerComponent: FC = () => {
       semester={semester}
       timetable={displayedTimetable}
       colors={filledColors}
+      roomID={roomID}
       header={
         <>
-          <TimetableHeader semester={semester} readOnly={readOnly} />
+          <TimetableHeader
+            semester={semester}
+            readOnly={readOnly}
+          />
         </>
       }
       readOnly={readOnly}

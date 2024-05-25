@@ -49,7 +49,7 @@ export const Internal = {
 
 
 // Realtime implementation which will mutate to GraphQL instead of modifying local timetable
-export function addModuleRT(semester: Semester, moduleCode: ModuleCode) {
+export function addModuleRT(semester: Semester, moduleCode: ModuleCode, roomID: String) {
   return (dispatch: Dispatch, getState: GetState) =>
     dispatch(fetchModule(moduleCode)).then(() => {
       const module: Module = getState().moduleBank.modules[moduleCode];
@@ -59,7 +59,7 @@ export function addModuleRT(semester: Semester, moduleCode: ModuleCode) {
             action: {
               text: 'Retry',
               handler: () => {
-                dispatch(addModuleRT(semester, moduleCode));
+                dispatch(addModuleRT(semester, moduleCode, roomID));
               },
             },
           }),
@@ -76,7 +76,7 @@ export function addModuleRT(semester: Semester, moduleCode: ModuleCode) {
           .mutate({
             mutation: CREATE_LESSON,
             variables: {
-              roomID: "room1", // TODO: Use variable roomID and name
+              roomID: roomID, // TODO: Use variable roomID and name
               name: "ks",
               semester: semester,
               moduleCode: moduleCode,

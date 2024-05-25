@@ -74,6 +74,18 @@ import { fetchModule } from 'actions/moduleBank';
 import type { Dispatch, GetState } from 'types/redux';
 import { Action } from 'actions/constants';
 
+export const LESSON_CHANGE_SUBSCRIPTION = gql`
+  subscription LessonChange($roomID: String!) {
+    lessonChange(roomID: $roomID) {
+      action
+      name
+      semester
+      moduleCode
+      lessonType
+      classNo
+    }
+  }
+  `
 export const CREATE_USER = gql`
   mutation CreateUser($roomID: String!, $name: String!) {
     createUser(roomID: $roomID, name: $name)
@@ -109,16 +121,6 @@ export const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-// apolloClient
-//   .mutate({
-//     mutation: CREATE_USER,
-//     variables: {
-//       roomID: "room1", // TODO: Use variable roomID and name
-//       name: "ks",
-//     }
-//   })
-// // .then((result) => console.log(result));
-
 type ModifiedCell = {
   className: string;
   position: ClientRect;
@@ -131,6 +133,7 @@ type OwnProps = {
   semester: Semester;
   timetable: SemTimetableConfig;
   colors: ColorMapping;
+  roomID: String;
 };
 
 type Props = OwnProps & {
@@ -146,7 +149,7 @@ type Props = OwnProps & {
 
   // Actions
   addModule: (semester: Semester, moduleCode: ModuleCode) => void;
-  addModuleRT: (semester: Semester, moduleCode: ModuleCode) => void;
+  addModuleRT: (semester: Semester, moduleCode: ModuleCode, roomID: String) => void;
   removeModule: (semester: Semester, moduleCode: ModuleCode) => void;
   resetTimetable: (semester: Semester) => void;
   resetInternalSelections: (semester: Semester) => void;
@@ -206,20 +209,9 @@ class TimetableContent extends React.Component<Props, State> {
     this.resetInternalSelections();
     const self = this;
     apolloClient.subscribe({
-      query: gql`
-  subscription LessonChange($roomID: String!) {
-    lessonChange(roomID: $roomID) {
-      action
-      name
-      semester
-      moduleCode
-      lessonType
-      classNo
-    }
-  }
-  `,
+      query: LESSON_CHANGE_SUBSCRIPTION,
       variables: {
-        roomID: "room1",
+        roomID: this.props.roomID,
       },
     }).subscribe({
       next(data) {
@@ -283,7 +275,7 @@ class TimetableContent extends React.Component<Props, State> {
 
     if (lesson.isActive) {
       // this.props.toggleSelectLesson(this.props.semester, lesson);
-      const { semester } = this.props;
+      const { semester, roomID } = this.props;
       const { moduleCode, lessonType, classNo } = lesson;
 
       // Prevent deselecting all lessons
@@ -300,7 +292,7 @@ class TimetableContent extends React.Component<Props, State> {
           .mutate({
             mutation: MUTATION,
             variables: {
-              roomID: "room1", // TODO: Use variable roomID and name
+              roomID: roomID, // TODO: Use variable roomID and name
               name: "ks",
               semester: semester,
               moduleCode: moduleCode,
@@ -366,7 +358,7 @@ class TimetableContent extends React.Component<Props, State> {
   };
 
   addModuleRT = (semester: Semester, moduleCode: ModuleCode) => {
-    this.props.addModuleRT(semester, moduleCode);
+    this.props.addModuleRT(semester, moduleCode, this.props.roomID);
   };
 
   // Old functionality, still used for adding to module table
@@ -380,7 +372,7 @@ class TimetableContent extends React.Component<Props, State> {
       .mutate({
         mutation: DELETE_MODULE,
         variables: {
-          roomID: "room1", // TODO: Use variable roomID and name
+          roomID: this.props.roomID, // TODO: Use variable roomID and name
           name: "ks",
           semester: this.props.semester,
           moduleCode: moduleCode,
@@ -656,7 +648,7 @@ class TimetableContent extends React.Component<Props, State> {
 }
 
 function mapStateToProps(state: StoreState, ownProps: OwnProps) {
-  const { semester, timetable, readOnly } = ownProps;
+  const { semester, timetable, readOnly, roomID } = ownProps;
   const { modules } = state.moduleBank;
   const { multiLessons } = state.timetables;
 
@@ -671,6 +663,7 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
     timetable,
     timetableWithLessons,
     modules,
+    roomID,
     activeLesson: state.app.activeLesson,
     editingType: state.timetables.editingType,
     multiLessons: state.timetables.multiLessons,
