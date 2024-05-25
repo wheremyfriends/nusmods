@@ -15,7 +15,6 @@ import {
 } from 'utils/timetables';
 import { getModuleTimetable } from 'utils/modules';
 import { CREATE_LESSON, apolloClient } from 'views/timetable/TimetableContent';
-import { gql } from '@apollo/client';
 
 // Actions that should not be used directly outside of thunks
 export const SET_TIMETABLE = 'SET_TIMETABLE' as const;
@@ -128,13 +127,11 @@ export function removeModule(semester: Semester, moduleCode: ModuleCode) {
   };
 }
 
-export const RESET_SELECTIONS = 'RESET_SELECTIONS' as const;
-export function resetInternalSelections(semester: Semester) {
+export const RESET_ALL_TIMETABLES = 'RESET_ALL_TIMETABLES' as const;
+export function resetAllTimetables() {
   return {
-    type: RESET_SELECTIONS,
-    payload: {
-      semester,
-    },
+    type: RESET_ALL_TIMETABLES,
+    payload: null,
   };
 }
 
@@ -205,18 +202,6 @@ export function cancelEditLesson() {
     payload: null,
   };
 }
-
-// Select or deselect lessons when in edit mode
-// export const TOGGLE_SELECT_LESSON = 'TOGGLE_SELECT_LESSON' as const;
-// export function toggleSelectLesson(semester: Semester, lesson: Lesson) {
-//   return {
-//     type: TOGGLE_SELECT_LESSON,
-//     payload: {
-//       semester,
-//       lesson,
-//     }
-//   };
-// }
 
 export const CHANGE_LESSON = 'CHANGE_LESSON' as const;
 export function setLesson(

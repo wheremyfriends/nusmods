@@ -27,7 +27,6 @@ import {
   cancelEditLesson,
   // toggleSelectLesson,
   resetTimetable,
-  resetInternalSelections,
   addModuleRT,
 } from 'actions/timetables';
 import {
@@ -134,7 +133,6 @@ type Props = OwnProps & {
   // Actions
   addModuleRT: (semester: Semester, moduleCode: ModuleCode, roomID: String) => void;
   resetTimetable: (semester: Semester) => void;
-  resetInternalSelections: (semester: Semester) => void;
   modifyLesson: (lesson: Lesson) => void;
   editLesson: (semester: Semester, lesson: Lesson) => void;
   // toggleSelectLesson: (semester: Semester, lesson: Lesson) => void;
@@ -182,12 +180,6 @@ class TimetableContent extends React.Component<Props, State> {
     showExamCalendar: false,
     tombstone: null,
   };
-
-  constructor(props: any) {
-    super(props);
-    this.resetTimetable();
-    this.resetInternalSelections();
-  }
 
   timetableRef = React.createRef<HTMLDivElement>();
 
@@ -294,9 +286,6 @@ class TimetableContent extends React.Component<Props, State> {
       });
   }
 
-  resetInternalSelections = () => {
-    this.props.resetInternalSelections(this.props.semester);
-  };
 
   resetTimetable = () => {
     this.props.resetTimetable(this.props.semester);
@@ -569,7 +558,6 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
 export default connect(mapStateToProps, {
   addModuleRT,
   resetTimetable,
-  resetInternalSelections,
   modifyLesson,
   editLesson,
   // toggleSelectLesson,

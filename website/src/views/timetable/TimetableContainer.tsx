@@ -13,9 +13,11 @@ import { selectSemester } from 'actions/settings';
 import { getSemesterTimetableColors, getSemesterTimetableLessons } from 'selectors/timetables';
 import {
   addModule,
+  cancelEditLesson,
   deselectLesson,
   fetchTimetableModules,
   removeModule,
+  resetAllTimetables,
   selectLesson,
   setHiddenModulesFromImport,
   setTimetable,
@@ -25,7 +27,7 @@ import { undo } from 'actions/undoHistory';
 import { getModuleCondensed } from 'selectors/moduleBank';
 import { deserializeHidden, deserializeTimetable } from 'utils/timetables';
 import { fillColorMapping } from 'utils/colors';
-import { generateRoomID, semesterForTimetablePage, TIMETABLE_SHARE, timetablePage } from 'views/routes/paths';
+import { generateRoomID, semesterForTimetablePage, TIMETABLE_SHARE, timetablePage, timetablePageWithRoomID } from 'views/routes/paths';
 import deferComponentRender from 'views/hocs/deferComponentRender';
 import SemesterSwitcher from 'views/components/semester-switcher/SemesterSwitcher';
 import LoadingSpinner from 'views/components/LoadingSpinner';
@@ -94,7 +96,8 @@ function handleLessonChange(lessonChange: LessonChange) {
 const TimetableHeader: FC<{
   semester: Semester;
   readOnly?: boolean;
-}> = ({ semester, readOnly }) => {
+  roomID: String;
+}> = ({ semester, readOnly, roomID }) => {
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -103,7 +106,7 @@ const TimetableHeader: FC<{
       dispatch(selectSemester(newSemester));
       history.push({
         ...history.location,
-        pathname: timetablePage(newSemester),
+        pathname: timetablePageWithRoomID(newSemester, roomID),
       });
     },
     [dispatch, history],
@@ -142,6 +145,10 @@ export const TimetableContainerComponent: FC = () => {
   // Resubscribe if roomID changes 
   // TODO: Unsubscribe
   useEffect(() => {
+    // TODO: states should not even be saved in the first place
+    dispatch(cancelEditLesson());
+    dispatch(resetAllTimetables());
+
     apolloClient.subscribe({
       query: LESSON_CHANGE_SUBSCRIPTION,
       variables: {
@@ -206,6 +213,7 @@ export const TimetableContainerComponent: FC = () => {
           <TimetableHeader
             semester={semester}
             readOnly={readOnly}
+            roomID={roomID}
           />
         </>
       }
