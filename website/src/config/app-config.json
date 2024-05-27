@@ -1,6 +1,6 @@
 {
-  "brandName": "NUSMods",
-  "defaultDescription": "NUSMods is a timetable builder and knowledge platform, providing students with a better way to plan their school timetable and useful module-related information that are community-driven.",
+  "brandName": "Where are my friends?",
+  "defaultDescription": "Where are my friends?",
   "academicYear": "2023/2024",
   "apiBaseUrl": "https://api.nusmods.com",
   "elasticsearchBaseUrl": "https://nusmods-search.es.ap-southeast-1.aws.found.io:9243",
