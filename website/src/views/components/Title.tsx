@@ -9,11 +9,11 @@ type Props = {
 
 const Title: React.FC<Props> = ({
   children,
-  description = 'NUSMods is a timetable builder and knowledge platform, providing students with a better way to plan their school timetable and useful course-related information that are community-driven.',
+  description = 'Where are my friends?',
 }) => (
   // We use defer=false to allow Google Analytics autotrack to send the correct
   // page title. See bootstrapping/google-analytics.js
-  <Helmet titleTemplate={`%s - ${config.brandName}`} defer={false}>
+  <Helmet titleTemplate={`${config.brandName}`} defer={false}>
     <title>{children}</title>
     <meta property="description" content={description} />
     <meta property="og:title" content={children} />

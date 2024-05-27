@@ -132,7 +132,7 @@ const AppShell: FC = ({ children }) => {
         />
       </Helmet>
 
-      <nav className={styles.navbar}>
+      {/* <nav className={styles.navbar}>
         <NavLink className={styles.brand} to="/" title="Home">
           <Logo className={styles.brandLogo} title="NUSMods" />
         </NavLink>
@@ -141,10 +141,10 @@ const AppShell: FC = ({ children }) => {
 
           <div className={styles.weekText}>{weekText}</div>
         </div>
-      </nav>
+      </nav> */}
 
-      <div className="main-container">
-        <Navtabs />
+      {/* <div className="main-container">
+        <Navtabs /> */}
 
         <main className="main-content">
           {isModuleListReady ? (
@@ -155,7 +155,7 @@ const AppShell: FC = ({ children }) => {
             <LoadingSpinner />
           )}
         </main>
-      </div>
+      {/* </div> */}
 
       <ErrorBoundary>
         <FeedbackModal />
