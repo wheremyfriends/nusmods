@@ -93,6 +93,12 @@ export const DELETE_MODULE = gql`
   }
   `;
 
+export const RESET_TIMETABLE_MUTATION = gql`
+  mutation ResetTimetable($roomID: String!, $name: String!, $semester: Int!) {
+    resetTimetable(roomID: $roomID, name: $name, semester: $semester)
+  }
+  `;
+
 // TODO: Proper URL variable
 const wsLink = new GraphQLWsLink(createClient({
   url: 'ws://localhost:4000/graphql',
@@ -288,7 +294,15 @@ class TimetableContent extends React.Component<Props, State> {
 
 
   resetTimetable = () => {
-    this.props.resetTimetable(this.props.semester);
+    apolloClient
+      .mutate({
+        mutation: RESET_TIMETABLE_MUTATION,
+        variables: {
+          roomID: this.props.roomID, // TODO: Use variable roomID and name
+          name: "ks",
+          semester: this.props.semester,
+        }
+      });
   };
 
   resetTombstone = () => this.setState({ tombstone: null });
