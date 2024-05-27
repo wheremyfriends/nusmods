@@ -18,6 +18,7 @@ import {
   fetchTimetableModules,
   removeModule,
   resetAllTimetables,
+  resetTimetable,
   selectLesson,
   setHiddenModulesFromImport,
   setTimetable,
@@ -85,6 +86,10 @@ function handleLessonChange(lessonChange: LessonChange) {
     }
     case Action.DELETE_MODULE: {
       dispatch(removeModule(semester, moduleCode));
+      return;
+    }
+    case Action.RESET_TIMETABLE: {
+      dispatch(resetTimetable(semester));
       return;
     }
     default:
