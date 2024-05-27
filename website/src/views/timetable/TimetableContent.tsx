@@ -101,11 +101,11 @@ export const RESET_TIMETABLE_MUTATION = gql`
 
 // TODO: Proper URL variable
 const wsLink = new GraphQLWsLink(createClient({
-  url: 'ws://localhost:4000/graphql',
+  url: `ws://${window.location.hostname}:4000/graphql`,
 }));
 
 export const apolloClient = new ApolloClient({
-  uri: 'http://localhost:4000/graphql/',
+  uri: `http://${window.location.hostname}:4000/graphql/`,
   link: wsLink,
   cache: new InMemoryCache(),
 });
