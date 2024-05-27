@@ -66,7 +66,7 @@ function handleLessonChange(lessonChange: LessonChange) {
   const dispatch = store.dispatch;
   const { action, name, semester, moduleCode, lessonType, classNo } = lessonChange;
 
-  console.log(lessonChange)
+  // console.log(lessonChange)
   switch (action) {
     case Action.CREATE_LESSON: {
       // Presence of moduleCode should guarantee module is being/already added
