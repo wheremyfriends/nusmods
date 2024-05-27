@@ -253,7 +253,7 @@ class TimetableContent extends React.Component<Props, State> {
             mutation: MUTATION,
             variables: {
               roomID: roomID, // TODO: Use variable roomID and name
-              name: "ks",
+              name: "user1",
               semester: semester,
               moduleCode: moduleCode,
               lessonType: lessonType,
@@ -285,7 +285,7 @@ class TimetableContent extends React.Component<Props, State> {
         mutation: DELETE_MODULE,
         variables: {
           roomID: this.props.roomID, // TODO: Use variable roomID and name
-          name: "ks",
+          name: "user1",
           semester: this.props.semester,
           moduleCode: moduleCode,
         }
@@ -299,7 +299,7 @@ class TimetableContent extends React.Component<Props, State> {
         mutation: RESET_TIMETABLE_MUTATION,
         variables: {
           roomID: this.props.roomID, // TODO: Use variable roomID and name
-          name: "ks",
+          name: "user1",
           semester: this.props.semester,
         }
       });
@@ -528,13 +528,13 @@ class TimetableContent extends React.Component<Props, State> {
               <div className="col-12">
                 {this.renderModuleSections(addedModules, !isVerticalOrientation)}
               </div>
-              <div className="col-12">
+              {/* <div className="col-12">
                 <ModulesTableFooter
                   modules={addedModules}
                   semester={semester}
                   hiddenInTimetable={hiddenInTimetable}
                 />
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

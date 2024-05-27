@@ -76,7 +76,7 @@ export function addModuleRT(semester: Semester, moduleCode: ModuleCode, roomID: 
             mutation: CREATE_LESSON,
             variables: {
               roomID: roomID, // TODO: Use variable roomID and name
-              name: "ks",
+              name: "user1",
               semester: semester,
               moduleCode: moduleCode,
               lessonType: lessonType,
