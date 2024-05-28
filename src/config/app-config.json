@@ -1,0 +1,45 @@
+{
+  "brandName": "Where are my friends?",
+  "defaultDescription": "Where are my friends?",
+  "academicYear": "2023/2024",
+  "apiBaseUrl": "https://api.nusmods.com",
+  "elasticsearchBaseUrl": "https://nusmods-search.es.ap-southeast-1.aws.found.io:9243",
+  "semester": 2,
+  "disqusShortname": "nusmods-prod",
+  "venueFeedbackApi": "https://dev--nusmods-venue-github-hook--zwliew.autocode.dev/",
+  "moduleErrorApi": "https://0-0-7--nusmods-module-error-reporting.mediumdeviation.autocode.gg/",
+  "archiveYears": [
+    "2016/2017",
+    "2017/2018",
+    "2018/2019",
+    "2019/2020",
+    "2020/2021",
+    "2021/2022",
+    "2022/2023"
+  ],
+  "examAvailability": [1, 2, 3, 4],
+  "semesterNames": {
+    "1": "Semester 1",
+    "2": "Semester 2",
+    "3": "Special Term I",
+    "4": "Special Term II"
+  },
+  "shortSemesterNames": {
+    "1": "Sem 1",
+    "2": "Sem 2",
+    "3": "ST I",
+    "4": "ST II"
+  },
+  "showSt2ExamTimetable": true,
+  "st2ExamTimetableUrl": "https://myportal.nus.edu.sg/studentportal/academics/all/special-term-part-2.html",
+  "contact": {
+    "blog": "https://blog.nusmods.com",
+    "email": "nusmods@googlegroups.com",
+    "privateEmail": "mods@nusmods.com",
+    "facebook": "https://facebook.com/nusmods",
+    "githubOrg": "https://github.com/nusmodifications",
+    "githubRepo": "https://github.com/nusmodifications/nusmods",
+    "messenger": "https://m.me/nusmods",
+    "twitter": "https://twitter.com/nusmods"
+  }
+}
