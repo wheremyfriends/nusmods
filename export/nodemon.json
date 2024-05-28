@@ -1,3 +1,0 @@
-{
-  "ignore": ["README.md", "*.test.js", "__mocks__/*"]
-}
