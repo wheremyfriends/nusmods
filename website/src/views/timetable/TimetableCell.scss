@@ -55,9 +55,12 @@ $cell-opacity: 0.5;
     animation-name: zoomIn;
   }
 
-  &:hover,
-  &.hover {
-    opacity: 1;
+  @media (pointer: fine) {
+
+    &:hover,
+    &.hover {
+      opacity: 1;
+    }
   }
 }
 
