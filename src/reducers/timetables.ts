@@ -317,6 +317,7 @@ function timetables(
       const { semester } = action.payload;
 
       return produce(state, (draft) => {
+        draft.editingType = null;
         draft.multiLessons[semester] = DEFAULT_SEM_TIMETABLE_MULTI_CONFIG;
         draft.lessons[semester] = DEFAULT_SEM_TIMETABLE_CONFIG;
         draft.colors[semester] = DEFAULT_SEM_COLOR_MAP;
@@ -334,13 +335,21 @@ function timetables(
       }
     case REMOVE_MODULE:
       {
+        const { semester, moduleCode } = action.payload;
         // Prevent double removing (likely not required)
-        if (!isModuleInTimetable(action.payload.moduleCode, state.lessons, action.payload.semester))
+        if (!isModuleInTimetable(moduleCode, state.lessons, semester))
           return state;
         else {
-          const newState = produceTimetableState(action.payload.semester, state, action);
-          newState.multiLessons[action.payload.semester][action.payload.moduleCode] = {};
-          return newState;
+          return produce(state, (draft) => {
+            // Exit edit mode if editing module is removed
+            if (moduleCode == state.editingType?.moduleCode) {
+              draft.editingType = null;
+            }
+            draft.multiLessons[semester][moduleCode] = {};
+            draft.lessons[semester] = semTimetable(draft.lessons[semester], action);
+            draft.colors[semester] = semColors(state.colors[semester], action);
+            draft.hidden[semester] = semHiddenModules(state.hidden[semester], action);
+          });
         }
       }
     case SELECT_MODULE_COLOR:
