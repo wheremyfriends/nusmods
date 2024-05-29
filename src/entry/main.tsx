@@ -1,5 +1,3 @@
-// Import Sentry earliest to capture exceptions
-import 'bootstrapping/sentry';
 // core-js has issues with Promise feature detection on Edge, and hence
 // polyfills Promise incorrectly. Importing this polyfill directly resolves that.
 // This is necessary as PersistGate used in ./App uses `Promise.prototype.finally`.
@@ -11,7 +9,6 @@ import ReactModal from 'react-modal';
 
 import configureStore from 'bootstrapping/configure-store';
 import subscribeOnlineEvents from 'bootstrapping/subscribeOnlineEvents';
-import { initializeMamoto } from 'bootstrapping/matomo';
 import registerServiceWorker from 'bootstrapping/service-worker-manager';
 
 import 'styles/main.scss';
@@ -35,10 +32,6 @@ if (
   DEBUG_SERVICE_WORKER
 ) {
   registerServiceWorker(store);
-}
-
-if (NUSMODS_ENV === 'production') {
-  initializeMamoto();
 }
 
 export default store;

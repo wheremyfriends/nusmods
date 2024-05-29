@@ -99,13 +99,23 @@ export const RESET_TIMETABLE_MUTATION = gql`
   }
   `;
 
+let url = "";
+let wsURL = "";
+if (process.env.NODE_ENV == "production") {
+  url = `https://${window.location.hostname}/graphql`
+  wsURL = `wss://${window.location.hostname}/graphql`
+} else {
+  url = `http://${window.location.hostname}:4000/graphql`
+  wsURL = `ws://${window.location.hostname}:4000/graphql`
+}
+
 // TODO: Proper URL variable
 const wsLink = new GraphQLWsLink(createClient({
-  url: `ws://${window.location.hostname}:4000/graphql`,
+  url: wsURL,
 }));
 
 export const apolloClient = new ApolloClient({
-  uri: `http://${window.location.hostname}:4000/graphql/`,
+  uri: url,
   link: wsLink,
   cache: new InMemoryCache(),
 });

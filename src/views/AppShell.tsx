@@ -22,7 +22,6 @@ import Notification from 'views/components/notfications/Notification';
 import ErrorBoundary from 'views/errors/ErrorBoundary';
 import ErrorPage from 'views/errors/ErrorPage';
 import ApiError from 'views/errors/ApiError';
-import { trackPageView } from 'bootstrapping/matomo';
 import { isIOS } from 'bootstrapping/browser';
 import Logo from 'img/nusmods-logo.svg';
 import type { Dispatch } from 'types/redux';
@@ -104,10 +103,6 @@ const AppShell: FC = ({ children }) => {
   const { moduleListError, refetchModuleListAndTimetableModules } =
     useFetchModuleListAndTimetableModules();
 
-  // Enable Matomo analytics
-  const history = useHistory();
-  useEffect(() => trackPageView(history), [history]);
-
   const moduleList = useSelector((state: State) => state.moduleBank.moduleList);
   const isModuleListReady = moduleList.length;
 
@@ -146,15 +141,15 @@ const AppShell: FC = ({ children }) => {
       {/* <div className="main-container">
         <Navtabs /> */}
 
-        <main className="main-content">
-          {isModuleListReady ? (
-            <ErrorBoundary errorPage={() => <ErrorPage showReportDialog />}>
-              {children}
-            </ErrorBoundary>
-          ) : (
-            <LoadingSpinner />
-          )}
-        </main>
+      <main className="main-content">
+        {isModuleListReady ? (
+          <ErrorBoundary errorPage={() => <ErrorPage showReportDialog />}>
+            {children}
+          </ErrorBoundary>
+        ) : (
+          <LoadingSpinner />
+        )}
+      </main>
       {/* </div> */}
 
       <ErrorBoundary>

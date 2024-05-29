@@ -9,7 +9,6 @@ import { State } from 'types/state';
 
 import AppShell from 'views/AppShell';
 import Routes from 'views/routes/Routes';
-import { DIMENSIONS, setCustomDimensions } from 'bootstrapping/matomo';
 import ErrorBoundary from 'views/errors/ErrorBoundary';
 import ErrorPage from 'views/errors/ErrorPage';
 
@@ -22,10 +21,6 @@ const App: React.FC<Props> = ({ store, persistor }) => {
   const onBeforeLift = () => {
     const { theme, settings } = store.getState();
 
-    setCustomDimensions({
-      [DIMENSIONS.theme]: theme.id,
-      [DIMENSIONS.beta]: String(!!settings.beta),
-    });
   };
 
   return (
