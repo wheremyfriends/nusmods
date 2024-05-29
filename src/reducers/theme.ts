@@ -1,29 +1,30 @@
-import { HORIZONTAL, ThemeState, VERTICAL } from 'types/reducers';
-import { Theme } from 'types/settings';
-import { Actions } from 'types/actions';
+import { HORIZONTAL, ThemeState, VERTICAL } from "types/reducers";
+import { Theme } from "types/settings";
+import { Actions } from "types/actions";
 
-import { SET_EXPORTED_DATA } from 'actions/constants';
+import { SET_EXPORTED_DATA } from "actions/constants";
 import {
   CYCLE_THEME,
   SELECT_THEME,
   TOGGLE_TIMETABLE_ORIENTATION,
   TOGGLE_TITLE_DISPLAY,
-} from 'actions/theme';
-import themes from 'data/themes.json';
-import { DIMENSIONS, withTracker } from 'bootstrapping/matomo';
+} from "actions/theme";
+import themes from "data/themes.json";
 
 export const defaultThemeState: ThemeState = {
   // Available themes are defined in `themes.scss`
-  id: 'eighties',
+  id: "eighties",
   timetableOrientation: HORIZONTAL,
   showTitle: false,
 };
 export const themeIds = themes.map((obj: Theme) => obj.id);
 
-function theme(state: ThemeState = defaultThemeState, action: Actions): ThemeState {
+function theme(
+  state: ThemeState = defaultThemeState,
+  action: Actions,
+): ThemeState {
   function setTheme(newTheme: string): ThemeState {
     // Update theme analytics info
-    withTracker((tracker) => tracker.setCustomDimension(DIMENSIONS.theme, newTheme));
 
     return {
       ...state,
@@ -37,14 +38,16 @@ function theme(state: ThemeState = defaultThemeState, action: Actions): ThemeSta
 
     case CYCLE_THEME: {
       const newThemeIndex =
-        (themeIds.indexOf(state.id) + themeIds.length + action.payload) % themeIds.length;
+        (themeIds.indexOf(state.id) + themeIds.length + action.payload) %
+        themeIds.length;
 
       return setTheme(themeIds[newThemeIndex]);
     }
     case TOGGLE_TIMETABLE_ORIENTATION:
       return {
         ...state,
-        timetableOrientation: state.timetableOrientation === VERTICAL ? HORIZONTAL : VERTICAL,
+        timetableOrientation:
+          state.timetableOrientation === VERTICAL ? HORIZONTAL : VERTICAL,
       };
 
     case SET_EXPORTED_DATA:
