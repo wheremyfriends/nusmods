@@ -270,7 +270,9 @@ class TimetableContent extends React.Component<Props, State> {
               classNo: classNo
             }
           })
-        // .then((result) => console.log(result));
+          .catch((err) => {
+            console.error("CREATE/DELETE_LESSON error: ", err)
+          });
       }
     } else {
       // Enter edit mode for the module and lesson type
@@ -299,6 +301,9 @@ class TimetableContent extends React.Component<Props, State> {
           semester: this.props.semester,
           moduleCode: moduleCode,
         }
+      })
+      .catch((err) => {
+        console.error("DELETE_MODULE error: ", err)
       });
   }
 
@@ -312,6 +317,9 @@ class TimetableContent extends React.Component<Props, State> {
           name: "user1",
           semester: this.props.semester,
         }
+      })
+      .catch((err) => {
+        console.error("RESET_TIMETABLE error: ", err)
       });
   };
 

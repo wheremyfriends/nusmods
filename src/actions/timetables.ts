@@ -83,7 +83,9 @@ export function addModuleRT(semester: Semester, moduleCode: ModuleCode, roomID: 
               classNo: classNo
             }
           })
-        // .then((result) => console.log(result));
+          .catch((err) => {
+            console.error("CREATE_LESSON error: ", err)
+          });
       }
     });
 }
