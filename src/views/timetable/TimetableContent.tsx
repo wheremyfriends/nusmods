@@ -319,7 +319,7 @@ class TimetableContent extends React.Component<Props, State> {
         }
       })
       .catch((err) => {
-        console.log("RESET_TIMETABLE error: ", err)
+        console.error("RESET_TIMETABLE error: ", err)
       });
   };
 
