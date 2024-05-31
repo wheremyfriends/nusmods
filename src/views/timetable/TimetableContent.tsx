@@ -303,7 +303,7 @@ class TimetableContent extends React.Component<Props, State> {
         }
       })
       .catch((err) => {
-        console.log("DELETE_MODULE error: ", err)
+        console.error("DELETE_MODULE error: ", err)
       });
   }
 
