@@ -20,13 +20,13 @@ export function generateRoomID() {
   return "room1"; // TODO: Implement generator
 }
 
-export function timetablePageWithRoomID(semester: Semester, roomID: String): string {
-  return `${timetablePage(semester)}/${roomID}`;
+export function pageWithRoomID(roomID: String): string {
+  return `/${roomID}`;
 }
 
 // Semester -> Timetable path
 export function timetablePage(semester: Semester): string {
-  return `/timetable/${fromSemester[semester]}`;
+  return `/`;
 }
 
 export const TIMETABLE_SHARE = 'share';

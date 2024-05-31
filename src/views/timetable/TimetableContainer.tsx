@@ -28,7 +28,7 @@ import { undo } from 'actions/undoHistory';
 import { getModuleCondensed } from 'selectors/moduleBank';
 import { deserializeHidden, deserializeTimetable } from 'utils/timetables';
 import { fillColorMapping } from 'utils/colors';
-import { generateRoomID, semesterForTimetablePage, TIMETABLE_SHARE, timetablePage, timetablePageWithRoomID } from 'views/routes/paths';
+import { generateRoomID, semesterForTimetablePage, TIMETABLE_SHARE, timetablePage, pageWithRoomID } from 'views/routes/paths';
 import deferComponentRender from 'views/hocs/deferComponentRender';
 import SemesterSwitcher from 'views/components/semester-switcher/SemesterSwitcher';
 import LoadingSpinner from 'views/components/LoadingSpinner';
@@ -40,6 +40,7 @@ import { gql } from '@apollo/client';
 import { Action } from 'actions/constants';
 import store from 'entry/main';
 import _ from 'lodash';
+import config from 'config';
 
 export const LESSON_CHANGE_SUBSCRIPTION = gql`
   subscription LessonChange($roomID: String!) {
@@ -56,7 +57,6 @@ export const LESSON_CHANGE_SUBSCRIPTION = gql`
 
 type Params = {
   roomID: string;
-  semester: string;
 };
 
 function handleLessonChange(lessonChange: LessonChange) {
@@ -111,7 +111,7 @@ const TimetableHeader: FC<{
       dispatch(selectSemester(newSemester));
       history.push({
         ...history.location,
-        pathname: timetablePageWithRoomID(newSemester, roomID),
+        pathname: pageWithRoomID(roomID),
       });
     },
     [dispatch, history],
@@ -135,7 +135,7 @@ const TimetableHeader: FC<{
 export const TimetableContainerComponent: FC = () => {
   const params = useParams<Params>();
 
-  const semester = semesterForTimetablePage(params.semester);
+  const semester = useSelector(({ app }: State) => app.activeSemester);
   const roomID = params.roomID;
 
   const timetable = useSelector(getSemesterTimetableLessons)(semester);
@@ -154,12 +154,13 @@ export const TimetableContainerComponent: FC = () => {
     dispatch(cancelEditLesson());
     dispatch(resetAllTimetables());
 
-    apolloClient.subscribe({
-      query: LESSON_CHANGE_SUBSCRIPTION,
-      variables: {
-        roomID: roomID,
-      },
-    })
+    apolloClient
+      .subscribe({
+        query: LESSON_CHANGE_SUBSCRIPTION,
+        variables: {
+          roomID: roomID,
+        },
+      })
       .subscribe({
         next(data) {
           // console.log("data", data);
@@ -192,12 +193,10 @@ export const TimetableContainerComponent: FC = () => {
   useScrollToTop();
 
   // Early returns must be placed last
-  if (semester == null) {
-    return <Redirect to={timetablePage(activeSemester)} />;
-  }
 
+  // Redirect to auto generated roomID
   if (!roomID) {
-    return <Redirect to={timetablePageWithRoomID(semester, generateRoomID())} />;
+    return <Redirect to={pageWithRoomID(generateRoomID())} />;
   }
 
   // 2. If we are importing a timetable, check that all imported modules are
