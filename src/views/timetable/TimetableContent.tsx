@@ -271,7 +271,7 @@ class TimetableContent extends React.Component<Props, State> {
             }
           })
           .catch((err) => {
-            console.log("CREATE/DELETE_LESSON error: ", err)
+            console.error("CREATE/DELETE_LESSON error: ", err)
           });
       }
     } else {
