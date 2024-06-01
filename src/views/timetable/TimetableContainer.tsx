@@ -33,7 +33,7 @@ import deferComponentRender from 'views/hocs/deferComponentRender';
 import SemesterSwitcher from 'views/components/semester-switcher/SemesterSwitcher';
 import LoadingSpinner from 'views/components/LoadingSpinner';
 import useScrollToTop from 'views/hooks/useScrollToTop';
-import TimetableContent, { apolloClient } from './TimetableContent';
+import TimetableContent, { CREATE_USER, apolloClient } from './TimetableContent';
 
 import styles from './TimetableContainer.scss';
 import { gql } from '@apollo/client';
@@ -153,6 +153,20 @@ export const TimetableContainerComponent: FC = () => {
     // TODO: states should not even be saved in the first place
     dispatch(cancelEditLesson());
     dispatch(resetAllTimetables());
+
+    // TODO: Implement proper user creation
+    // This is a temporary solution to support all rooms
+    apolloClient
+      .mutate({
+        mutation: CREATE_USER,
+        variables: {
+          roomID: roomID, // TODO: Use variable roomID and name
+          name: "user1",
+        }
+      })
+      .catch((err) => {
+        console.error("CREATE_USER error: ", err)
+      });
 
     apolloClient
       .subscribe({
