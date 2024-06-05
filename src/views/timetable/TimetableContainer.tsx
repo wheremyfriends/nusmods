@@ -42,6 +42,16 @@ import store from 'entry/main';
 import _ from 'lodash';
 import config from 'config';
 
+export const USER_CHANGE_SUBSCRIPTION = gql`
+  subscription UserChange($roomID: String!) {
+    userChange(roomID: $roomID) {
+      action
+      userID
+      name
+    }
+  }
+  `;
+
 export const LESSON_CHANGE_SUBSCRIPTION = gql`
   subscription LessonChange($roomID: String!) {
     lessonChange(roomID: $roomID) {
@@ -156,17 +166,37 @@ export const TimetableContainerComponent: FC = () => {
 
     // TODO: Implement proper user creation
     // This is a temporary solution to support all rooms
+    // apolloClient
+    //   .mutate({
+    //     mutation: CREATE_USER,
+    //     variables: {
+    //       roomID: roomID, // TODO: Use variable roomID and name
+    //       // name: "User 1",
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     console.error("CREATE_USER error: ", err)
+    //   });
+
     apolloClient
-      .mutate({
-        mutation: CREATE_USER,
+      .subscribe({
+        query: USER_CHANGE_SUBSCRIPTION,
         variables: {
-          roomID: roomID, // TODO: Use variable roomID and name
-          name: "user1",
-        }
+          roomID: roomID,
+        },
       })
-      .catch((err) => {
-        console.error("CREATE_USER error: ", err)
-      });
+      .subscribe({
+        next(data) {
+          if (data.data) {
+            console.log(data.data.userChange);
+          }
+        },
+        error(error) {
+          console.log("Apollo subscribe error", error);
+        },
+        complete() {
+        },
+      })
 
     apolloClient
       .subscribe({

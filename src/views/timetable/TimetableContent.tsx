@@ -70,8 +70,8 @@ import type { Dispatch, GetState } from 'types/redux';
 import { Action } from 'actions/constants';
 
 export const CREATE_USER = gql`
-  mutation CreateUser($roomID: String!, $name: String!) {
-    createUser(roomID: $roomID, name: $name)
+  mutation CreateUser($roomID: String!) {
+    createUser(roomID: $roomID)
   }
 `;
 
@@ -263,7 +263,7 @@ class TimetableContent extends React.Component<Props, State> {
             mutation: MUTATION,
             variables: {
               roomID: roomID, // TODO: Use variable roomID and name
-              name: "user1",
+              name: "User 1",
               semester: semester,
               moduleCode: moduleCode,
               lessonType: lessonType,
@@ -297,7 +297,7 @@ class TimetableContent extends React.Component<Props, State> {
         mutation: DELETE_MODULE,
         variables: {
           roomID: this.props.roomID, // TODO: Use variable roomID and name
-          name: "user1",
+          name: "User 1",
           semester: this.props.semester,
           moduleCode: moduleCode,
         }
@@ -314,7 +314,7 @@ class TimetableContent extends React.Component<Props, State> {
         mutation: RESET_TIMETABLE_MUTATION,
         variables: {
           roomID: this.props.roomID, // TODO: Use variable roomID and name
-          name: "user1",
+          name: "User 1",
           semester: this.props.semester,
         }
       })
