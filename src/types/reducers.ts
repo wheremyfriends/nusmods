@@ -49,6 +49,7 @@ export type NotificationOptions = {
 export type NotificationData = { readonly message: string } & NotificationOptions;
 
 export type AppState = {
+  readonly activeUserID: number | null;
   readonly activeSemester: Semester;
   readonly activeLesson: Lesson | null;
   readonly isOnline: boolean;

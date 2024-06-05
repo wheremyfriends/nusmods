@@ -69,12 +69,6 @@ import { fetchModule } from 'actions/moduleBank';
 import type { Dispatch, GetState } from 'types/redux';
 import { Action } from 'actions/constants';
 
-export const CREATE_USER = gql`
-  mutation CreateUser($roomID: String!) {
-    createUser(roomID: $roomID)
-  }
-`;
-
 export const CREATE_LESSON = gql`
   mutation CreateLesson($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
     createLesson(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
@@ -133,6 +127,7 @@ type OwnProps = {
   timetable: SemTimetableConfig;
   colors: ColorMapping;
   roomID: String;
+  userID: number | null;
 };
 
 type Props = OwnProps & {
@@ -562,10 +557,11 @@ class TimetableContent extends React.Component<Props, State> {
 }
 
 function mapStateToProps(state: StoreState, ownProps: OwnProps) {
-  const { semester, timetable, readOnly, roomID } = ownProps;
+  const { semester, timetable, readOnly, roomID, userID } = ownProps;
   const { modules } = state.moduleBank;
   const { multiLessons } = state.timetables;
 
+  console.log(userID); // TODO: display timetable by userID
   const timetableWithLessons = hydrateSemTimetableWithMultiLessons(timetable, multiLessons[semester], modules, semester);
 
   // Determine the key to check for hidden modules based on readOnly status
@@ -578,6 +574,7 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
     timetableWithLessons,
     modules,
     roomID,
+    userID,
     activeLesson: state.app.activeLesson,
     editingType: state.timetables.editingType,
     multiLessons: state.timetables.multiLessons,

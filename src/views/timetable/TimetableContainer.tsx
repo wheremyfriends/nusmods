@@ -43,15 +43,6 @@ import store from 'entry/main';
 import _ from 'lodash';
 import config from 'config';
 
-export const USER_CHANGE_SUBSCRIPTION = gql`
-  subscription UserChange($roomID: String!) {
-    userChange(roomID: $roomID) {
-      action
-      userID
-      name
-    }
-  }
-  `;
 
 export const LESSON_CHANGE_SUBSCRIPTION = gql`
   subscription LessonChange($roomID: String!) {
@@ -117,21 +108,21 @@ const TimetableHeader: FC<{
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const handleSelectSemester = useCallback(
-    (newSemester: Semester) => {
-      dispatch(selectSemester(newSemester));
-      history.push({
-        ...history.location,
-        pathname: pageWithRoomID(roomID),
-      });
-    },
-    [dispatch, history],
-  );
+  // const handleSelectSemester = useCallback(
+  //   (newSemester: Semester) => {
+  //     dispatch(selectSemester(newSemester));
+  //     history.push({
+  //       ...history.location,
+  //       pathname: pageWithRoomID(roomID),
+  //     });
+  //   },
+  //   [dispatch, history],
+  // );
 
   return (
     <SemesterSwitcher
       semester={semester}
-      onSelectSemester={handleSelectSemester}
+      onSelectSemester={(semester) => dispatch(selectSemester(semester))}
       readOnly={readOnly}
     />
   );
@@ -147,6 +138,7 @@ export const TimetableContainerComponent: FC = () => {
   const params = useParams<Params>();
 
   const semester = useSelector(({ app }: State) => app.activeSemester);
+  const userID = useSelector(({ app }: State) => app.activeUserID);
   const roomID = params.roomID;
 
   const timetable = useSelector(getSemesterTimetableLessons)(semester);
@@ -158,7 +150,7 @@ export const TimetableContainerComponent: FC = () => {
 
   const dispatch = useDispatch();
 
-  console.log("SUB", roomID)
+  console.log("TIMETABLE COMPONENT UPDATE")
 
   // Resubscribe if roomID changes 
   // TODO: Unsubscribe
@@ -167,39 +159,6 @@ export const TimetableContainerComponent: FC = () => {
     dispatch(cancelEditLesson());
     dispatch(resetAllTimetables());
 
-    // TODO: Implement proper user creation
-    // This is a temporary solution to support all rooms
-    // apolloClient
-    //   .mutate({
-    //     mutation: CREATE_USER,
-    //     variables: {
-    //       roomID: roomID, // TODO: Use variable roomID and name
-    //       // name: "user1",
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     console.error("CREATE_USER error: ", err)
-    //   });
-
-    apolloClient
-      .subscribe({
-        query: USER_CHANGE_SUBSCRIPTION,
-        variables: {
-          roomID: roomID,
-        },
-      })
-      .subscribe({
-        next(data) {
-          if (data.data) {
-            console.log(data.data.userChange);
-          }
-        },
-        error(error) {
-          console.log("Apollo subscribe error", error);
-        },
-        complete() {
-        },
-      })
 
     apolloClient
       .subscribe({
@@ -260,6 +219,7 @@ export const TimetableContainerComponent: FC = () => {
       <TimetableContent
         key={semester}
         semester={semester}
+        userID={userID}
         timetable={displayedTimetable}
         colors={filledColors}
         roomID={roomID}

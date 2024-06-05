@@ -87,6 +87,12 @@ export type HoverLesson = {
 
 export type ColorIndex = number;
 
+export type UserChange = {
+  readonly action: String;
+  readonly userID: number;
+  readonly name: String;
+}
+
 export type LessonChange = {
   readonly action: String;
   readonly name: String;
@@ -95,3 +101,8 @@ export type LessonChange = {
   readonly lessonType: LessonType;
   readonly classNo: ClassNo;
 }
+
+export type RoomUser = {
+  readonly userID: number;
+  name: String;
+};

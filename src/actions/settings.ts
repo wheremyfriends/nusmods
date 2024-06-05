@@ -5,6 +5,14 @@ import { ModuleTableOrder } from 'types/reducers';
 import { RegPeriod, ScheduleType } from 'config';
 import { getModRegRoundKey } from 'selectors/modreg';
 
+export const SWITCH_USER = 'SWITCH_USER' as const;
+export function switchUser(userID: Number) {
+  return {
+    type: SWITCH_USER,
+    payload: userID,
+  };
+}
+
 export const SELECT_SEMESTER = 'SELECT_SEMESTER' as const;
 export function selectSemester(semester: Semester) {
   return {
