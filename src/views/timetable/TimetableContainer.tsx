@@ -9,6 +9,7 @@ import type { ColorMapping } from 'types/reducers';
 import type { State } from 'types/state';
 import type { LessonChange, SemTimetableConfig } from 'types/timetables';
 
+import Navtabs from 'views/layout/Navtabs';
 import { selectSemester } from 'actions/settings';
 import { getSemesterTimetableColors, getSemesterTimetableLessons } from 'selectors/timetables';
 import {
@@ -157,6 +158,8 @@ export const TimetableContainerComponent: FC = () => {
 
   const dispatch = useDispatch();
 
+  console.log("SUB", roomID)
+
   // Resubscribe if roomID changes 
   // TODO: Unsubscribe
   useEffect(() => {
@@ -171,7 +174,7 @@ export const TimetableContainerComponent: FC = () => {
     //     mutation: CREATE_USER,
     //     variables: {
     //       roomID: roomID, // TODO: Use variable roomID and name
-    //       // name: "User 1",
+    //       // name: "user1",
     //     }
     //   })
     //   .catch((err) => {
@@ -250,23 +253,28 @@ export const TimetableContainerComponent: FC = () => {
   }
 
   return (
-    <TimetableContent
-      key={semester}
-      semester={semester}
-      timetable={displayedTimetable}
-      colors={filledColors}
-      roomID={roomID}
-      header={
-        <>
-          <TimetableHeader
-            semester={semester}
-            readOnly={readOnly}
-            roomID={roomID}
-          />
-        </>
-      }
-      readOnly={readOnly}
-    />
+    <>
+      <div className="main-container">
+        <Navtabs roomID={roomID} />
+      </div>
+      <TimetableContent
+        key={semester}
+        semester={semester}
+        timetable={displayedTimetable}
+        colors={filledColors}
+        roomID={roomID}
+        header={
+          <>
+            <TimetableHeader
+              semester={semester}
+              readOnly={readOnly}
+              roomID={roomID}
+            />
+          </>
+        }
+        readOnly={readOnly}
+      />
+    </>
   );
 };
 

@@ -23,7 +23,9 @@ import styles from './Navtabs.scss';
 
 export const NAVTAB_HEIGHT = 48;
 
-const Navtabs: FC = () => {
+const Navtabs: FC<{
+  roomID: String;
+}> = ({ roomID }) => {
   const activeSemester = useSelector(({ app }: State) => app.activeSemester);
   const beta = useSelector(({ settings }: State) => settings.beta);
 
@@ -32,13 +34,15 @@ const Navtabs: FC = () => {
     activeClassName: styles.linkActive,
   };
 
+  console.log("ROOMID ",roomID)
+
   return (
     <nav className={styles.nav}>
       <NavLink {...tabProps} to={timetablePage(activeSemester)}>
         <Calendar />
         <span className={styles.title}>Timetable</span>
       </NavLink>
-      <div className={styles.divider} />
+      {/* <div className={styles.divider} /> */}
     </nav>
   );
 };
