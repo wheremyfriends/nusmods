@@ -112,7 +112,9 @@ const Navtabs: FC<{
 
   const navUsers = users.map((user) => {
 
-    return <a className={styles.link}
+    return <a
+    key={user.userID}
+    className={styles.link}
     onClick={(e) => {
       const userID = Number(e.currentTarget.getAttribute('data-userid'));
       dispatch(switchUser(userID));
