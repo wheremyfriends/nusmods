@@ -116,8 +116,11 @@ const Navtabs: FC<{
     key={user.userID}
     className={styles.link}
     onClick={(e) => {
-      const userID = Number(e.currentTarget.getAttribute('data-userid'));
-      dispatch(switchUser(userID));
+      const userIDString = e.currentTarget.getAttribute('data-userid');
+      if (userIDString) {
+        const userID: number = +userIDString;
+        dispatch(switchUser(userID));
+      }
     }}
     data-userid={user.userID}
     >

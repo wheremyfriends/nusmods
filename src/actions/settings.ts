@@ -6,7 +6,7 @@ import { RegPeriod, ScheduleType } from 'config';
 import { getModRegRoundKey } from 'selectors/modreg';
 
 export const SWITCH_USER = 'SWITCH_USER' as const;
-export function switchUser(userID: Number) {
+export function switchUser(userID: number) {
   return {
     type: SWITCH_USER,
     payload: userID,
