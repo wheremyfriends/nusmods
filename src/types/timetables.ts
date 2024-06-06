@@ -30,6 +30,10 @@ export type TimetableMultiConfig = {
   [semester: string]: SemTimetableMultiConfig;
 };
 
+export type MultiUserTimetableConfig = {
+  [userID: UserID]: TimetableMultiConfig;
+};
+
 export type EditingType = {
   readonly moduleCode: ModuleCode;
   readonly lessonType: LessonType;

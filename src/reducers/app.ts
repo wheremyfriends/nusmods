@@ -16,7 +16,7 @@ import {
 const defaultAppState = (): AppState => ({
   // Default to the current semester from config.
   activeSemester: config.semester,
-  activeUserID: null,
+  activeUserID: -1,
   // The lesson being modified on the timetable.
   activeLesson: null,
   isOnline: navigator.onLine,

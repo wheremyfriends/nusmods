@@ -16,18 +16,14 @@ import {
   addModule,
   cancelEditLesson,
   deselectLesson,
-  fetchTimetableModules,
   removeModule,
   resetAllTimetables,
   resetTimetable,
   selectLesson,
-  setHiddenModulesFromImport,
-  setTimetable,
 } from 'actions/timetables';
 import { openNotification } from 'actions/app';
 import { undo } from 'actions/undoHistory';
 import { getModuleCondensed } from 'selectors/moduleBank';
-import { deserializeHidden, deserializeTimetable } from 'utils/timetables';
 import { fillColorMapping } from 'utils/colors';
 import { generateRoomID, semesterForTimetablePage, TIMETABLE_SHARE, timetablePage, pageWithRoomID } from 'views/routes/paths';
 import deferComponentRender from 'views/hocs/deferComponentRender';
@@ -73,25 +69,25 @@ function handleLessonChange(lessonChange: LessonChange) {
     case Action.CREATE_LESSON: {
       // Presence of moduleCode should guarantee module is being/already added
       // Prevents multiple adding
-      if (_.isEmpty(state.timetables.multiLessons[semester]?.[moduleCode])) {
+      if (_.isEmpty(state.timetables.multiUserLessons[userID]?.[semester]?.[moduleCode])) {
         dispatch(addModule(userID, semester, moduleCode)); // TODO: define typed dispatch
       }
 
-      dispatch(selectLesson(semester, moduleCode, lessonType, classNo));
+      dispatch(selectLesson(userID, semester, moduleCode, lessonType, classNo));
       return;
     }
 
     case Action.DELETE_LESSON: {
-      dispatch(deselectLesson(semester, moduleCode, lessonType, classNo));
+      dispatch(deselectLesson(userID, semester, moduleCode, lessonType, classNo));
       return;
 
     }
     case Action.DELETE_MODULE: {
-      dispatch(removeModule(semester, moduleCode));
+      dispatch(removeModule(userID, semester, moduleCode));
       return;
     }
     case Action.RESET_TIMETABLE: {
-      dispatch(resetTimetable(semester));
+      dispatch(resetTimetable(userID, semester));
       return;
     }
     default:
@@ -141,7 +137,7 @@ export const TimetableContainerComponent: FC = () => {
   const userID = useSelector(({ app }: State) => app.activeUserID);
   const roomID = params.roomID;
 
-  const multiTimetable = useSelector(getSemesterTimetableMultiLessons)(semester);
+  const multiTimetable = useSelector(getSemesterTimetableMultiLessons)(userID, semester);
   const colors = useSelector(getSemesterTimetableColors)(semester);
   const getModule = useSelector(getModuleCondensed);
   const modules = useSelector(({ moduleBank }: State) => moduleBank.modules);

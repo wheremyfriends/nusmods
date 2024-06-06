@@ -8,7 +8,7 @@ import produce from 'immer';
 import { Eye, EyeOff, Trash } from 'react-feather';
 import { ModuleWithColor, TombstoneModule } from 'types/views';
 import { ColorIndex } from 'types/timetables';
-import { ModuleCode, Semester } from 'types/modules';
+import { ModuleCode, Semester, UserID } from 'types/modules';
 import { State as StoreState } from 'types/state';
 import { ModuleTableOrder } from 'types/reducers';
 
@@ -31,6 +31,7 @@ import ModuleTombstone from './ModuleTombstone';
 import { moduleOrders } from './ModulesTableFooter';
 
 export type Props = {
+  userID: UserID,
   semester: Semester;
   readOnly: boolean;
   horizontalOrientation: boolean;
@@ -40,8 +41,8 @@ export type Props = {
 
   // Actions
   selectModuleColor: (semester: Semester, moduleCode: ModuleCode, colorIndex: ColorIndex) => void;
-  hideLessonInTimetable: (semester: Semester, moduleCode: ModuleCode) => void;
-  showLessonInTimetable: (semester: Semester, moduleCode: ModuleCode) => void;
+  hideLessonInTimetable: (userID: UserID, semester: Semester, moduleCode: ModuleCode) => void;
+  showLessonInTimetable: (userID: UserID, semester: Semester, moduleCode: ModuleCode) => void;
   onRemoveModule: (moduleCode: ModuleCode) => void;
   resetTombstone: () => void;
 };
@@ -50,7 +51,7 @@ export const TimetableModulesTableComponent: React.FC<Props> = (props) => {
   const renderModuleActions = (module: ModuleWithColor) => {
     const hideBtnLabel = `${module.hiddenInTimetable ? 'Show' : 'Hide'} ${module.moduleCode}`;
     const removeBtnLabel = `Remove ${module.moduleCode} from timetable`;
-    const { semester } = props;
+    const { userID, semester } = props;
 
     return (
       <div className={styles.moduleActionButtons}>
@@ -72,9 +73,9 @@ export const TimetableModulesTableComponent: React.FC<Props> = (props) => {
               aria-label={hideBtnLabel}
               onClick={() => {
                 if (module.hiddenInTimetable) {
-                  props.showLessonInTimetable(semester, module.moduleCode);
+                  props.showLessonInTimetable(userID, semester, module.moduleCode);
                 } else {
-                  props.hideLessonInTimetable(semester, module.moduleCode);
+                  props.hideLessonInTimetable(userID, semester, module.moduleCode);
                 }
               }}
             >

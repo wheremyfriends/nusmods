@@ -23,6 +23,7 @@ export const SET_HIDDEN_IMPORTED = 'SET_HIDDEN_IMPORTED' as const;
 export const HIDDEN_IMPORTED_SEM = 'HIDDEN_IMPORTED_SEM' as const;
 export const Internal = {
   setTimetable(
+    userID: UserID,
     semester: Semester,
     timetable: SemTimetableConfig | undefined,
     colors?: ColorMapping,
@@ -30,7 +31,13 @@ export const Internal = {
   ) {
     return {
       type: SET_TIMETABLE,
-      payload: { semester, timetable, colors, hiddenModules },
+      payload: {
+        userID,
+        semester,
+        timetable,
+        colors,
+        hiddenModules
+      },
     };
   },
 
@@ -49,7 +56,7 @@ export const Internal = {
 
 
 // Realtime implementation which will mutate to GraphQL instead of modifying local timetable
-export function addModuleRT(semester: Semester, moduleCode: ModuleCode, roomID: String) {
+export function addModuleRT(userID: UserID, semester: Semester, moduleCode: ModuleCode, roomID: String) {
   return (dispatch: Dispatch, getState: GetState) =>
     dispatch(fetchModule(moduleCode)).then(() => {
       const module: Module = getState().moduleBank.modules[moduleCode];
@@ -59,7 +66,7 @@ export function addModuleRT(semester: Semester, moduleCode: ModuleCode, roomID: 
             action: {
               text: 'Retry',
               handler: () => {
-                dispatch(addModuleRT(semester, moduleCode, roomID));
+                dispatch(addModuleRT(userID, semester, moduleCode, roomID));
               },
             },
           }),
@@ -77,7 +84,7 @@ export function addModuleRT(semester: Semester, moduleCode: ModuleCode, roomID: 
             mutation: CREATE_LESSON,
             variables: {
               roomID: roomID, // TODO: Use variable roomID and name
-              userID: 10,
+              userID: userID,
               semester: semester,
               moduleCode: moduleCode,
               lessonType: lessonType,
@@ -120,10 +127,11 @@ export function addModule(userID: UserID, semester: Semester, moduleCode: Module
 }
 
 export const REMOVE_MODULE = 'REMOVE_MODULE' as const;
-export function removeModule(semester: Semester, moduleCode: ModuleCode) {
+export function removeModule(userID: UserID, semester: Semester, moduleCode: ModuleCode) {
   return {
     type: REMOVE_MODULE,
     payload: {
+      userID,
       semester,
       moduleCode,
     },
@@ -140,10 +148,11 @@ export function resetAllTimetables() {
 
 
 export const RESET_TIMETABLE = 'RESET_TIMETABLE' as const;
-export function resetTimetable(semester: Semester) {
+export function resetTimetable(userID: UserID, semester: Semester) {
   return {
     type: RESET_TIMETABLE,
     payload: {
+      userID,
       semester,
     },
   };
@@ -173,10 +182,11 @@ export function editLesson(semester: Semester, lesson: Lesson) {
 }
 
 export const ADD_SELECTED_MODULE = 'ADD_SELECTED_MODULE' as const;
-export function selectLesson(semester: Semester, moduleCode: ModuleCode, lessonType: LessonType, classNo: ClassNo) {
+export function selectLesson(userID: UserID, semester: Semester, moduleCode: ModuleCode, lessonType: LessonType, classNo: ClassNo) {
   return {
     type: ADD_SELECTED_MODULE,
     payload: {
+      userID,
       semester,
       moduleCode,
       lessonType,
@@ -186,10 +196,11 @@ export function selectLesson(semester: Semester, moduleCode: ModuleCode, lessonT
 }
 
 export const REMOVE_SELECTED_MODULE = 'REMOVE_SELECTED_MODULE' as const;
-export function deselectLesson(semester: Semester, moduleCode: ModuleCode, lessonType: LessonType, classNo: ClassNo) {
+export function deselectLesson(userID: UserID, semester: Semester, moduleCode: ModuleCode, lessonType: LessonType, classNo: ClassNo) {
   return {
     type: REMOVE_SELECTED_MODULE,
     payload: {
+      userID,
       semester,
       moduleCode,
       lessonType,
@@ -253,6 +264,7 @@ export function cancelModifyLesson() {
 }
 
 export function setTimetable(
+  userID: UserID,
   semester: Semester,
   timetable?: SemTimetableConfig,
   colors?: ColorMapping,
@@ -265,10 +277,11 @@ export function setTimetable(
 
     return dispatch(
       Internal.setTimetable(
+        userID,
         semester,
         validatedTimetable,
         colors,
-        getState().timetables.hidden[HIDDEN_IMPORTED_SEM] || [],
+        getState().timetables.multiUserHidden[userID]?.[HIDDEN_IMPORTED_SEM] || [],
       ),
     );
   };
@@ -342,17 +355,17 @@ export function selectModuleColor(
 }
 
 export const HIDE_LESSON_IN_TIMETABLE = 'HIDE_LESSON_IN_TIMETABLE' as const;
-export function hideLessonInTimetable(semester: Semester, moduleCode: ModuleCode) {
+export function hideLessonInTimetable(userID: UserID, semester: Semester, moduleCode: ModuleCode) {
   return {
     type: HIDE_LESSON_IN_TIMETABLE,
-    payload: { moduleCode, semester },
+    payload: { userID, moduleCode, semester },
   };
 }
 
 export const SHOW_LESSON_IN_TIMETABLE = 'SHOW_LESSON_IN_TIMETABLE' as const;
-export function showLessonInTimetable(semester: Semester, moduleCode: ModuleCode) {
+export function showLessonInTimetable(userID: UserID, semester: Semester, moduleCode: ModuleCode) {
   return {
     type: SHOW_LESSON_IN_TIMETABLE,
-    payload: { moduleCode, semester },
+    payload: { userID, moduleCode, semester },
   };
 }

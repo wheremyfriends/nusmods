@@ -75,8 +75,7 @@ const Navtabs: FC<{
             switch (action) {
               case Action.CREATE_USER: {
                 setUsers(users => [...users, { userID, name }]);
-                const activeUserID = store.getState().app.activeUserID;
-                if (!activeUserID) {
+                if (store.getState().app.activeUserID == -1) {
                   dispatch(switchUser(userID));
                 }
                 return;

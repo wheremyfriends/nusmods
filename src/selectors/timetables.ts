@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 
-import type { ModuleCode, Semester } from 'types/modules';
+import type { ModuleCode, Semester, UserID } from 'types/modules';
 import type { State } from 'types/state';
 
 import { fetchArchiveRequest } from 'actions/constants';
@@ -25,9 +25,9 @@ const EMPTY_OBJECT = {};
  * Extract semester timetable lessons for a specific semester.
  */
 export const getSemesterTimetableMultiLessons = createSelector(
-  ({ timetables }: State) => timetables.multiLessons,
-  (multiLessons) => (semester: Semester | null) =>
-    semester === null ? EMPTY_OBJECT : multiLessons[semester] ?? EMPTY_OBJECT,
+  ({ timetables }: State) => timetables.multiUserLessons,
+  (multiUserLessons) => (userID: UserID, semester: Semester | null) =>
+    semester === null ? EMPTY_OBJECT : multiUserLessons[userID]?.[semester] ?? EMPTY_OBJECT,
 );
 
 /**
