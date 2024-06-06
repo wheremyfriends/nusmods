@@ -11,7 +11,7 @@ import type { LessonChange, SemTimetableConfig } from 'types/timetables';
 
 import Navtabs from 'views/layout/Navtabs';
 import { selectSemester } from 'actions/settings';
-import { getSemesterTimetableColors, getSemesterTimetableLessons, getSemesterTimetableMultiLessons } from 'selectors/timetables';
+import { getSemesterTimetableColors, getSemesterTimetableMultiLessons } from 'selectors/timetables';
 import {
   addModule,
   cancelEditLesson,
@@ -34,7 +34,7 @@ import deferComponentRender from 'views/hocs/deferComponentRender';
 import SemesterSwitcher from 'views/components/semester-switcher/SemesterSwitcher';
 import LoadingSpinner from 'views/components/LoadingSpinner';
 import useScrollToTop from 'views/hooks/useScrollToTop';
-import TimetableContent, { CREATE_USER, apolloClient } from './TimetableContent';
+import TimetableContent, { apolloClient } from './TimetableContent';
 
 import styles from './TimetableContainer.scss';
 import { gql } from '@apollo/client';
@@ -182,6 +182,7 @@ export const TimetableContainerComponent: FC = () => {
       })
   }, [roomID]);
 
+  // Not needed as modules are fetched on demand
   const isLoading = useMemo(() => {
     // Check that all modules are fully loaded into the ModuleBank
     const moduleCodes = new Set(Object.keys(multiTimetable));
