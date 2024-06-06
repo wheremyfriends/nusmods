@@ -69,7 +69,7 @@ export const persistConfig = {
       ...original,
       archive: {
         ...inbound.archive,
-        [inbound.academicYear]: inbound.lessons,
+        [inbound.academicYear]: inbound.multiLessons,
       },
     };
   },
@@ -177,52 +177,14 @@ function semHiddenModules(state = DEFAULT_HIDDEN_STATE, action: Actions) {
   }
 }
 
-function mergeSemTimetable(
-  timetable: TimetableConfig,
-  multiTimetable: TimetableMultiConfig
-): TimetableMultiConfig {
-  for (const [semester, semTimetableConfig] of Object.entries(timetable)) {
-    for (const [moduleCode, moduleLessonConfig] of Object.entries(semTimetableConfig)) {
-      for (const [lessonType, classNo] of Object.entries(moduleLessonConfig)) {
-        // Merge only if multiTimetable does not contain entries for this specific type
-        const multiClassNo = multiTimetable[semester]?.[moduleCode]?.[lessonType] || [];
-        if (multiClassNo.length === 0) {
-          ((multiTimetable[semester] ??= {})[moduleCode] ??= {})[lessonType] = [classNo];
-        }
-      }
-    }
-  }
-  return multiTimetable;
-}
-
 export const defaultTimetableState: TimetablesState = {
   multiLessons: {},
   editingType: null,
-  lessons: {},
   colors: {},
   hidden: {},
   academicYear: config.academicYear,
   archive: {},
 };
-
-
-
-
-function isModuleInTimetable(
-  moduleCode: ModuleCode,
-  timetable: TimetableConfig,
-  semester: Semester
-): boolean {
-  return !!get(timetable[semester], moduleCode);
-}
-
-function produceTimetableState(semester: Semester, state: TimetablesState, action: Actions) {
-  return produce(state, (draft) => {
-    draft.lessons[semester] = semTimetable(draft.lessons[semester], action);
-    draft.colors[semester] = semColors(state.colors[semester], action);
-    draft.hidden[semester] = semHiddenModules(state.hidden[semester], action);
-  });
-}
 
 function timetables(
   state: TimetablesState = defaultTimetableState,
@@ -295,7 +257,6 @@ function timetables(
       const { semester, timetable, colors, hiddenModules } = action.payload;
 
       return produce(state, (draft) => {
-        draft.lessons[semester] = timetable || DEFAULT_SEM_TIMETABLE_CONFIG;
         draft.colors[semester] = colors || {};
         draft.hidden[semester] = hiddenModules || [];
 
@@ -307,7 +268,6 @@ function timetables(
     case RESET_ALL_TIMETABLES: {
       return produce(state, (draft) => {
         draft.multiLessons = {};
-        draft.lessons = {};
         draft.colors = {};
         draft.hidden = {};
       });
@@ -319,14 +279,18 @@ function timetables(
       return produce(state, (draft) => {
         draft.editingType = null;
         draft.multiLessons[semester] = DEFAULT_SEM_TIMETABLE_MULTI_CONFIG;
-        draft.lessons[semester] = DEFAULT_SEM_TIMETABLE_CONFIG;
         draft.colors[semester] = DEFAULT_SEM_COLOR_MAP;
         draft.hidden[semester] = DEFAULT_HIDDEN_STATE;
       });
     }
 
-    case ADD_MODULE:
-      return produceTimetableState(action.payload.semester, state, action);
+    case ADD_MODULE: {
+      const { semester, moduleCode } = action.payload;
+      return produce(state, (draft) => {
+        draft.colors[semester] = semColors(state.colors[semester], action);
+        draft.hidden[semester] = semHiddenModules(state.hidden[semester], action);
+      });
+    }
     case REMOVE_MODULE:
       {
         const { semester, moduleCode } = action.payload;
@@ -335,7 +299,6 @@ function timetables(
           if (moduleCode == state.editingType?.moduleCode)
             draft.editingType = null;
           draft.multiLessons[semester] = omit(draft.multiLessons[semester], moduleCode);
-          draft.lessons[semester] = semTimetable(draft.lessons[semester], action);
           draft.colors[semester] = semColors(state.colors[semester], action);
           draft.hidden[semester] = semHiddenModules(state.hidden[semester], action);
         });
@@ -345,7 +308,11 @@ function timetables(
     case SET_LESSON_CONFIG:
     case HIDE_LESSON_IN_TIMETABLE:
     case SHOW_LESSON_IN_TIMETABLE: {
-      return produceTimetableState(action.payload.semester, state, action);
+      const { semester, moduleCode } = action.payload;
+      return produce(state, (draft) => {
+        draft.colors[semester] = semColors(state.colors[semester], action);
+        draft.hidden[semester] = semHiddenModules(state.hidden[semester], action);
+      });
     }
 
     case SET_EXPORTED_DATA: {
@@ -353,7 +320,6 @@ function timetables(
 
       return {
         ...state,
-        lessons: { [semester]: timetable },
         colors: { [semester]: colors },
         hidden: { [semester]: hidden },
       };

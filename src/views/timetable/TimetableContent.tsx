@@ -124,7 +124,7 @@ type OwnProps = {
   readOnly: boolean;
   header: React.ReactNode;
   semester: Semester;
-  timetable: SemTimetableConfig;
+  multiTimetable: SemTimetableMultiConfig;
   colors: ColorMapping;
   roomID: String;
   userID: number | null;
@@ -519,7 +519,7 @@ class TimetableContent extends React.Component<Props, State> {
                   isVerticalOrientation={isVerticalOrientation}
                   showTitle={isShowingTitle}
                   semester={semester}
-                  timetable={this.props.timetable}
+                  multiTimetable={this.props.multiLessons[semester]}
                   showExamCalendar={showExamCalendar}
                   resetTimetable={this.resetTimetable}
                   toggleExamCalendar={() => this.setState({ showExamCalendar: !showExamCalendar })}
@@ -531,7 +531,7 @@ class TimetableContent extends React.Component<Props, State> {
                 {!readOnly && (
                   <ModulesSelectContainer
                     semester={semester}
-                    timetable={this.props.timetable}
+                    multiTimetable={this.props.multiLessons[semester] || {}}
                     addModule={this.addModuleRT}
                     removeModuleRT={this.removeModuleRT}
                   />
@@ -557,7 +557,7 @@ class TimetableContent extends React.Component<Props, State> {
 }
 
 function mapStateToProps(state: StoreState, ownProps: OwnProps) {
-  const { semester, timetable, readOnly, roomID, userID } = ownProps;
+  const { semester, readOnly, roomID, userID } = ownProps;
   const { modules } = state.moduleBank;
   const { multiLessons } = state.timetables;
 
@@ -570,7 +570,6 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
 
   return {
     semester,
-    timetable,
     timetableWithLessons,
     modules,
     roomID,

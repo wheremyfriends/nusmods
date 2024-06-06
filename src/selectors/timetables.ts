@@ -24,10 +24,10 @@ const EMPTY_OBJECT = {};
 /**
  * Extract semester timetable lessons for a specific semester.
  */
-export const getSemesterTimetableLessons = createSelector(
-  ({ timetables }: State) => timetables.lessons,
-  (lessons) => (semester: Semester | null) =>
-    semester === null ? EMPTY_OBJECT : lessons[semester] ?? EMPTY_OBJECT,
+export const getSemesterTimetableMultiLessons = createSelector(
+  ({ timetables }: State) => timetables.multiLessons,
+  (multiLessons) => (semester: Semester | null) =>
+    semester === null ? EMPTY_OBJECT : multiLessons[semester] ?? EMPTY_OBJECT,
 );
 
 /**

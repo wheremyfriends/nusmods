@@ -2,7 +2,7 @@ import { createSelector } from 'reselect';
 
 import type { ModuleCode, ModuleCondensed, Semester } from 'types/modules';
 import type { ModuleCodeMap, ModuleSelectListItem } from 'types/reducers';
-import type { SemTimetableConfig } from 'types/timetables';
+import type { SemTimetableConfig, SemTimetableMultiConfig } from 'types/timetables';
 import type { State } from 'types/state';
 
 import { notNull } from 'types/utils';
@@ -28,7 +28,7 @@ export function getAllPendingModules(state: State): ModuleCode[] {
 export function getSemModuleSelectList(
   state: State,
   semester: Semester,
-  semTimetableConfig: SemTimetableConfig,
+  semTimetableMultiConfig: SemTimetableMultiConfig,
 ): ModuleSelectListItem[] {
   const pendingModules = new Set(getAllPendingModules(state));
 
@@ -38,7 +38,7 @@ export function getSemModuleSelectList(
       .filter((item) => item.semesters.includes(semester))
       .map((module) => ({
         ...module,
-        isAdded: module.moduleCode in semTimetableConfig,
+        isAdded: module.moduleCode in semTimetableMultiConfig,
         isAdding: pendingModules.has(module.moduleCode),
       }))
   );

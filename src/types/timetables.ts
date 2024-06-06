@@ -20,6 +20,11 @@ export type SemTimetableMultiConfig = {
   [moduleCode: string]: ModuleLessonMultiConfig;
 };
 
+// TimetableConfig is the timetable data for the whole academic year.
+export type TimetableConfig = {
+  [semester: string]: SemTimetableConfig;
+};
+
 // TimetableMultiConfig is the timetable data for each semester that supports multiple ClassNo.
 export type TimetableMultiConfig = {
   [semester: string]: SemTimetableMultiConfig;
@@ -56,12 +61,6 @@ export type ModuleLessonConfigWithLessons = {
 // SemTimetableConfig is the timetable data for each semester with lessons data.
 export type SemTimetableConfigWithLessons = {
   [moduleCode: string]: ModuleLessonConfigWithLessons;
-};
-
-
-// TimetableConfig is the timetable data for the whole academic year.
-export type TimetableConfig = {
-  [semester: string]: SemTimetableConfig;
 };
 
 // TimetableDayFormat is timetable data grouped by DayText.
