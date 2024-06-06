@@ -334,7 +334,7 @@ function timetables(
           // Exit edit mode if editing module is removed
           if (moduleCode == state.editingType?.moduleCode)
             draft.editingType = null;
-          draft.multiLessons[semester][moduleCode] = {};
+          draft.multiLessons[semester] = omit(draft.multiLessons[semester], moduleCode);
           draft.lessons[semester] = semTimetable(draft.lessons[semester], action);
           draft.colors[semester] = semColors(state.colors[semester], action);
           draft.hidden[semester] = semHiddenModules(state.hidden[semester], action);
