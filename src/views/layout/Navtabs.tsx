@@ -1,24 +1,11 @@
 import { useEffect, useState, type FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { NavLink } from 'react-router-dom';
 import classnames from 'classnames';
 import {
-  BookOpen,
-  Calendar,
-  Clock,
-  Heart,
-  Map,
   UserPlus,
-  Settings,
-  Star,
-  Target,
-  Trello,
   User,
 } from 'react-feather';
 
-import { showCPExTab } from 'featureFlags';
-import ExternalLink from 'views/components/ExternalLink';
-import { pageWithRoomID, timetablePage } from 'views/routes/paths';
 import type { State } from 'types/state';
 
 import styles from './Navtabs.scss';
@@ -52,6 +39,7 @@ const Navtabs: FC<{
   roomID: String;
 }> = ({ roomID }) => {
   const activeSemester = useSelector(({ app }: State) => app.activeSemester);
+  const activeUserID = useSelector(({ app }: State) => app.activeUserID);
   const beta = useSelector(({ settings }: State) => settings.beta);
   const dispatch = useDispatch();
 
@@ -105,16 +93,11 @@ const Navtabs: FC<{
       })
   }, [roomID]);
 
-  const tabProps = {
-    className: styles.link,
-    activeClassName: styles.linkActive, // TODO: active for current user
-  };
-
   const navUsers = users.map((user) => {
 
     return <a
     key={user.userID}
-    className={styles.link}
+    className={activeUserID === user.userID ? classnames(styles.link, styles.linkActive) : styles.link}
     onClick={(e) => {
       const userIDString = e.currentTarget.getAttribute('data-userid');
       if (userIDString) {

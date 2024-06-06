@@ -64,7 +64,6 @@ function handleLessonChange(lessonChange: LessonChange) {
   const dispatch = store.dispatch;
   const { action, userID, semester, moduleCode, lessonType, classNo } = lessonChange;
 
-  // console.log(lessonChange)
   switch (action) {
     case Action.CREATE_LESSON: {
       // Presence of moduleCode should guarantee module is being/already added
@@ -146,8 +145,6 @@ export const TimetableContainerComponent: FC = () => {
 
   const dispatch = useDispatch();
 
-  console.log("TIMETABLE COMPONENT UPDATE", colors)
-
   // Resubscribe if roomID changes 
   // TODO: Unsubscribe
   useEffect(() => {
@@ -165,7 +162,6 @@ export const TimetableContainerComponent: FC = () => {
       })
       .subscribe({
         next(data) {
-          // console.log("data", data);
           if (data.data) {
             handleLessonChange(data.data.lessonChange);
           }

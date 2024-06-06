@@ -454,7 +454,6 @@ class TimetableContent extends React.Component<Props, State> {
         colorIndex: colors[lesson.moduleCode],
       }),
     );
-    console.log(coloredTimetableLessons)
 
     const arrangedLessons = arrangeLessonsForWeek(coloredTimetableLessons);
     const arrangedLessonsWithModifiableFlag: TimetableArrangement = _.mapValues(
@@ -565,8 +564,7 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
   const { modules } = state.moduleBank;
   const { multiUserLessons } = state.timetables;
 
-  console.log(userID); // TODO: display timetable by userID
-    // TODO: handle possibility of non-existent SemConfig
+  // TODO: handle possibility of non-existent SemConfig
   const timetableWithLessons = hydrateSemTimetableWithMultiLessons(multiUserLessons[userID]?.[semester] || {}, modules, semester);
 
   // Determine the key to check for hidden modules based on readOnly status
