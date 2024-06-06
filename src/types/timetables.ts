@@ -1,4 +1,4 @@
-import { ClassNo, LessonType, ModuleCode, ModuleTitle, RawLesson, Semester } from './modules';
+import { ClassNo, LessonType, ModuleCode, ModuleTitle, RawLesson, Semester, UserID } from './modules';
 
 //  ModuleLessonConfig is a mapping of lessonType to ClassNo for a module.
 export type ModuleLessonConfig = {
@@ -88,13 +88,13 @@ export type ColorIndex = number;
 
 export type UserChange = {
   readonly action: String;
-  readonly userID: number;
+  readonly userID: UserID;
   readonly name: String;
 }
 
 export type LessonChange = {
   readonly action: String;
-  readonly name: String;
+  readonly userID: UserID;
   readonly semester: Semester;
   readonly moduleCode: ModuleCode;
   readonly lessonType: LessonType;
@@ -102,6 +102,6 @@ export type LessonChange = {
 }
 
 export type RoomUser = {
-  readonly userID: number;
+  readonly userID: UserID;
   name: String;
 };

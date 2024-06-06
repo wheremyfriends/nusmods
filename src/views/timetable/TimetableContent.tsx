@@ -4,7 +4,7 @@ import { connect, useDispatch } from 'react-redux';
 import _, { get } from 'lodash';
 
 import { ColorMapping, HORIZONTAL, ModulesMap, TimetableOrientation, NotificationOptions } from 'types/reducers';
-import { Module, ModuleCode, LessonType, Semester, ClassNo } from 'types/modules';
+import { Module, ModuleCode, LessonType, Semester, ClassNo, UserID } from 'types/modules';
 import {
   ColoredLesson,
   Lesson,
@@ -70,26 +70,26 @@ import type { Dispatch, GetState } from 'types/redux';
 import { Action } from 'actions/constants';
 
 export const CREATE_LESSON = gql`
-  mutation CreateLesson($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
-    createLesson(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
+  mutation CreateLesson($roomID: String!, $userID: Int!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
+    createLesson(roomID: $roomID, userID: $userID, semester: $semester, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
   }
 `;
 
 export const DELETE_LESSON = gql`
-  mutation DeleteLesson($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
-    deleteLesson(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
+  mutation DeleteLesson($roomID: String!, $userID: Int!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
+    deleteLesson(roomID: $roomID, userID: $userID, semester: $semester, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
   }
   `;
 
 export const DELETE_MODULE = gql`
-  mutation DeleteModule($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!) {
-    deleteModule(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode)
+  mutation DeleteModule($roomID: String!, $userID: Int!, $semester: Int!, $moduleCode: String!) {
+    deleteModule(roomID: $roomID, userID: $userID, semester: $semester, moduleCode: $moduleCode)
   }
   `;
 
 export const RESET_TIMETABLE_MUTATION = gql`
-  mutation ResetTimetable($roomID: String!, $name: String!, $semester: Int!) {
-    resetTimetable(roomID: $roomID, name: $name, semester: $semester)
+  mutation ResetTimetable($roomID: String!, $userID: Int!, $semester: Int!) {
+    resetTimetable(roomID: $roomID, userID: $userID, semester: $semester)
   }
   `;
 
@@ -127,7 +127,7 @@ type OwnProps = {
   multiTimetable: SemTimetableMultiConfig;
   colors: ColorMapping;
   roomID: String;
-  userID: number | null;
+  userID: UserID | null;
 };
 
 type Props = OwnProps & {
@@ -258,7 +258,7 @@ class TimetableContent extends React.Component<Props, State> {
             mutation: MUTATION,
             variables: {
               roomID: roomID, // TODO: Use variable roomID and name
-              name: "User 1",
+              userID: 10,
               semester: semester,
               moduleCode: moduleCode,
               lessonType: lessonType,
@@ -292,7 +292,7 @@ class TimetableContent extends React.Component<Props, State> {
         mutation: DELETE_MODULE,
         variables: {
           roomID: this.props.roomID, // TODO: Use variable roomID and name
-          name: "User 1",
+          userID: 10,
           semester: this.props.semester,
           moduleCode: moduleCode,
         }
@@ -309,7 +309,7 @@ class TimetableContent extends React.Component<Props, State> {
         mutation: RESET_TIMETABLE_MUTATION,
         variables: {
           roomID: this.props.roomID, // TODO: Use variable roomID and name
-          name: "User 1",
+          userID: 10,
           semester: this.props.semester,
         }
       })

@@ -28,6 +28,7 @@ import { RoomUser, UserChange } from 'types/timetables';
 import { Action } from 'actions/constants';
 import { switchUser } from 'actions/settings';
 import store from 'entry/main';
+import { UserID } from 'types/modules';
 
 export const NAVTAB_HEIGHT = 48;
 
@@ -118,7 +119,7 @@ const Navtabs: FC<{
     onClick={(e) => {
       const userIDString = e.currentTarget.getAttribute('data-userid');
       if (userIDString) {
-        const userID: number = +userIDString;
+        const userID: UserID = +userIDString;
         dispatch(switchUser(userID));
       }
     }}

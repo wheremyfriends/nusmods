@@ -48,7 +48,7 @@ export const LESSON_CHANGE_SUBSCRIPTION = gql`
   subscription LessonChange($roomID: String!) {
     lessonChange(roomID: $roomID) {
       action
-      name
+      userID
       semester
       moduleCode
       lessonType
@@ -66,7 +66,7 @@ function handleLessonChange(lessonChange: LessonChange) {
   // TODO: Check if request is intended for correct user via name
   const state = store.getState();
   const dispatch = store.dispatch;
-  const { action, name, semester, moduleCode, lessonType, classNo } = lessonChange;
+  const { action, userID, semester, moduleCode, lessonType, classNo } = lessonChange;
 
   // console.log(lessonChange)
   switch (action) {
@@ -74,7 +74,7 @@ function handleLessonChange(lessonChange: LessonChange) {
       // Presence of moduleCode should guarantee module is being/already added
       // Prevents multiple adding
       if (_.isEmpty(state.timetables.multiLessons[semester]?.[moduleCode])) {
-        dispatch(addModule(semester, moduleCode)); // TODO: define typed dispatch
+        dispatch(addModule(userID, semester, moduleCode)); // TODO: define typed dispatch
       }
 
       dispatch(selectLesson(semester, moduleCode, lessonType, classNo));

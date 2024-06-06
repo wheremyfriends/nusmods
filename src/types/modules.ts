@@ -10,6 +10,7 @@ export type LessonType = string;
 export type ModuleCode = string;
 export type ModuleTitle = string;
 export type Semester = number;
+export type UserID = number;
 export type Department = string;
 export type Workload = string | readonly number[];
 export type Venue = string;

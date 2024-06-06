@@ -3,7 +3,7 @@ import { each, flatMap } from 'lodash';
 import type { ColorIndex, Lesson, ModuleLessonConfig, SemTimetableConfig } from 'types/timetables';
 import type { Dispatch, GetState } from 'types/redux';
 import type { ColorMapping } from 'types/reducers';
-import type { ClassNo, LessonType, Module, ModuleCode, Semester } from 'types/modules';
+import type { ClassNo, LessonType, Module, ModuleCode, Semester, UserID } from 'types/modules';
 
 import { fetchModule } from 'actions/moduleBank';
 import { openNotification } from 'actions/app';
@@ -34,10 +34,11 @@ export const Internal = {
     };
   },
 
-  addModule(semester: Semester, moduleCode: ModuleCode, moduleLessonConfig: ModuleLessonConfig) {
+  addModule(userID: UserID, semester: Semester, moduleCode: ModuleCode, moduleLessonConfig: ModuleLessonConfig) {
     return {
       type: ADD_MODULE,
       payload: {
+        userID,
         semester,
         moduleCode,
         moduleLessonConfig,
@@ -76,7 +77,7 @@ export function addModuleRT(semester: Semester, moduleCode: ModuleCode, roomID: 
             mutation: CREATE_LESSON,
             variables: {
               roomID: roomID, // TODO: Use variable roomID and name
-              name: "User 1",
+              userID: 10,
               semester: semester,
               moduleCode: moduleCode,
               lessonType: lessonType,
@@ -91,7 +92,7 @@ export function addModuleRT(semester: Semester, moduleCode: ModuleCode, roomID: 
 }
 
 
-export function addModule(semester: Semester, moduleCode: ModuleCode) {
+export function addModule(userID: UserID, semester: Semester, moduleCode: ModuleCode) {
   return (dispatch: Dispatch, getState: GetState) =>
     dispatch(fetchModule(moduleCode)).then(() => {
       const module: Module = getState().moduleBank.modules[moduleCode];
@@ -102,7 +103,7 @@ export function addModule(semester: Semester, moduleCode: ModuleCode) {
             action: {
               text: 'Retry',
               handler: () => {
-                dispatch(addModule(semester, moduleCode));
+                dispatch(addModule(userID, semester, moduleCode));
               },
             },
           }),
@@ -114,7 +115,7 @@ export function addModule(semester: Semester, moduleCode: ModuleCode) {
       const lessons = getModuleTimetable(module, semester);
       const moduleLessonConfig = randomModuleLessonConfig(lessons);
 
-      dispatch(Internal.addModule(semester, moduleCode, moduleLessonConfig));
+      dispatch(Internal.addModule(userID, semester, moduleCode, moduleLessonConfig));
     });
 }
 

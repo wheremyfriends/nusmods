@@ -1,4 +1,4 @@
-import { Faculty, Semester } from 'types/modules';
+import { Faculty, Semester, UserID } from 'types/modules';
 import { Mode } from 'types/settings';
 import { ModuleTableOrder } from 'types/reducers';
 
@@ -6,7 +6,7 @@ import { RegPeriod, ScheduleType } from 'config';
 import { getModRegRoundKey } from 'selectors/modreg';
 
 export const SWITCH_USER = 'SWITCH_USER' as const;
-export function switchUser(userID: number) {
+export function switchUser(userID: UserID) {
   return {
     type: SWITCH_USER,
     payload: userID,
