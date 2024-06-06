@@ -11,7 +11,7 @@ import type { LessonChange, SemTimetableConfig } from 'types/timetables';
 
 import Navtabs from 'views/layout/Navtabs';
 import { selectSemester } from 'actions/settings';
-import { getSemesterTimetableColors, getSemesterTimetableLessons } from 'selectors/timetables';
+import { getSemesterTimetableColors, getSemesterTimetableLessons, getSemesterTimetableMultiLessons } from 'selectors/timetables';
 import {
   addModule,
   cancelEditLesson,
@@ -141,7 +141,7 @@ export const TimetableContainerComponent: FC = () => {
   const userID = useSelector(({ app }: State) => app.activeUserID);
   const roomID = params.roomID;
 
-  const timetable = useSelector(getSemesterTimetableLessons)(semester);
+  const multiTimetable = useSelector(getSemesterTimetableMultiLessons)(semester);
   const colors = useSelector(getSemesterTimetableColors)(semester);
   const getModule = useSelector(getModuleCondensed);
   const modules = useSelector(({ moduleBank }: State) => moduleBank.modules);
@@ -150,7 +150,7 @@ export const TimetableContainerComponent: FC = () => {
 
   const dispatch = useDispatch();
 
-  console.log("TIMETABLE COMPONENT UPDATE")
+  console.log("TIMETABLE COMPONENT UPDATE", colors)
 
   // Resubscribe if roomID changes 
   // TODO: Unsubscribe
@@ -184,15 +184,15 @@ export const TimetableContainerComponent: FC = () => {
 
   const isLoading = useMemo(() => {
     // Check that all modules are fully loaded into the ModuleBank
-    const moduleCodes = new Set(Object.keys(timetable));
+    const moduleCodes = new Set(Object.keys(multiTimetable));
     // TODO: Account for loading error
     return Array.from(moduleCodes).some((moduleCode) => !modules[moduleCode]);
-  }, [getModule, modules, timetable]);
+  }, [getModule, modules, multiTimetable]);
 
-  const displayedTimetable = timetable;
+  const displayedMultiTimetable = multiTimetable;
   const filledColors = useMemo(
-    () => fillColorMapping(displayedTimetable, colors),
-    [colors, displayedTimetable],
+    () => fillColorMapping(displayedMultiTimetable, colors),
+    [colors, displayedMultiTimetable],
   );
   const readOnly = false;
 
@@ -207,9 +207,9 @@ export const TimetableContainerComponent: FC = () => {
 
   // 2. If we are importing a timetable, check that all imported modules are
   //    loaded first, and display a spinner if they're not.
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
+  // if (isLoading) {
+  //   return <LoadingSpinner />;
+  // }
 
   return (
     <>
@@ -220,7 +220,7 @@ export const TimetableContainerComponent: FC = () => {
         key={semester}
         semester={semester}
         userID={userID}
-        timetable={displayedTimetable}
+        multiTimetable={displayedMultiTimetable}
         colors={filledColors}
         roomID={roomID}
         header={

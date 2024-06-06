@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { ModuleSelectList } from 'types/reducers';
 import { ModuleCode, Semester } from 'types/modules';
-import { SemTimetableConfig } from 'types/timetables';
+import { SemTimetableConfig, SemTimetableMultiConfig } from 'types/timetables';
 
 import Online from 'views/components/Online';
 import { popNotification } from 'actions/app';
@@ -13,7 +13,7 @@ import { State as StoreState } from 'types/state';
 import ModulesSelect from './ModulesSelect';
 
 type OwnProps = {
-  timetable: SemTimetableConfig;
+  multiTimetable: SemTimetableMultiConfig;
   semester: Semester;
 };
 
@@ -64,8 +64,8 @@ class ModulesSelectContainer extends Component<Props> {
 }
 
 function mapStateToProps(state: StoreState, ownProps: OwnProps) {
-  const { semester, timetable } = ownProps;
-  const moduleList = getSemModuleSelectList(state, semester, timetable);
+  const { semester, multiTimetable } = ownProps;
+  const moduleList = getSemModuleSelectList(state, semester, multiTimetable);
 
   return {
     semester,

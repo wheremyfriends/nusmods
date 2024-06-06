@@ -198,7 +198,7 @@ function mergeSemTimetable(
 export const defaultTimetableState: TimetablesState = {
   multiLessons: {},
   editingType: null,
-  lessons: {},
+  // lessons: {},
   colors: {},
   hidden: {},
   academicYear: config.academicYear,
@@ -218,7 +218,7 @@ function isModuleInTimetable(
 
 function produceTimetableState(semester: Semester, state: TimetablesState, action: Actions) {
   return produce(state, (draft) => {
-    draft.lessons[semester] = semTimetable(draft.lessons[semester], action);
+    // draft.lessons[semester] = semTimetable(draft.lessons[semester], action);
     draft.colors[semester] = semColors(state.colors[semester], action);
     draft.hidden[semester] = semHiddenModules(state.hidden[semester], action);
   });
@@ -295,7 +295,7 @@ function timetables(
       const { semester, timetable, colors, hiddenModules } = action.payload;
 
       return produce(state, (draft) => {
-        draft.lessons[semester] = timetable || DEFAULT_SEM_TIMETABLE_CONFIG;
+        // draft.lessons[semester] = timetable || DEFAULT_SEM_TIMETABLE_CONFIG;
         draft.colors[semester] = colors || {};
         draft.hidden[semester] = hiddenModules || [];
 
@@ -307,7 +307,7 @@ function timetables(
     case RESET_ALL_TIMETABLES: {
       return produce(state, (draft) => {
         draft.multiLessons = {};
-        draft.lessons = {};
+        // draft.lessons = {};
         draft.colors = {};
         draft.hidden = {};
       });
@@ -319,7 +319,7 @@ function timetables(
       return produce(state, (draft) => {
         draft.editingType = null;
         draft.multiLessons[semester] = DEFAULT_SEM_TIMETABLE_MULTI_CONFIG;
-        draft.lessons[semester] = DEFAULT_SEM_TIMETABLE_CONFIG;
+        // draft.lessons[semester] = DEFAULT_SEM_TIMETABLE_CONFIG;
         draft.colors[semester] = DEFAULT_SEM_COLOR_MAP;
         draft.hidden[semester] = DEFAULT_HIDDEN_STATE;
       });
@@ -335,7 +335,7 @@ function timetables(
           if (moduleCode == state.editingType?.moduleCode)
             draft.editingType = null;
           draft.multiLessons[semester] = omit(draft.multiLessons[semester], moduleCode);
-          draft.lessons[semester] = semTimetable(draft.lessons[semester], action);
+          // draft.lessons[semester] = semTimetable(draft.lessons[semester], action);
           draft.colors[semester] = semColors(state.colors[semester], action);
           draft.hidden[semester] = semHiddenModules(state.hidden[semester], action);
         });
@@ -353,7 +353,7 @@ function timetables(
 
       return {
         ...state,
-        lessons: { [semester]: timetable },
+        // lessons: { [semester]: timetable },
         colors: { [semester]: colors },
         hidden: { [semester]: hidden },
       };

@@ -117,7 +117,7 @@ export type HiddenModulesMap = { [semester: string]: ModuleCode[] };
 export type TimetablesState = {
   readonly multiLessons: TimetableMultiConfig;
   readonly editingType: EditingType | null;
-  readonly lessons: TimetableConfig;
+  // readonly lessons: TimetableConfig;
   readonly colors: SemesterColorMap;
   readonly hidden: HiddenModulesMap;
   readonly academicYear: string;
