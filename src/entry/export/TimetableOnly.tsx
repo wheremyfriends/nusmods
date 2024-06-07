@@ -41,7 +41,6 @@ export default class TimetableOnly extends Component<Props, State> {
             <TimetableContent
               header={null}
               semester={semester}
-              timetable={timetable}
               colors={timetableColors}
               readOnly
             />

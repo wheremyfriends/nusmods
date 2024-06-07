@@ -4,7 +4,7 @@ import { connect, useDispatch } from 'react-redux';
 import _, { get } from 'lodash';
 
 import { ColorMapping, HORIZONTAL, ModulesMap, TimetableOrientation, NotificationOptions } from 'types/reducers';
-import { Module, ModuleCode, LessonType, Semester, ClassNo } from 'types/modules';
+import { Module, ModuleCode, LessonType, Semester, ClassNo, UserID } from 'types/modules';
 import {
   ColoredLesson,
   Lesson,
@@ -16,6 +16,7 @@ import {
   TimetableArrangement,
   TimetableMultiConfig,
   LessonChange,
+  MultiUserTimetableConfig,
 } from 'types/timetables';
 
 import {
@@ -69,33 +70,27 @@ import { fetchModule } from 'actions/moduleBank';
 import type { Dispatch, GetState } from 'types/redux';
 import { Action } from 'actions/constants';
 
-export const CREATE_USER = gql`
-  mutation CreateUser($roomID: String!, $name: String!) {
-    createUser(roomID: $roomID, name: $name)
-  }
-`;
-
 export const CREATE_LESSON = gql`
-  mutation CreateLesson($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
-    createLesson(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
+  mutation CreateLesson($roomID: String!, $userID: Int!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
+    createLesson(roomID: $roomID, userID: $userID, semester: $semester, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
   }
 `;
 
 export const DELETE_LESSON = gql`
-  mutation DeleteLesson($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
-    deleteLesson(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
+  mutation DeleteLesson($roomID: String!, $userID: Int!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
+    deleteLesson(roomID: $roomID, userID: $userID, semester: $semester, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
   }
   `;
 
 export const DELETE_MODULE = gql`
-  mutation DeleteModule($roomID: String!, $name: String!, $semester: Int!, $moduleCode: String!) {
-    deleteModule(roomID: $roomID, name: $name, semester: $semester, moduleCode: $moduleCode)
+  mutation DeleteModule($roomID: String!, $userID: Int!, $semester: Int!, $moduleCode: String!) {
+    deleteModule(roomID: $roomID, userID: $userID, semester: $semester, moduleCode: $moduleCode)
   }
   `;
 
 export const RESET_TIMETABLE_MUTATION = gql`
-  mutation ResetTimetable($roomID: String!, $name: String!, $semester: Int!) {
-    resetTimetable(roomID: $roomID, name: $name, semester: $semester)
+  mutation ResetTimetable($roomID: String!, $userID: Int!, $semester: Int!) {
+    resetTimetable(roomID: $roomID, userID: $userID, semester: $semester)
   }
   `;
 
@@ -130,15 +125,16 @@ type OwnProps = {
   readOnly: boolean;
   header: React.ReactNode;
   semester: Semester;
-  timetable: SemTimetableConfig;
+  multiTimetable: SemTimetableMultiConfig;
   colors: ColorMapping;
   roomID: String;
+  userID: UserID;
 };
 
 type Props = OwnProps & {
   // From Redux
   timetableWithLessons: SemTimetableConfigWithLessons;
-  multiLessons: TimetableMultiConfig;
+  multiUserLessons: MultiUserTimetableConfig;
   modules: ModulesMap;
   activeLesson: Lesson | null;
   editingType: EditingType | null;
@@ -147,8 +143,8 @@ type Props = OwnProps & {
   hiddenInTimetable: ModuleCode[];
 
   // Actions
-  addModuleRT: (semester: Semester, moduleCode: ModuleCode, roomID: String) => void;
-  resetTimetable: (semester: Semester) => void;
+  addModuleRT: (userID: UserID, semester: Semester, moduleCode: ModuleCode, roomID: String) => void;
+  resetTimetable: (userID: UserID, semester: Semester) => void;
   modifyLesson: (lesson: Lesson) => void;
   editLesson: (semester: Semester, lesson: Lesson) => void;
   // toggleSelectLesson: (semester: Semester, lesson: Lesson) => void;
@@ -245,11 +241,11 @@ class TimetableContent extends React.Component<Props, State> {
 
     if (lesson.isActive) {
       // this.props.toggleSelectLesson(this.props.semester, lesson);
-      const { semester, roomID } = this.props;
+      const { userID, semester, roomID } = this.props;
       const { moduleCode, lessonType, classNo } = lesson;
 
       // Prevent deselecting all lessons
-      if (!lesson.isAvailable && (this.props.multiLessons[semester]?.[moduleCode]?.[lessonType] || [])
+      if (!lesson.isAvailable && (this.props.multiUserLessons[userID]?.[semester]?.[moduleCode]?.[lessonType] || [])
         .filter(e => e !== classNo).length === 0) {
         this.props.openNotification(`Must select at least one ${lessonType} for ${moduleCode}`,
           {
@@ -263,7 +259,7 @@ class TimetableContent extends React.Component<Props, State> {
             mutation: MUTATION,
             variables: {
               roomID: roomID, // TODO: Use variable roomID and name
-              name: "user1",
+              userID: userID,
               semester: semester,
               moduleCode: moduleCode,
               lessonType: lessonType,
@@ -286,8 +282,9 @@ class TimetableContent extends React.Component<Props, State> {
   };
 
 
+  // Centralized function to send addModule mutation
   addModuleRT = (semester: Semester, moduleCode: ModuleCode) => {
-    this.props.addModuleRT(semester, moduleCode, this.props.roomID);
+    this.props.addModuleRT(this.props.userID, semester, moduleCode, this.props.roomID);
   };
 
   // Centralized function to send deleteModule mutation
@@ -297,7 +294,7 @@ class TimetableContent extends React.Component<Props, State> {
         mutation: DELETE_MODULE,
         variables: {
           roomID: this.props.roomID, // TODO: Use variable roomID and name
-          name: "user1",
+          userID: this.props.userID,
           semester: this.props.semester,
           moduleCode: moduleCode,
         }
@@ -314,7 +311,7 @@ class TimetableContent extends React.Component<Props, State> {
         mutation: RESET_TIMETABLE_MUTATION,
         variables: {
           roomID: this.props.roomID, // TODO: Use variable roomID and name
-          name: "user1",
+          userID: this.props.userID,
           semester: this.props.semester,
         }
       })
@@ -343,6 +340,7 @@ class TimetableContent extends React.Component<Props, State> {
     tombstone: TombstoneModule | null = null,
   ) => (
     <TimetableModulesTable
+      userID={this.props.userID}
       modules={modules.map(this.toModuleWithColor)}
       horizontalOrientation={horizontalOrientation}
       semester={this.props.semester}
@@ -398,12 +396,12 @@ class TimetableContent extends React.Component<Props, State> {
 
   override render() {
     const {
+      userID,
       semester,
       modules,
       colors,
-      activeLesson,
       editingType,
-      multiLessons,
+      multiUserLessons,
       timetableOrientation,
       showTitle,
       readOnly,
@@ -443,7 +441,7 @@ class TimetableContent extends React.Component<Props, State> {
         // Blink animation
         modifiableLesson.isActive = true;
         // Transparency
-        modifiableLesson.isAvailable = isLessonSelected(modifiableLesson, multiLessons[semester]) ? false : true;
+        modifiableLesson.isAvailable = !isLessonSelected(modifiableLesson, multiUserLessons[userID]?.[semester] || {});
 
         timetableLessons.push(modifiableLesson);
       });
@@ -524,7 +522,7 @@ class TimetableContent extends React.Component<Props, State> {
                   isVerticalOrientation={isVerticalOrientation}
                   showTitle={isShowingTitle}
                   semester={semester}
-                  timetable={this.props.timetable}
+                  multiTimetable={this.props.multiUserLessons[userID]?.[semester]}
                   showExamCalendar={showExamCalendar}
                   resetTimetable={this.resetTimetable}
                   toggleExamCalendar={() => this.setState({ showExamCalendar: !showExamCalendar })}
@@ -536,7 +534,7 @@ class TimetableContent extends React.Component<Props, State> {
                 {!readOnly && (
                   <ModulesSelectContainer
                     semester={semester}
-                    timetable={this.props.timetable}
+                    multiTimetable={this.props.multiUserLessons[userID]?.[semester] || {}}
                     addModule={this.addModuleRT}
                     removeModuleRT={this.removeModuleRT}
                   />
@@ -562,25 +560,26 @@ class TimetableContent extends React.Component<Props, State> {
 }
 
 function mapStateToProps(state: StoreState, ownProps: OwnProps) {
-  const { semester, timetable, readOnly, roomID } = ownProps;
+  const { semester, readOnly, roomID, userID } = ownProps;
   const { modules } = state.moduleBank;
-  const { multiLessons } = state.timetables;
+  const { multiUserLessons } = state.timetables;
 
-  const timetableWithLessons = hydrateSemTimetableWithMultiLessons(timetable, multiLessons[semester], modules, semester);
+  // TODO: handle possibility of non-existent SemConfig
+  const timetableWithLessons = hydrateSemTimetableWithMultiLessons(multiUserLessons[userID]?.[semester] || {}, modules, semester);
 
   // Determine the key to check for hidden modules based on readOnly status
   const hiddenModulesKey = readOnly ? HIDDEN_IMPORTED_SEM : semester;
-  const hiddenInTimetable = state.timetables.hidden[hiddenModulesKey] || [];
+  const hiddenInTimetable = state.timetables.multiUserHidden?.[userID]?.[hiddenModulesKey] || [];
 
   return {
     semester,
-    timetable,
     timetableWithLessons,
     modules,
     roomID,
+    userID,
     activeLesson: state.app.activeLesson,
     editingType: state.timetables.editingType,
-    multiLessons: state.timetables.multiLessons,
+    multiUserLessons: state.timetables.multiUserLessons,
     timetableOrientation: state.theme.timetableOrientation,
     showTitle: state.theme.showTitle,
     hiddenInTimetable,

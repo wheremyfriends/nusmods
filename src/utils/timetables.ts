@@ -37,6 +37,7 @@ import {
   HoverLesson,
   Lesson,
   ModuleLessonConfig,
+  ModuleLessonMultiConfig,
   SemTimetableConfig,
   SemTimetableConfigWithLessons,
   SemTimetableMultiConfig,
@@ -126,24 +127,20 @@ export function lessonsFromClassNo(classNoArray: ClassNo[], lessonType: LessonTy
 }
 
 export function hydrateSemTimetableWithMultiLessons(
-  semTimetableConfig: SemTimetableConfig,
   semTimetableMultiConfig: SemTimetableMultiConfig,
   modules: ModulesMap,
   semester: Semester,
 ): SemTimetableConfigWithLessons {
   return mapValues(
-    semTimetableConfig,
-    (moduleLessonConfig: ModuleLessonConfig, moduleCode: ModuleCode) => {
+    semTimetableMultiConfig,
+    (moduleLessonMultiConfig: ModuleLessonMultiConfig, moduleCode: ModuleCode) => {
       const module: Module = modules[moduleCode];
       if (!module) return EMPTY_OBJECT;
       const lessons = getModuleTimetable(module, semester);
 
-      return mapValues(moduleLessonConfig,
-        (classNo: ClassNo, lessonType: LessonType) => {
-          // Fetch from semTimetableMultiConfig if module was selected, otherwise fetch from default timetable
-          const multiClassNo = semTimetableMultiConfig?.[moduleCode]?.[lessonType] || [];
-          const classNoArray = multiClassNo.length === 0 ? [classNo] : multiClassNo;
-          return lessonsFromClassNo(classNoArray, lessonType, module, lessons);
+      return mapValues(moduleLessonMultiConfig,
+        (classNoArr: ClassNo[], lessonType: LessonType) => {
+          return lessonsFromClassNo(classNoArr, lessonType, module, lessons);
         }
       )
     },

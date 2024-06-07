@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import { RegPeriodType, ScheduleType } from 'config';
 
 import { Mode } from './settings';
-import { ColorIndex, Lesson, EditingType, SemTimetableMultiConfig, TimetableConfig, TimetableMultiConfig } from './timetables';
+import { ColorIndex, Lesson, EditingType, SemTimetableMultiConfig, TimetableConfig, TimetableMultiConfig, MultiUserTimetableConfig } from './timetables';
 import {
   Faculty,
   Module,
@@ -10,6 +10,7 @@ import {
   ModuleCondensed,
   SearchableModule,
   Semester,
+  UserID,
 } from './modules';
 import { VenueList } from './venues';
 
@@ -49,6 +50,7 @@ export type NotificationOptions = {
 export type NotificationData = { readonly message: string } & NotificationOptions;
 
 export type AppState = {
+  readonly activeUserID: UserID;
   readonly activeSemester: Semester;
   readonly activeLesson: Lesson | null;
   readonly isOnline: boolean;
@@ -112,16 +114,16 @@ export type SettingsState = {
 export type ColorMapping = { [moduleCode: string]: ColorIndex };
 export type SemesterColorMap = { [semester: string]: ColorMapping };
 export type HiddenModulesMap = { [semester: string]: ModuleCode[] };
+export type MultiUserHiddenModulesMap = { [userID: UserID]: HiddenModulesMap };
 
 export type TimetablesState = {
-  readonly multiLessons: TimetableMultiConfig;
+  readonly multiUserLessons: MultiUserTimetableConfig;
   readonly editingType: EditingType | null;
-  readonly lessons: TimetableConfig;
   readonly colors: SemesterColorMap;
-  readonly hidden: HiddenModulesMap;
+  readonly multiUserHidden: MultiUserHiddenModulesMap;
   readonly academicYear: string;
   // Mapping of academic year to old timetable config
-  readonly archive: { [key: string]: TimetableConfig };
+  readonly archive: { [key: string]: MultiUserTimetableConfig };
 };
 
 /* venueBank.js */

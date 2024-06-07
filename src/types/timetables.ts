@@ -1,4 +1,4 @@
-import { ClassNo, LessonType, ModuleCode, ModuleTitle, RawLesson, Semester } from './modules';
+import { ClassNo, LessonType, ModuleCode, ModuleTitle, RawLesson, Semester, UserID } from './modules';
 
 //  ModuleLessonConfig is a mapping of lessonType to ClassNo for a module.
 export type ModuleLessonConfig = {
@@ -20,9 +20,18 @@ export type SemTimetableMultiConfig = {
   [moduleCode: string]: ModuleLessonMultiConfig;
 };
 
+// TimetableConfig is the timetable data for the whole academic year.
+export type TimetableConfig = {
+  [semester: string]: SemTimetableConfig;
+};
+
 // TimetableMultiConfig is the timetable data for each semester that supports multiple ClassNo.
 export type TimetableMultiConfig = {
   [semester: string]: SemTimetableMultiConfig;
+};
+
+export type MultiUserTimetableConfig = {
+  [userID: UserID]: TimetableMultiConfig;
 };
 
 export type EditingType = {
@@ -58,12 +67,6 @@ export type SemTimetableConfigWithLessons = {
   [moduleCode: string]: ModuleLessonConfigWithLessons;
 };
 
-
-// TimetableConfig is the timetable data for the whole academic year.
-export type TimetableConfig = {
-  [semester: string]: SemTimetableConfig;
-};
-
 // TimetableDayFormat is timetable data grouped by DayText.
 export type TimetableDayFormat = {
   [dayText: string]: ColoredLesson[];
@@ -87,11 +90,22 @@ export type HoverLesson = {
 
 export type ColorIndex = number;
 
+export type UserChange = {
+  readonly action: String;
+  readonly userID: UserID;
+  readonly name: String;
+}
+
 export type LessonChange = {
   readonly action: String;
-  readonly name: String;
+  readonly userID: UserID;
   readonly semester: Semester;
   readonly moduleCode: ModuleCode;
   readonly lessonType: LessonType;
   readonly classNo: ClassNo;
 }
+
+export type RoomUser = {
+  readonly userID: UserID;
+  name: String;
+};

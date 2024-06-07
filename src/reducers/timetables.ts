@@ -29,6 +29,7 @@ import {
 import { getNewColor } from 'utils/colors';
 import { SET_EXPORTED_DATA } from 'actions/constants';
 import { Actions } from '../types/actions';
+import { SWITCH_USER } from 'actions/settings';
 
 export const persistConfig = {
   /* eslint-disable no-useless-computed-key */
@@ -69,7 +70,7 @@ export const persistConfig = {
       ...original,
       archive: {
         ...inbound.archive,
-        [inbound.academicYear]: inbound.lessons,
+        [inbound.academicYear]: inbound.multiUserLessons,
       },
     };
   },
@@ -101,11 +102,8 @@ function moduleLessonConfig(
   }
 }
 
-
-
 // Map of ModuleCode to module lesson config.
 const DEFAULT_SEM_TIMETABLE_CONFIG: SemTimetableConfig = {};
-const DEFAULT_SEM_TIMETABLE_MULTI_CONFIG: SemTimetableMultiConfig = {};
 function semTimetable(
   state: SemTimetableConfig = DEFAULT_SEM_TIMETABLE_CONFIG,
   action: Actions,
@@ -142,11 +140,14 @@ function semColors(state: ColorMapping = DEFAULT_SEM_COLOR_MAP, action: Actions)
     case ADD_MODULE:
       return {
         ...state,
-        [moduleCode]: getNewColor(values(state)),
+        // Dont change color if it is already defined
+        [moduleCode]: state[moduleCode] || getNewColor(values(state)),
       };
 
     case REMOVE_MODULE:
-      return omit(state, moduleCode);
+      // return omit(state, moduleCode);
+      // TODO: reference counter to remove only when no modules among all users
+      return state;
 
     case SELECT_MODULE_COLOR:
       return {
@@ -177,52 +178,14 @@ function semHiddenModules(state = DEFAULT_HIDDEN_STATE, action: Actions) {
   }
 }
 
-function mergeSemTimetable(
-  timetable: TimetableConfig,
-  multiTimetable: TimetableMultiConfig
-): TimetableMultiConfig {
-  for (const [semester, semTimetableConfig] of Object.entries(timetable)) {
-    for (const [moduleCode, moduleLessonConfig] of Object.entries(semTimetableConfig)) {
-      for (const [lessonType, classNo] of Object.entries(moduleLessonConfig)) {
-        // Merge only if multiTimetable does not contain entries for this specific type
-        const multiClassNo = multiTimetable[semester]?.[moduleCode]?.[lessonType] || [];
-        if (multiClassNo.length === 0) {
-          ((multiTimetable[semester] ??= {})[moduleCode] ??= {})[lessonType] = [classNo];
-        }
-      }
-    }
-  }
-  return multiTimetable;
-}
-
 export const defaultTimetableState: TimetablesState = {
-  multiLessons: {},
+  multiUserLessons: {},
   editingType: null,
-  lessons: {},
   colors: {},
-  hidden: {},
+  multiUserHidden: {},
   academicYear: config.academicYear,
   archive: {},
 };
-
-
-
-
-function isModuleInTimetable(
-  moduleCode: ModuleCode,
-  timetable: TimetableConfig,
-  semester: Semester
-): boolean {
-  return !!get(timetable[semester], moduleCode);
-}
-
-function produceTimetableState(semester: Semester, state: TimetablesState, action: Actions) {
-  return produce(state, (draft) => {
-    draft.lessons[semester] = semTimetable(draft.lessons[semester], action);
-    draft.colors[semester] = semColors(state.colors[semester], action);
-    draft.hidden[semester] = semHiddenModules(state.hidden[semester], action);
-  });
-}
 
 function timetables(
   state: TimetablesState = defaultTimetableState,
@@ -231,47 +194,53 @@ function timetables(
   // All normal timetable actions should specify their semester
   switch (action.type) {
     case ADD_SELECTED_MODULE: {
-      const { semester, moduleCode, lessonType, classNo } = action.payload;
+      const { userID, semester, moduleCode, lessonType, classNo } = action.payload;
 
-      const oldClassNoArray = state.multiLessons[semester]?.[moduleCode]?.[lessonType] || [];
+      const oldClassNoArray = state.multiUserLessons[userID]?.[semester]?.[moduleCode]?.[lessonType] || [];
       // Prevent duplicates
       if (oldClassNoArray.includes(classNo))
         return state;
 
       return {
         ...state,
-        multiLessons: {
-          ...state.multiLessons,
-          [semester]: {
-            ...state.multiLessons[semester],
-            [moduleCode]: {
-              ...state.multiLessons[semester]?.[moduleCode],
-              [lessonType]: [...oldClassNoArray, classNo]
+        multiUserLessons: {
+          ...state.multiUserLessons,
+          [userID]: {
+            ...state.multiUserLessons[userID],
+            [semester]: {
+              ...state.multiUserLessons[userID]?.[semester],
+              [moduleCode]: {
+                ...state.multiUserLessons[userID]?.[semester]?.[moduleCode],
+                [lessonType]: [...oldClassNoArray, classNo]
+              }
             }
           }
         }
       };
     }
-    case REMOVE_SELECTED_MODULE: {
-      const { semester, moduleCode, lessonType, classNo } = action.payload;
 
-      const newClassNoArray = (state.multiLessons[semester]?.[moduleCode]?.[lessonType] || [])
-        .filter(e => e !== classNo);
+    case REMOVE_SELECTED_MODULE: {
+      const { userID, semester, moduleCode, lessonType, classNo } = action.payload;
 
       return {
         ...state,
-        multiLessons: {
-          ...state.multiLessons,
-          [semester]: {
-            ...state.multiLessons[semester],
-            [moduleCode]: {
-              ...state.multiLessons[semester]?.[moduleCode],
-              [lessonType]: newClassNoArray
+        multiUserLessons: {
+          ...state.multiUserLessons,
+          [userID]: {
+            ...state.multiUserLessons[userID],
+            [semester]: {
+              ...state.multiUserLessons[userID]?.[semester],
+              [moduleCode]: {
+                ...state.multiUserLessons[userID]?.[semester]?.[moduleCode],
+                [lessonType]: (state.multiUserLessons[userID]?.[semester]?.[moduleCode]?.[lessonType] || [])
+                  .filter(e => e !== classNo)
+              }
             }
           }
         }
       };
     }
+
     case EDIT_LESSON:
       {
         const { semester } = action.payload;
@@ -285,6 +254,7 @@ function timetables(
           },
         };
       }
+    case SWITCH_USER:
     case CANCEL_EDIT_LESSON:
       return {
         ...state,
@@ -292,79 +262,87 @@ function timetables(
       }
 
     case SET_TIMETABLE: {
-      const { semester, timetable, colors, hiddenModules } = action.payload;
+      const { userID, semester, timetable, colors, hiddenModules } = action.payload;
 
       return produce(state, (draft) => {
-        draft.lessons[semester] = timetable || DEFAULT_SEM_TIMETABLE_CONFIG;
         draft.colors[semester] = colors || {};
-        draft.hidden[semester] = hiddenModules || [];
+        draft.multiUserHidden[userID][semester] = hiddenModules || [];
 
         // Remove the old hidden imported modules
-        delete draft.hidden[HIDDEN_IMPORTED_SEM];
+        delete draft.multiUserHidden[userID][HIDDEN_IMPORTED_SEM];
       });
     }
 
     case RESET_ALL_TIMETABLES: {
       return produce(state, (draft) => {
-        draft.multiLessons = {};
-        draft.lessons = {};
+        draft.multiUserLessons = {};
         draft.colors = {};
-        draft.hidden = {};
+        draft.multiUserHidden = {};
       });
     }
 
     case RESET_TIMETABLE: {
-      const { semester } = action.payload;
+      const { userID, semester } = action.payload;
 
       return produce(state, (draft) => {
         draft.editingType = null;
-        draft.multiLessons[semester] = DEFAULT_SEM_TIMETABLE_MULTI_CONFIG;
-        draft.lessons[semester] = DEFAULT_SEM_TIMETABLE_CONFIG;
-        draft.colors[semester] = DEFAULT_SEM_COLOR_MAP;
-        draft.hidden[semester] = DEFAULT_HIDDEN_STATE;
+        draft.multiUserLessons[userID][semester] = {};
+        // draft.colors[semester] = DEFAULT_SEM_COLOR_MAP; // TODO: Reference count
+        draft.multiUserHidden[userID][semester] = DEFAULT_HIDDEN_STATE;
       });
     }
 
-    case ADD_MODULE:
-      return produceTimetableState(action.payload.semester, state, action);
+    case ADD_MODULE: {
+      const { userID, semester, moduleCode } = action.payload;
+      return produce(state, (draft) => {
+        draft.colors[semester] = semColors(state.colors[semester], action);
+        draft.multiUserHidden[userID] = { [semester]: [] }
+      });
+    }
     case REMOVE_MODULE:
       {
-        const { semester, moduleCode } = action.payload;
+        const { userID, semester, moduleCode } = action.payload;
         return produce(state, (draft) => {
           // Exit edit mode if editing module is removed
           if (moduleCode == state.editingType?.moduleCode)
             draft.editingType = null;
-          draft.multiLessons[semester][moduleCode] = {};
-          draft.lessons[semester] = semTimetable(draft.lessons[semester], action);
+          draft.multiUserLessons[userID][semester] = omit(draft.multiUserLessons[userID][semester], moduleCode);
           draft.colors[semester] = semColors(state.colors[semester], action);
-          draft.hidden[semester] = semHiddenModules(state.hidden[semester], action);
+          draft.multiUserHidden[userID][semester] = semHiddenModules(state.multiUserHidden[userID][semester], action);
         });
       }
-    case SELECT_MODULE_COLOR:
-    case CHANGE_LESSON:
-    case SET_LESSON_CONFIG:
-    case HIDE_LESSON_IN_TIMETABLE:
-    case SHOW_LESSON_IN_TIMETABLE: {
-      return produceTimetableState(action.payload.semester, state, action);
-    }
 
-    case SET_EXPORTED_DATA: {
-      const { semester, timetable, colors, hidden } = action.payload;
-
-      return {
-        ...state,
-        lessons: { [semester]: timetable },
-        colors: { [semester]: colors },
-        hidden: { [semester]: hidden },
-      };
-    }
-
-    case SET_HIDDEN_IMPORTED: {
-      const { semester, hiddenModules } = action.payload;
+    case SELECT_MODULE_COLOR: {
+      const { semester, moduleCode } = action.payload;
       return produce(state, (draft) => {
-        draft.hidden[semester] = hiddenModules;
+        draft.colors[semester] = semColors(state.colors[semester], action);
       });
     }
+
+    case HIDE_LESSON_IN_TIMETABLE:
+    case SHOW_LESSON_IN_TIMETABLE: {
+      const { userID, semester, moduleCode } = action.payload;
+      return produce(state, (draft) => {
+        draft.multiUserHidden[userID][semester] = semHiddenModules(state.multiUserHidden[userID][semester], action);
+      });
+    }
+
+    // case SET_EXPORTED_DATA: {
+    //   const { semester, timetable, colors, hidden } = action.payload;
+
+    //   return {
+    //     ...state,
+    //     colors: { [semester]: colors },
+    //     hidden: { [semester]: hidden },
+    //   };
+    // }
+
+    // case SET_HIDDEN_IMPORTED: {
+    //   const { semester, hiddenModules } = action.payload;
+    //   return produce(state, (draft) => {
+    //     draft.hidden[semester] = hiddenModules;
+    //   });
+    // }
 
     default:
       return state;
@@ -372,3 +350,4 @@ function timetables(
 }
 
 export default timetables;
+

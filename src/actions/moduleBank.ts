@@ -58,7 +58,7 @@ export function fetchModule(moduleCode: ModuleCode) {
 
         const LRUModule = getLRUModules(
           moduleBank.modules,
-          timetables.lessons,
+          timetables.multiLessons,
           moduleCode,
           overLimitCount,
         );

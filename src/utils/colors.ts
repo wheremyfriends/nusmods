@@ -1,6 +1,6 @@
 import { range, sample, without } from 'lodash';
 
-import { ColorIndex, SemTimetableConfig } from 'types/timetables';
+import { ColorIndex, SemTimetableConfig, SemTimetableMultiConfig } from 'types/timetables';
 import { ColorMapping } from 'types/reducers';
 import { ModuleCode } from 'types/modules';
 
@@ -52,7 +52,7 @@ export function colorLessonsByKey<T>(
 // when importing timetables since imported modules do not have any colors defined
 // in the store
 export function fillColorMapping(
-  timetable: SemTimetableConfig,
+  multiTimetable: SemTimetableMultiConfig,
   original: ColorMapping,
 ): ColorMapping {
   const colorMap: ColorMapping = {};
@@ -60,21 +60,22 @@ export function fillColorMapping(
   const withoutColors: ModuleCode[] = [];
 
   // Collect a list of all colors used and all modules without colors
-  Object.keys(timetable).forEach((moduleCode) => {
+  Object.keys(multiTimetable).forEach((moduleCode) => {
     if (moduleCode in original) {
       colorMap[moduleCode] = original[moduleCode];
       colorsUsed.push(Number(original[moduleCode]));
     } else {
-      withoutColors.push(moduleCode);
+      // Only decide color after module is added via addModule
+      // withoutColors.push(moduleCode);
     }
   });
 
   // Assign the modules without colors
-  withoutColors.forEach((moduleCode) => {
-    const color = getNewColor(colorsUsed, false);
-    colorMap[moduleCode] = color;
-    colorsUsed.push(color);
-  });
+  // withoutColors.forEach((moduleCode) => {
+  //   const color = getNewColor(colorsUsed, false);
+  //   colorMap[moduleCode] = color;
+  //   colorsUsed.push(color);
+  // });
 
   return colorMap;
 }

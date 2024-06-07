@@ -4,7 +4,7 @@ import config from 'config';
 
 import { forceRefreshPrompt } from 'utils/debug';
 import { MODIFY_LESSON, CHANGE_LESSON, CANCEL_MODIFY_LESSON } from 'actions/timetables';
-import { SELECT_SEMESTER } from 'actions/settings';
+import { SELECT_SEMESTER, SWITCH_USER } from 'actions/settings';
 import {
   OPEN_NOTIFICATION,
   POP_NOTIFICATION,
@@ -16,6 +16,7 @@ import {
 const defaultAppState = (): AppState => ({
   // Default to the current semester from config.
   activeSemester: config.semester,
+  activeUserID: -1,
   // The lesson being modified on the timetable.
   activeLesson: null,
   isOnline: navigator.onLine,
@@ -27,6 +28,11 @@ const defaultAppState = (): AppState => ({
 // This reducer is for storing state pertaining to the UI.
 function app(state: AppState = defaultAppState(), action: Actions): AppState {
   switch (action.type) {
+    case SWITCH_USER:
+      return {
+        ...state,
+        activeUserID: action.payload,
+      };
     case SELECT_SEMESTER:
       return {
         ...state,

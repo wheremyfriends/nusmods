@@ -138,8 +138,8 @@ const AppShell: FC = ({ children }) => {
         </div>
       </nav> */}
 
-      {/* <div className="main-container">
-        <Navtabs /> */}
+      <div className="main-container">
+        {/* <Navtabs /> */}
 
       <main className="main-content">
         {isModuleListReady ? (
@@ -150,7 +150,7 @@ const AppShell: FC = ({ children }) => {
           <LoadingSpinner />
         )}
       </main>
-      {/* </div> */}
+      </div>
 
       <ErrorBoundary>
         <FeedbackModal />
