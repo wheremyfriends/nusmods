@@ -69,6 +69,7 @@ import { openNotification } from 'actions/app';
 import { fetchModule } from 'actions/moduleBank';
 import type { Dispatch, GetState } from 'types/redux';
 import { Action } from 'actions/constants';
+import { getOptimisedTimetable } from 'solver';
 
 export const CREATE_LESSON = gql`
   mutation CreateLesson($roomID: String!, $userID: Int!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
@@ -421,6 +422,16 @@ class TimetableContent extends React.Component<Props, State> {
     let timetableLessons: Lesson[] = timetableLessonsArray(filteredTimetableWithLessons)
       // Do not process hidden modules
       .filter((lesson) => !this.isHiddenInTimetable(lesson.moduleCode));
+
+    console.log("timetableLessons")
+    console.log(timetableLessons)
+    console.log("Optimised timetable")
+    try {
+      const optimisedTimetable = getOptimisedTimetable([timetableLessons], 0, 1)
+      console.log(optimisedTimetable)
+    } catch (e) {
+      console.error(e)
+    }
 
     // TODO: Set editingType to null when abruptly exiting from edit mode
     if (editingType) {
