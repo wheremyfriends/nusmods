@@ -3,6 +3,7 @@ name: Create and build static site
 on:
   push:
     branches: ['main']
+  pull_request:
 
 jobs:
   build-static-site:
