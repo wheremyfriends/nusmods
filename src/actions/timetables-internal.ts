@@ -1,8 +1,8 @@
-import { ModuleCode, Semester } from 'types/modules';
-import { ModuleLessonConfig, SemTimetableConfig } from 'types/timetables';
-import { ColorMapping } from 'types/reducers';
+import { ModuleCode, Semester } from "types/modules";
+import { ModuleLessonConfig, SemTimetableConfig } from "types/timetables";
+import { ColorMapping } from "types/reducers";
 
-export const SET_TIMETABLE = 'SET_TIMETABLE' as const;
+export const SET_TIMETABLE = "SET_TIMETABLE" as const;
 export function setTimetable(
   semester: Semester,
   timetable: SemTimetableConfig | undefined,
@@ -14,7 +14,7 @@ export function setTimetable(
   };
 }
 
-export const ADD_MODULE = 'ADD_MODULE' as const;
+export const ADD_MODULE = "ADD_MODULE" as const;
 export function addModule(
   semester: Semester,
   moduleCode: ModuleCode,

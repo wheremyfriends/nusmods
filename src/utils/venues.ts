@@ -1,16 +1,16 @@
-import { range, entries, padStart, clamp } from 'lodash';
-import produce from 'immer';
+import { range, entries, padStart, clamp } from "lodash";
+import produce from "immer";
 import {
   VenueInfo,
   VenueSearchOptions,
   VenueDetailList,
   VenueLocationMap,
   OCCUPIED,
-} from 'types/venues';
+} from "types/venues";
 
-import excludedRooms from 'data/excludedFreeRooms';
-import { tokenize } from './moduleSearch';
-import { SCHOOLDAYS } from './timify';
+import excludedRooms from "data/excludedFreeRooms";
+import { tokenize } from "./moduleSearch";
+import { SCHOOLDAYS } from "./timify";
 
 // The first and last starting time of lessons
 export const FIRST_CLASS_HOUR = 8;
@@ -19,12 +19,15 @@ export const SCHOOL_CLOSE_HOUR = 24;
 
 // Array of [0, 30, 100, 130, 200, 230, ...], used to create time strings at half hour intervals
 // eg. 900 + hourDifference[2] // (9am + 2 * 30 minutes = 10am)
-const hourDifference = range(48).map((i) => Math.floor(i / 2) * 100 + (i % 2) * 30);
+const hourDifference = range(48).map(
+  (i) => Math.floor(i / 2) * 100 + (i % 2) * 30,
+);
 
 const stringCompare =
   // Feature detect Intl API
-  window.Intl && typeof window.Intl === 'object'
-    ? new window.Intl.Collator('en', { sensitivity: 'base', numeric: true }).compare
+  window.Intl && typeof window.Intl === "object"
+    ? new window.Intl.Collator("en", { sensitivity: "base", numeric: true })
+        .compare
     : (a: string, b: string) => a.localeCompare(b);
 
 export function sortVenues(venues: VenueInfo): VenueDetailList {
@@ -42,9 +45,12 @@ export function searchVenue(
   return venues.filter(([venue]) => {
     const lowercaseVenueName = venue.toLowerCase();
     const lowercaseRoomName =
-      venueLocations && venueLocations[venue] ? venueLocations[venue].roomName.toLowerCase() : '';
+      venueLocations && venueLocations[venue]
+        ? venueLocations[venue].roomName.toLowerCase()
+        : "";
     return tokens.every(
-      (token) => lowercaseVenueName.includes(token) || lowercaseRoomName.includes(token),
+      (token) =>
+        lowercaseVenueName.includes(token) || lowercaseRoomName.includes(token),
     );
   });
 }
@@ -63,12 +69,14 @@ export function filterAvailability(
     }
 
     const start = time * 100;
-    const dayAvailability = venue.find((availability) => availability.day === SCHOOLDAYS[day]);
+    const dayAvailability = venue.find(
+      (availability) => availability.day === SCHOOLDAYS[day],
+    );
     if (!dayAvailability) return true;
 
     // Check that all half-hour slots within the time requested are vacant
     for (let i = 0; i < duration * 2; i++) {
-      const timeString = padStart(String(start + hourDifference[i]), 4, '0');
+      const timeString = padStart(String(start + hourDifference[i]), 4, "0");
       if (dayAvailability.availability[timeString] === OCCUPIED) {
         return false;
       }
@@ -81,20 +89,26 @@ export function filterAvailability(
 /**
  * Clamp the duration of the search option to within school hours
  */
-export function clampClassDuration(searchOptions: VenueSearchOptions): VenueSearchOptions {
+export function clampClassDuration(
+  searchOptions: VenueSearchOptions,
+): VenueSearchOptions {
   return produce(searchOptions, (draft) => {
-    const newEndTime = clamp(draft.time + draft.duration, FIRST_CLASS_HOUR, SCHOOL_CLOSE_HOUR);
+    const newEndTime = clamp(
+      draft.time + draft.duration,
+      FIRST_CLASS_HOUR,
+      SCHOOL_CLOSE_HOUR,
+    );
     draft.duration = newEndTime - draft.time;
   });
 }
 
 export function floorName(floor: number | string): string {
-  if (typeof floor === 'string') {
+  if (typeof floor === "string") {
     return `${floor.toLowerCase()} floor`;
   }
 
   if (floor === 0) {
-    return 'the ground floor';
+    return "the ground floor";
   }
 
   const floorNumber = floor < 0 ? `B${-floor}` : floor;

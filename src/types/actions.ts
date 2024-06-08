@@ -1,15 +1,15 @@
-import { REHYDRATE } from 'redux-persist/es/constants';
+import { REHYDRATE } from "redux-persist/es/constants";
 
-import * as app from 'actions/app';
-import * as exportActions from 'actions/export';
-import * as moduleBank from 'actions/moduleBank';
-import * as planner from 'actions/planner';
-import * as settings from 'actions/settings';
-import * as theme from 'actions/theme';
-import * as timetables from 'actions/timetables';
-import * as undoHistory from 'actions/undoHistory';
-import * as venueBank from 'actions/venueBank';
-import { ExtractActionShape } from './redux';
+import * as app from "actions/app";
+import * as exportActions from "actions/export";
+import * as moduleBank from "actions/moduleBank";
+import * as planner from "actions/planner";
+import * as settings from "actions/settings";
+import * as theme from "actions/theme";
+import * as timetables from "actions/timetables";
+import * as undoHistory from "actions/undoHistory";
+import * as venueBank from "actions/venueBank";
+import { ExtractActionShape } from "./redux";
 
 type AppAction = ExtractActionShape<typeof app>;
 type ExportActionsAction = ExtractActionShape<typeof exportActions>;
@@ -26,7 +26,7 @@ type UndoHistoryAction = ExtractActionShape<typeof undoHistory>;
 type VenueBankAction = venueBank.VenueActions;
 
 type InitActions = {
-  type: 'INIT';
+  type: "INIT";
   payload: null;
 };
 

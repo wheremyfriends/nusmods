@@ -1,33 +1,34 @@
-const warnInDevelopment = process.env.NODE_ENV === 'production' ? 'error' : 'warn';
+const warnInDevelopment =
+  process.env.NODE_ENV === "production" ? "error" : "warn";
 
 module.exports = {
-  parser: '@typescript-eslint/parser',
+  parser: "@typescript-eslint/parser",
   root: true,
   extends: [
-    'plugin:@typescript-eslint/recommended',
-    'plugin:import/typescript',
-    'prettier/@typescript-eslint',
-    'prettier',
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/typescript",
+    "prettier/@typescript-eslint",
+    "prettier",
   ],
   env: {
     browser: true,
     node: true,
   },
-  plugins: ['@typescript-eslint', 'prettier', 'import'],
+  plugins: ["@typescript-eslint", "prettier", "import"],
   rules: {
-    'prettier/prettier': warnInDevelopment,
-    'import/extensions': [
+    "prettier/prettier": warnInDevelopment,
+    "import/extensions": [
       warnInDevelopment,
-      'always',
+      "always",
       {
-        js: 'never',
-        ts: 'never',
+        js: "never",
+        ts: "never",
       },
     ],
     // Makes the code unnecessarily verbose
-    '@typescript-eslint/explicit-member-accessibility': 'off',
+    "@typescript-eslint/explicit-member-accessibility": "off",
     // Makes the code unnecessarily verbose
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    'linebreak-style': 'off',
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "linebreak-style": "off",
   },
 };

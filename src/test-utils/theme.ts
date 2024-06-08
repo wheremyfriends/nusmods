@@ -1,10 +1,13 @@
-import { ShallowWrapper, ReactWrapper } from 'enzyme';
+import { ShallowWrapper, ReactWrapper } from "enzyme";
 
-import { ColorIndex } from 'types/timetables';
-import { Module } from 'types/modules';
-import { ModuleWithColor } from '../types/views';
+import { ColorIndex } from "types/timetables";
+import { Module } from "types/modules";
+import { ModuleWithColor } from "../types/views";
 
-export function expectColor(element: ReactWrapper | ShallowWrapper, color?: ColorIndex) {
+export function expectColor(
+  element: ReactWrapper | ShallowWrapper,
+  color?: ColorIndex,
+) {
   if (color == null) {
     expect(element.is('[class^="color-"')).toBe(true);
   } else {
@@ -12,7 +15,10 @@ export function expectColor(element: ReactWrapper | ShallowWrapper, color?: Colo
   }
 }
 
-export function addColors(modules: Module[], hiddenInTimetable = false): ModuleWithColor[] {
+export function addColors(
+  modules: Module[],
+  hiddenInTimetable = false,
+): ModuleWithColor[] {
   return modules.map((module, index) => ({
     ...module,
     colorIndex: index,

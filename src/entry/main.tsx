@@ -2,32 +2,37 @@
 // polyfills Promise incorrectly. Importing this polyfill directly resolves that.
 // This is necessary as PersistGate used in ./App uses `Promise.prototype.finally`.
 // See: https://github.com/zloirock/core-js/issues/579#issuecomment-504325213
-import 'core-js/es/promise/finally';
+import "core-js/es/promise/finally";
 
-import ReactDOM from 'react-dom';
-import ReactModal from 'react-modal';
+import ReactDOM from "react-dom";
+import ReactModal from "react-modal";
 
-import configureStore from 'bootstrapping/configure-store';
-import subscribeOnlineEvents from 'bootstrapping/subscribeOnlineEvents';
-import registerServiceWorker from 'bootstrapping/service-worker-manager';
+import configureStore from "bootstrapping/configure-store";
+import subscribeOnlineEvents from "bootstrapping/subscribeOnlineEvents";
+import registerServiceWorker from "bootstrapping/service-worker-manager";
 
-import 'styles/main.scss';
+import "styles/main.scss";
 
-import App from './App';
+import App from "./App";
 
 const { store, persistor } = configureStore();
 
 subscribeOnlineEvents(store);
 
 // Initialize ReactModal
-ReactModal.setAppElement('#app');
+ReactModal.setAppElement("#app");
 
-ReactDOM.render(<App store={store} persistor={persistor} />, document.getElementById('app'));
+ReactDOM.render(
+  <App store={store} persistor={persistor} />,
+  document.getElementById("app"),
+);
 
 if (
-  ((NUSMODS_ENV === 'preview' || NUSMODS_ENV === 'staging' || NUSMODS_ENV === 'production') &&
-    'serviceWorker' in navigator &&
-    window.location.protocol === 'https:') ||
+  ((NUSMODS_ENV === "preview" ||
+    NUSMODS_ENV === "staging" ||
+    NUSMODS_ENV === "production") &&
+    "serviceWorker" in navigator &&
+    window.location.protocol === "https:") ||
   // Allow us to force service worker to be enabled for debugging
   DEBUG_SERVICE_WORKER
 ) {

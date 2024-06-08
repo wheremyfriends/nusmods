@@ -1,5 +1,5 @@
-import _ from 'lodash';
-import { format } from 'date-fns';
+import _ from "lodash";
+import { format } from "date-fns";
 import type {
   Module,
   ModuleCode,
@@ -7,12 +7,12 @@ import type {
   Semester,
   SemesterData,
   SemesterDataCondensed,
-} from 'types/modules';
+} from "types/modules";
 
-import config from 'config';
-import { NBSP, noBreak } from 'utils/react';
-import { Lesson, SemTimetableMultiConfig } from 'types/timetables';
-import { toSingaporeTime } from './timify';
+import config from "config";
+import { NBSP, noBreak } from "utils/react";
+import { Lesson, SemTimetableMultiConfig } from "types/timetables";
+import { toSingaporeTime } from "./timify";
 
 // Look for strings that look like module codes - eg.
 // ACC1010  - 3 chars, 4 digits, no suffix
@@ -26,17 +26,27 @@ export function getModuleSemesterData(
   module: Module,
   semester: Semester,
 ): SemesterData | undefined {
-  return module.semesterData.find((semData: SemesterData) => semData.semester === semester);
+  return module.semesterData.find(
+    (semData: SemesterData) => semData.semester === semester,
+  );
 }
 
 // Returns a flat array of lessons of a module for the corresponding semester.
-export function getModuleTimetable(module: Module, semester: Semester): readonly RawLesson[] {
-  return _.get(getModuleSemesterData(module, semester), 'timetable', []);
+export function getModuleTimetable(
+  module: Module,
+  semester: Semester,
+): readonly RawLesson[] {
+  return _.get(getModuleSemesterData(module, semester), "timetable", []);
 }
 
 // Is the lesson already selected and stored?
-export function isLessonSelected(lesson: Lesson, semTimetableMultiConfig: SemTimetableMultiConfig): boolean {
-  return (semTimetableMultiConfig[lesson.moduleCode]?.[lesson.lessonType] || []).includes(lesson.classNo);
+export function isLessonSelected(
+  lesson: Lesson,
+  semTimetableMultiConfig: SemTimetableMultiConfig,
+): boolean {
+  return (
+    semTimetableMultiConfig[lesson.moduleCode]?.[lesson.lessonType] || []
+  ).includes(lesson.classNo);
 }
 
 // Do these two lessons belong to the same class?
@@ -52,21 +62,27 @@ export function areLessonsSameClass(lesson1: Lesson, lesson2: Lesson): boolean {
  * Convert exam in ISO format to 12-hour date/time format.
  */
 export function formatExamDate(examDate: string | null | undefined): string {
-  if (!examDate) return 'No Exam';
+  if (!examDate) return "No Exam";
 
   const localDate = toSingaporeTime(examDate);
-  return format(localDate, 'dd-MMM-yyyy p');
+  return format(localDate, "dd-MMM-yyyy p");
 }
 
 export function getExamDate(module: Module, semester: Semester): string | null {
-  return _.get(getModuleSemesterData(module, semester), 'examDate') || null;
+  return _.get(getModuleSemesterData(module, semester), "examDate") || null;
 }
 
-export function getExamDuration(module: Module, semester: Semester): number | null {
-  return _.get(getModuleSemesterData(module, semester), 'examDuration') || null;
+export function getExamDuration(
+  module: Module,
+  semester: Semester,
+): number | null {
+  return _.get(getModuleSemesterData(module, semester), "examDuration") || null;
 }
 
-export function getFormattedExamDate(module: Module, semester: Semester): string {
+export function getFormattedExamDate(
+  module: Module,
+  semester: Semester,
+): string {
   const examDate = getExamDate(module, semester);
   return formatExamDate(examDate);
 }
@@ -77,18 +93,27 @@ export function getFirstAvailableSemester(
   semesters: readonly SemesterDataCondensed[],
   current: Semester = config.semester, // For testing only
 ): Semester {
-  const availableSemesters = semesters.map((semesterData) => semesterData.semester);
+  const availableSemesters = semesters.map(
+    (semesterData) => semesterData.semester,
+  );
   // Assume there is at least 1 semester
-  return availableSemesters.includes(current) ? current : Math.min(...availableSemesters);
+  return availableSemesters.includes(current)
+    ? current
+    : Math.min(...availableSemesters);
 }
 
 export function getSemestersOffered(module: Module): Semester[] {
-  return module.semesterData.map((semesterData) => semesterData.semester).sort();
+  return module.semesterData
+    .map((semesterData) => semesterData.semester)
+    .sort();
 }
 
 export function renderMCs(moduleCredits: number | string) {
-  const credit = typeof moduleCredits === 'string' ? parseFloat(moduleCredits) : moduleCredits;
-  return `${credit}${NBSP}${credit === 1 ? 'Unit' : 'Units'}`;
+  const credit =
+    typeof moduleCredits === "string"
+      ? parseFloat(moduleCredits)
+      : moduleCredits;
+  return `${credit}${NBSP}${credit === 1 ? "Unit" : "Units"}`;
 }
 
 export function renderExamDuration(examDuration: number) {
@@ -96,7 +121,7 @@ export function renderExamDuration(examDuration: number) {
     return noBreak(`${examDuration} mins`);
   }
   const hours = examDuration / 60;
-  return noBreak(`${hours} ${hours === 1 ? 'hr' : 'hrs'}`);
+  return noBreak(`${hours} ${hours === 1 ? "hr" : "hrs"}`);
 }
 
 export function subtractAcadYear(acadYear: string): string {
@@ -132,7 +157,8 @@ export function offsetAcadYear(year: string, offset: number) {
 }
 
 export function getYearsBetween(minYear: string, maxYear: string): string[] {
-  if (minYear > maxYear) throw new Error('minYear should be less than or equal to maxYear');
+  if (minYear > maxYear)
+    throw new Error("minYear should be less than or equal to maxYear");
 
   const years = [];
   let nextYear = minYear;

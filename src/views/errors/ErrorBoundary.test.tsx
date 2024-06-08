@@ -1,28 +1,28 @@
-import * as React from 'react';
-import { shallow, mount } from 'enzyme';
-import { captureException } from 'utils/error';
-import ErrorBoundary from './ErrorBoundary';
+import * as React from "react";
+import { shallow, mount } from "enzyme";
+import { captureException } from "utils/error";
+import ErrorBoundary from "./ErrorBoundary";
 
 const mockCaptureException = captureException as jest.Mock;
 
-jest.mock('utils/error');
+jest.mock("utils/error");
 jest.mock(
-  'views/errors/ErrorPage',
+  "views/errors/ErrorPage",
   () =>
     function ErrorPage() {
-      return '<ErrorPage> component';
+      return "<ErrorPage> component";
     },
 );
 
 // To be used to compare with error caught by ErrorBoundary
-const error = new Error('Test error');
+const error = new Error("Test error");
 
 // Stateless React component which throws error
 const ThrowsError: React.FC<unknown> = (): never => {
   throw error;
 };
 
-describe('ErrorBoundary', () => {
+describe("ErrorBoundary", () => {
   let consoleError: typeof console.error;
 
   beforeEach(() => {
@@ -37,17 +37,17 @@ describe('ErrorBoundary', () => {
     global.console.error = consoleError;
   });
 
-  test('should display children when there is no error', () => {
+  test("should display children when there is no error", () => {
     const wrapper = shallow(
       <ErrorBoundary>
         <div>Some content</div>
       </ErrorBoundary>,
     );
 
-    expect(wrapper.text()).toEqual('Some content');
+    expect(wrapper.text()).toEqual("Some content");
   });
 
-  test('should show nothing by default when error is thrown', () => {
+  test("should show nothing by default when error is thrown", () => {
     const wrapper = mount(
       <ErrorBoundary>
         <ThrowsError>Some content</ThrowsError>
@@ -55,12 +55,15 @@ describe('ErrorBoundary', () => {
     );
 
     expect(wrapper.isEmptyRender()).toBe(true);
-    expect(mockCaptureException).toHaveBeenCalledWith(error, expect.any(Object));
+    expect(mockCaptureException).toHaveBeenCalledWith(
+      error,
+      expect.any(Object),
+    );
   });
 
-  test('should show custom error page if provided', () => {
+  test("should show custom error page if provided", () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const errorPage = jest.fn((_error: Error) => 'Custom content');
+    const errorPage = jest.fn((_error: Error) => "Custom content");
 
     const wrapper = mount(
       <ErrorBoundary errorPage={errorPage}>
@@ -68,11 +71,11 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>,
     );
 
-    expect(wrapper.text()).toEqual('Custom content');
+    expect(wrapper.text()).toEqual("Custom content");
     expect(errorPage).toHaveBeenCalledWith(error);
   });
 
-  test('should not capture error if captureError is false', () => {
+  test("should not capture error if captureError is false", () => {
     mount(
       <ErrorBoundary captureError={false}>
         <ThrowsError>Some content</ThrowsError>

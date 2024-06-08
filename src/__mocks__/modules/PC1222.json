@@ -88,7 +88,11 @@
         }
       ],
       "LecturePeriods": ["Tuesday Morning", "Friday Morning"],
-      "TutorialPeriods": ["Monday Afternoon", "Tuesday Afternoon", "Wednesday Afternoon"]
+      "TutorialPeriods": [
+        "Monday Afternoon",
+        "Tuesday Afternoon",
+        "Wednesday Afternoon"
+      ]
     },
     {
       "semester": 1,

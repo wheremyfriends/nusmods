@@ -1,4 +1,4 @@
-const config = require('../config/app-config.json');
+const config = require("../config/app-config.json");
 
 class NUSModsApi {
   /**
@@ -7,17 +7,17 @@ class NUSModsApi {
    */
   static baseUrl(academicYear = config.academicYear) {
     let envApiBaseUrl;
-    if (typeof DATA_API_BASE_URL !== 'undefined') {
+    if (typeof DATA_API_BASE_URL !== "undefined") {
       // Use global constant defined with Webpack's DefinePlugin
       envApiBaseUrl = DATA_API_BASE_URL;
-    } else if (typeof process !== 'undefined') {
+    } else if (typeof process !== "undefined") {
       // Use Node.js `process`, which will be defined if we're in a Node.js
       // environment (e.g. when building).
       envApiBaseUrl = process.env.DATA_API_BASE_URL;
     }
 
     const apiBaseUrl = envApiBaseUrl || config.apiBaseUrl;
-    return `${apiBaseUrl}/v2/${academicYear.replace('/', '-')}`;
+    return `${apiBaseUrl}/v2/${academicYear.replace("/", "-")}`;
   }
 
   /**
@@ -82,7 +82,7 @@ class NUSModsApi {
    * @returns {string}
    */
   static mpeModuleListUrl() {
-    return `${NUSModsApi.baseUrl('')}cpexModules.json`;
+    return `${NUSModsApi.baseUrl("")}cpexModules.json`;
   }
 }
 

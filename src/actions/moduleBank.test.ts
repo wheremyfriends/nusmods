@@ -1,27 +1,27 @@
-import _ from 'lodash';
+import _ from "lodash";
 
-import { TimetableConfig } from 'types/timetables';
-import * as actions from 'actions/moduleBank';
-import NUSModsApi from 'apis/nusmods';
-import { getLRUModules } from './moduleBank-lru';
+import { TimetableConfig } from "types/timetables";
+import * as actions from "actions/moduleBank";
+import NUSModsApi from "apis/nusmods";
+import { getLRUModules } from "./moduleBank-lru";
 
 // Mock NUSModsApi as its URLs contain the current AY, breaking the snapshot tests
 // every AY.
-jest.mock('apis/nusmods');
+jest.mock("apis/nusmods");
 const mockApi: jest.Mocked<typeof NUSModsApi> = NUSModsApi as any;
-mockApi.moduleListUrl.mockReturnValue('test://MOCK_MOD_LIST_URL');
+mockApi.moduleListUrl.mockReturnValue("test://MOCK_MOD_LIST_URL");
 mockApi.moduleDetailsUrl.mockImplementation(
-  (...args) => `test://MOCK_MOD_DETAILS_URL/${args.join('/')}`,
+  (...args) => `test://MOCK_MOD_DETAILS_URL/${args.join("/")}`,
 );
 
-test('fetchModuleList should return a request action', () => {
+test("fetchModuleList should return a request action", () => {
   const resultOfAction = actions.fetchModuleList();
   expect(resultOfAction).toMatchSnapshot();
 });
 
 describe(actions.fetchModule, () => {
-  test('should return a thunk', async () => {
-    const thunk = actions.fetchModule('CS1010S');
+  test("should return a thunk", async () => {
+    const thunk = actions.fetchModule("CS1010S");
     expect(thunk).toBeInstanceOf(Function);
 
     const dispatch = jest.fn().mockResolvedValue(undefined);
@@ -34,8 +34,8 @@ describe(actions.fetchModule, () => {
     expect(dispatch.mock.calls).toMatchSnapshot();
   });
 
-  test('should remove LRU modules above limit', async () => {
-    const thunk = actions.fetchModule('CS1010S');
+  test("should remove LRU modules above limit", async () => {
+    const thunk = actions.fetchModule("CS1010S");
 
     const modules: any = {};
     _.range(105).forEach((i) => {
@@ -53,10 +53,10 @@ describe(actions.fetchModule, () => {
     expect(dispatch.mock.calls).toMatchSnapshot();
   });
 
-  test('should rethrow errors', async () => {
-    const thunk = actions.fetchModule('CS1010S');
+  test("should rethrow errors", async () => {
+    const thunk = actions.fetchModule("CS1010S");
 
-    const error = new Error('ModuleBank Test: Error loading module');
+    const error = new Error("ModuleBank Test: Error loading module");
     const dispatch = jest.fn().mockRejectedValueOnce(error);
     const getState = jest.fn().mockReturnValue({
       moduleBank: { modules: { CS1010S: {} } },
@@ -66,7 +66,7 @@ describe(actions.fetchModule, () => {
   });
 });
 
-test('getLRUModule should return the LRU and non-timetable module', () => {
+test("getLRUModule should return the LRU and non-timetable module", () => {
   /* eslint-disable no-useless-computed-key */
   const timetableConfig: TimetableConfig = {
     [1]: {
@@ -81,28 +81,28 @@ test('getLRUModule should return the LRU and non-timetable module', () => {
     ACC1004: { timestamp: 4 },
   };
 
-  const currentModule = 'ACC1002';
+  const currentModule = "ACC1002";
   const resultOfAction = getLRUModules(modules, timetableConfig, currentModule);
   expect(resultOfAction).toMatchSnapshot();
 });
 
-test('removeLRUModule should return an action', () => {
-  const resultOfAction = actions.Internal.removeLRUModule(['ACC1001']);
+test("removeLRUModule should return an action", () => {
+  const resultOfAction = actions.Internal.removeLRUModule(["ACC1001"]);
   expect(resultOfAction).toMatchSnapshot();
 });
 
-test('updateModuleTimestamp should return an action', () => {
-  const resultOfAction = actions.Internal.updateModuleTimestamp('ACC1001');
+test("updateModuleTimestamp should return an action", () => {
+  const resultOfAction = actions.Internal.updateModuleTimestamp("ACC1001");
   expect(resultOfAction).toMatchSnapshot();
 });
 
-test('fetchModuleArchive should return a request action', () => {
-  expect(actions.fetchModuleArchive('CS1010S', '2016/2017')).toMatchSnapshot();
+test("fetchModuleArchive should return a request action", () => {
+  expect(actions.fetchModuleArchive("CS1010S", "2016/2017")).toMatchSnapshot();
 });
 
-test('fetchAllModuleArchive should return multiple request actions', () => {
+test("fetchAllModuleArchive should return multiple request actions", () => {
   const dispatch = jest.fn().mockReturnValue(Promise.resolve());
-  const thunk = actions.fetchAllModuleArchive('CS1010S');
+  const thunk = actions.fetchAllModuleArchive("CS1010S");
   expect(thunk).toEqual(expect.any(Function));
   thunk(dispatch);
   expect(dispatch.mock.calls).toMatchSnapshot();

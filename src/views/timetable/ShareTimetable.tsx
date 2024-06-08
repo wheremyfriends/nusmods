@@ -1,27 +1,27 @@
-import * as React from 'react';
-import axios from 'axios';
-import classnames from 'classnames';
-import qs from 'query-string';
-import { Copy, Mail, Repeat } from 'react-feather';
-import type { QRCodeProps } from 'react-qr-svg';
+import * as React from "react";
+import axios from "axios";
+import classnames from "classnames";
+import qs from "query-string";
+import { Copy, Mail, Repeat } from "react-feather";
+import type { QRCodeProps } from "react-qr-svg";
 
-import type { SemTimetableConfig } from 'types/timetables';
-import type { ModuleCode, Semester } from 'types/modules';
+import type { SemTimetableConfig } from "types/timetables";
+import type { ModuleCode, Semester } from "types/modules";
 
-import config from 'config';
-import { enableShortUrl } from 'featureFlags';
-import { absolutePath, timetableShare } from 'views/routes/paths';
-import Modal from 'views/components/Modal';
-import CloseButton from 'views/components/CloseButton';
-import LoadingSpinner from 'views/components/LoadingSpinner';
-import retryImport from 'utils/retryImport';
+import config from "config";
+import { enableShortUrl } from "featureFlags";
+import { absolutePath, timetableShare } from "views/routes/paths";
+import Modal from "views/components/Modal";
+import CloseButton from "views/components/CloseButton";
+import LoadingSpinner from "views/components/LoadingSpinner";
+import retryImport from "utils/retryImport";
 
-import styles from './ShareTimetable.scss';
+import styles from "./ShareTimetable.scss";
 
-type CopyState = 'NOT_COPIED' | 'COPY_SUCCESS' | 'COPY_FAIL';
-const NOT_COPIED: CopyState = 'NOT_COPIED';
-const COPY_SUCCESS: CopyState = 'COPY_SUCCESS';
-const COPY_FAIL: CopyState = 'COPY_FAIL';
+type CopyState = "NOT_COPIED" | "COPY_SUCCESS" | "COPY_FAIL";
+const NOT_COPIED: CopyState = "NOT_COPIED";
+const COPY_SUCCESS: CopyState = "COPY_SUCCESS";
+const COPY_FAIL: CopyState = "COPY_FAIL";
 
 type Props = {
   semester: Semester;
@@ -44,7 +44,7 @@ function shareUrl(
 }
 
 // So that I don't keep typing 'shortUrl' instead
-export const SHORT_URL_KEY = 'shorturl';
+export const SHORT_URL_KEY = "shorturl";
 
 export default class ShareTimetable extends React.PureComponent<Props, State> {
   // React QR component is lazy loaded for performance
@@ -63,7 +63,9 @@ export default class ShareTimetable extends React.PureComponent<Props, State> {
 
   override componentDidMount() {
     if (!ShareTimetable.QRCode) {
-      retryImport(() => import(/* webpackChunkName: "export" */ 'react-qr-svg')).then((module) => {
+      retryImport(
+        () => import(/* webpackChunkName: "export" */ "react-qr-svg"),
+      ).then((module) => {
         ShareTimetable.QRCode = module.QRCode;
         this.forceUpdate();
       });
@@ -90,7 +92,7 @@ export default class ShareTimetable extends React.PureComponent<Props, State> {
 
     if (enableShortUrl) {
       axios
-        .get('/api/shorturl', { params: { url }, timeout: 8000 })
+        .get("/api/shorturl", { params: { url }, timeout: 8000 })
         .then(({ data }) => {
           if (data[SHORT_URL_KEY]) {
             this.setState({ shortUrl: data[SHORT_URL_KEY] });
@@ -123,7 +125,7 @@ export default class ShareTimetable extends React.PureComponent<Props, State> {
       input.select();
       input.setSelectionRange(0, input.value.length);
 
-      if (document.execCommand('copy')) {
+      if (document.execCommand("copy")) {
         input.blur();
         this.setState({ urlCopied: COPY_SUCCESS });
       } else {
@@ -137,10 +139,15 @@ export default class ShareTimetable extends React.PureComponent<Props, State> {
 
     return (
       <div>
-        <div className={classnames('input-group input-group-lg', styles.linkInputGroup)}>
+        <div
+          className={classnames(
+            "input-group input-group-lg",
+            styles.linkInputGroup,
+          )}
+        >
           <input
             value={url}
-            className={classnames('form-control', styles.url)}
+            className={classnames("form-control", styles.url)}
             ref={this.urlInput}
             readOnly
           />
@@ -176,7 +183,7 @@ export default class ShareTimetable extends React.PureComponent<Props, State> {
             <a
               className="btn btn-outline-primary btn-block btn-svg"
               href={`mailto:?${qs.stringify({
-                subject: 'NUSMods timetable',
+                subject: "NUSMods timetable",
                 body:
                   `My timetable for ${config.academicYear} ${config.semesterNames[semester]}` +
                   ` can be found at ${url}`,

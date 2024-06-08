@@ -1,14 +1,14 @@
-import { flatMap, get, sortBy, values } from 'lodash';
-import { ModuleCode, Semester, Semesters } from 'types/modules';
+import { flatMap, get, sortBy, values } from "lodash";
+import { ModuleCode, Semester, Semesters } from "types/modules";
 import {
   PlannerState,
   ModulesMap,
   ModuleCodeMap,
   CustomModuleData,
   PlannerTime,
-} from 'types/reducers';
-import config from 'config';
-import { getYearsBetween, subtractAcadYear } from 'utils/modules';
+} from "types/reducers";
+import config from "config";
+import { getYearsBetween, subtractAcadYear } from "utils/modules";
 import {
   checkPrerequisite,
   EXEMPTION_SEMESTER,
@@ -16,20 +16,24 @@ import {
   IBLOCS_SEMESTER,
   PLAN_TO_TAKE_SEMESTER,
   PLAN_TO_TAKE_YEAR,
-} from 'utils/planner';
-import { findExamClashes } from 'utils/timetables';
-import { Conflict, PlannerModuleInfo, PlannerModulesWithInfo } from 'types/planner';
-import placeholders from 'utils/placeholders';
-import { notNull } from 'types/utils';
-import { State } from 'types/state';
-import { ExamClashes } from 'types/views';
+} from "utils/planner";
+import { findExamClashes } from "utils/timetables";
+import {
+  Conflict,
+  PlannerModuleInfo,
+  PlannerModulesWithInfo,
+} from "types/planner";
+import placeholders from "utils/placeholders";
+import { notNull } from "types/utils";
+import { State } from "types/state";
+import { ExamClashes } from "types/views";
 
 /**
  * Get a list of modules planned for a specific semester in an acad year
  * in the order specified by the index
  */
 export function filterModuleForSemester(
-  modules: PlannerState['modules'],
+  modules: PlannerState["modules"],
   year: string,
   semester: Semester,
 ) {
@@ -54,13 +58,13 @@ export function filterModuleForSemester(
 const prereqConflict =
   (modulesMap: ModulesMap, modulesTaken: Set<ModuleCode>) =>
   (moduleCode: ModuleCode): Conflict | null => {
-    const prereqs = get(modulesMap, [moduleCode, 'prereqTree']);
+    const prereqs = get(modulesMap, [moduleCode, "prereqTree"]);
     if (!prereqs) return null;
 
     const unfulfilledPrereqs = checkPrerequisite(modulesTaken, prereqs);
     if (!unfulfilledPrereqs || !unfulfilledPrereqs.length) return null;
 
-    return { type: 'prereq', unfulfilledPrereqs };
+    return { type: "prereq", unfulfilledPrereqs };
   };
 
 /**
@@ -69,7 +73,9 @@ const prereqConflict =
 const noInfoConflict =
   (moduleCodeMap: ModuleCodeMap, customData: CustomModuleData) =>
   (moduleCode: ModuleCode): Conflict | null =>
-    moduleCodeMap[moduleCode] || customData[moduleCode] ? null : { type: 'noInfo' };
+    moduleCodeMap[moduleCode] || customData[moduleCode]
+      ? null
+      : { type: "noInfo" };
 
 /**
  * Checks if modules are added to semesters in which they are not available
@@ -80,7 +86,7 @@ const semesterConflict =
     const moduleCondensed = moduleCodeMap[moduleCode];
     if (!moduleCondensed) return null;
     if (!moduleCondensed.semesters.includes(semester)) {
-      return { type: 'semester', semestersOffered: moduleCondensed.semesters };
+      return { type: "semester", semestersOffered: moduleCondensed.semesters };
     }
 
     return null;
@@ -99,7 +105,10 @@ const examConflict =
     );
 
     if (clash) {
-      return { type: 'exam', conflictModules: clash.map((module) => module.moduleCode) };
+      return {
+        type: "exam",
+        conflictModules: clash.map((module) => module.moduleCode),
+      };
     }
 
     return null;
@@ -162,10 +171,18 @@ export function mapNonTimetableModules(
   semester: Semester,
 ): PlannerModuleInfo[] {
   const { planner, moduleBank } = state;
-  const conflictChecks = [noInfoConflict(moduleBank.moduleCodes, planner.custom)];
+  const conflictChecks = [
+    noInfoConflict(moduleBank.moduleCodes, planner.custom),
+  ];
 
-  return filterModuleForSemester(planner.modules, year, semester).map((moduleCode) =>
-    mapModuleToInfo(moduleCode, moduleBank.modules, planner.custom, conflictChecks),
+  return filterModuleForSemester(planner.modules, year, semester).map(
+    (moduleCode) =>
+      mapModuleToInfo(
+        moduleCode,
+        moduleBank.modules,
+        planner.custom,
+        conflictChecks,
+      ),
   );
 }
 
@@ -201,12 +218,18 @@ export function getAcadYearModules(state: State): PlannerModulesWithInfo {
   );
 
   // Same type as PlannerModulesWithInfo, but writable so we can build it here
-  const modules: { [year: string]: { [semester: string]: PlannerModuleInfo[] } } = {};
+  const modules: {
+    [year: string]: { [semester: string]: PlannerModuleInfo[] };
+  } = {};
   years.forEach((year) => {
     modules[year] = {};
 
     Semesters.forEach((semester) => {
-      const moduleTimes = filterModuleForSemester(planner.modules, year, semester);
+      const moduleTimes = filterModuleForSemester(
+        planner.modules,
+        year,
+        semester,
+      );
 
       // Only check for exam clashes for modules in the current year
       let clashes = {};
@@ -231,13 +254,20 @@ export function getAcadYearModules(state: State): PlannerModulesWithInfo {
       }
 
       modules[year][semester] = moduleTimes.map((moduleCode) =>
-        mapModuleToInfo(moduleCode, moduleBank.modules, planner.custom, conflictChecks),
+        mapModuleToInfo(
+          moduleCode,
+          moduleBank.modules,
+          planner.custom,
+          conflictChecks,
+        ),
       );
 
       // Add taken modules to set of modules taken for prerequisite calculation
       moduleTimes.forEach((moduleTime) => {
         if (!moduleTime.moduleCode) return;
-        getPrereqModuleCode(moduleTime.moduleCode).forEach((prereq) => modulesTaken.add(prereq));
+        getPrereqModuleCode(moduleTime.moduleCode).forEach((prereq) =>
+          modulesTaken.add(prereq),
+        );
       });
     });
   });

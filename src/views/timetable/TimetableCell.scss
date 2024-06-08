@@ -1,4 +1,4 @@
-@import './_variables.scss';
+@import "./_variables.scss";
 
 $cell-padding: 0.3rem;
 $cell-opacity: 0.5;
@@ -13,7 +13,8 @@ $cell-opacity: 0.5;
   font-size: $font-size-xxs;
   line-height: 0.85rem;
   text-align: left;
-  transition: background-color $desktop-entering-duration $material-deceleration-curve;
+  transition: background-color $desktop-entering-duration
+    $material-deceleration-curve;
   animation-duration: $desktop-entering-duration;
 
   &:hover,
@@ -56,7 +57,6 @@ $cell-opacity: 0.5;
   }
 
   @media (pointer: fine) {
-
     &:hover,
     &.hover {
       opacity: 1;
@@ -83,7 +83,7 @@ $cell-opacity: 0.5;
   border-bottom: 1px dotted;
 
   &::after {
-    content: '*';
+    content: "*";
   }
 }
 

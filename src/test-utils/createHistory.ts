@@ -1,10 +1,10 @@
-import type { RouteComponentProps, match as Match } from 'react-router-dom';
+import type { RouteComponentProps, match as Match } from "react-router-dom";
 // react-router-dom internal dependency, used here to construct the history
 // object needed for testing. This is not added as a dev dependency to avoid
 // version desync between the version depended on by react-router-dom
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { createMemoryHistory } from 'history';
-import _ from 'lodash';
+import { createMemoryHistory } from "history";
+import _ from "lodash";
 
 type MatchShape = {
   params?: { [key: string]: string | null | undefined };
@@ -12,8 +12,10 @@ type MatchShape = {
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export default function createHistory<T extends { [K in keyof T]?: string | undefined } = {}>(
-  initialEntries: string | string[] = '/',
+export default function createHistory<
+  T extends { [K in keyof T]?: string | undefined } = {},
+>(
+  initialEntries: string | string[] = "/",
   matchParams: MatchShape = {},
 ): RouteComponentProps<T> {
   const entries = _.castArray(initialEntries);

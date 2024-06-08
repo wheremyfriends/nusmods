@@ -1,10 +1,10 @@
-import produce from 'immer';
-import { each, max, min, pull } from 'lodash';
-import { createMigrate, PersistedState } from 'redux-persist';
+import produce from "immer";
+import { each, max, min, pull } from "lodash";
+import { createMigrate, PersistedState } from "redux-persist";
 
-import { PlannerState } from 'types/reducers';
-import { Actions } from 'types/actions';
-import { Semester } from 'types/modules';
+import { PlannerState } from "types/reducers";
+import { Actions } from "types/actions";
+import { Semester } from "types/modules";
 
 import {
   ADD_CUSTOM_PLANNER_DATA,
@@ -16,9 +16,9 @@ import {
   SET_PLANNER_MAX_YEAR,
   SET_PLANNER_MIN_YEAR,
   SET_IGNORE_PREREQUISITES_CHECK,
-} from 'actions/planner';
-import { filterModuleForSemester } from 'selectors/planner';
-import config from 'config';
+} from "actions/planner";
+import { filterModuleForSemester } from "selectors/planner";
+import config from "config";
 
 const defaultPlannerState: PlannerState = {
   minYear: config.academicYear,
@@ -34,9 +34,9 @@ const defaultPlannerState: PlannerState = {
  * Derive the next ID in PlannerState.modules by incrementing from the last
  * existing ID
  */
-export function nextId(modules: PlannerState['modules']): string {
+export function nextId(modules: PlannerState["modules"]): string {
   const ids = Object.keys(modules).map(Number);
-  if (ids.length === 0) return '0';
+  if (ids.length === 0) return "0";
   return String(Math.max(...ids) + 1);
 }
 
@@ -45,12 +45,14 @@ export function nextId(modules: PlannerState['modules']): string {
  * given ID
  */
 function getSemesterIds(
-  modules: PlannerState['modules'],
+  modules: PlannerState["modules"],
   year: string,
   semester: Semester,
   exclude?: string,
 ): string[] {
-  const ids = filterModuleForSemester(modules, year, semester).map((module) => module.id);
+  const ids = filterModuleForSemester(modules, year, semester).map(
+    (module) => module.id,
+  );
   if (exclude) return pull(ids, exclude);
   return ids;
 }
@@ -87,7 +89,7 @@ export default function planner(
       const id = nextId(state.modules);
       const index = getSemesterIds(state.modules, year, semester).length;
       const props =
-        payload.type === 'placeholder'
+        payload.type === "placeholder"
           ? { placeholderId: payload.placeholderId }
           : { moduleCode: payload.moduleCode };
 
@@ -116,7 +118,12 @@ export default function planner(
       let oldModuleOrder: string[] = [];
       const { year: oldYear, semester: oldSemester } = state.modules[id];
       if (oldYear !== year || oldSemester !== semester) {
-        oldModuleOrder = getSemesterIds(state.modules, oldYear, oldSemester, id);
+        oldModuleOrder = getSemesterIds(
+          state.modules,
+          oldYear,
+          oldSemester,
+          id,
+        );
       }
 
       // Update the index of all affected modules
@@ -155,7 +162,7 @@ export default function planner(
 }
 
 // Migration from state V0 -> V1
-type PlannerStateV0 = Omit<PlannerState, 'modules'> & {
+type PlannerStateV0 = Omit<PlannerState, "modules"> & {
   modules: { [moduleCode: string]: [string, Semester, number] };
 };
 export function migrateV0toV1(
@@ -165,7 +172,7 @@ export function migrateV0toV1(
   // to the new mapping of id to module time object
   let id = 0;
 
-  const newModules: PlannerState['modules'] = {};
+  const newModules: PlannerState["modules"] = {};
 
   each(oldState.modules, ([year, semester, index], moduleCode) => {
     newModules[id] = {

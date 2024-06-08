@@ -1,19 +1,19 @@
-import { PureComponent } from 'react';
-import { Link } from 'react-router-dom';
-import { connect } from 'react-redux';
-import classnames from 'classnames';
-import * as Sentry from '@sentry/browser';
+import { PureComponent } from "react";
+import { Link } from "react-router-dom";
+import { connect } from "react-redux";
+import classnames from "classnames";
+import * as Sentry from "@sentry/browser";
 
-import { ModuleCode } from 'types/modules';
-import RandomKawaii from 'views/components/RandomKawaii';
-import Title from 'views/components/Title';
-import { fetchAllModuleArchive } from 'actions/moduleBank';
-import { MODULE_CODE_REGEX } from 'utils/modules';
-import LoadingSpinner from 'views/components/LoadingSpinner';
-import { availableArchive, isArchiveLoading } from 'selectors/timetables';
-import { moduleArchive } from 'views/routes/paths';
-import { State } from 'types/state';
-import styles from './ErrorPage.scss';
+import { ModuleCode } from "types/modules";
+import RandomKawaii from "views/components/RandomKawaii";
+import Title from "views/components/Title";
+import { fetchAllModuleArchive } from "actions/moduleBank";
+import { MODULE_CODE_REGEX } from "utils/modules";
+import LoadingSpinner from "views/components/LoadingSpinner";
+import { availableArchive, isArchiveLoading } from "selectors/timetables";
+import { moduleArchive } from "views/routes/paths";
+import { State } from "types/state";
+import styles from "./ErrorPage.scss";
 
 type OwnProps = {
   tryArchive: boolean;
@@ -29,11 +29,14 @@ type Props = OwnProps & {
 export class ModuleNotFoundPageComponent extends PureComponent<Props> {
   override componentDidMount() {
     Sentry.withScope(() => {
-      Sentry.captureMessage('404 - Module Not Found');
+      Sentry.captureMessage("404 - Module Not Found");
     });
 
     // If we think this is a module, try checking for archived modules
-    if (this.props.moduleCode.match(MODULE_CODE_REGEX) && this.props.tryArchive) {
+    if (
+      this.props.moduleCode.match(MODULE_CODE_REGEX) &&
+      this.props.tryArchive
+    ) {
       this.props.fetchModuleArchive(this.props.moduleCode);
     }
   }
@@ -55,8 +58,9 @@ export class ModuleNotFoundPageComponent extends PureComponent<Props> {
               <RandomKawaii size={100} />
             </div>
 
-            <h1 className={classnames('h3', styles.header)}>
-              <span className={styles.expr}>{moduleCode}</span> is not currently offered
+            <h1 className={classnames("h3", styles.header)}>
+              <span className={styles.expr}>{moduleCode}</span> is not currently
+              offered
             </h1>
 
             <p>However, it was previously offered in these academic years</p>
@@ -75,8 +79,8 @@ export class ModuleNotFoundPageComponent extends PureComponent<Props> {
             </div>
 
             <p>
-              Otherwise, if this is not what you are looking for,{' '}
-              <Link to="/">go back to nusmods.com</Link> or{' '}
+              Otherwise, if this is not what you are looking for,{" "}
+              <Link to="/">go back to nusmods.com</Link> or{" "}
               <Link to="/courses">try the course finder</Link>.
             </p>
           </>
@@ -91,8 +95,8 @@ export class ModuleNotFoundPageComponent extends PureComponent<Props> {
             <h2>Oops, course {moduleCode} not found.</h2>
 
             <p>
-              This usually means you have a typo in the course code, or the course is not offered
-              this year.
+              This usually means you have a typo in the course code, or the
+              course is not offered this year.
             </p>
 
             <div className={styles.buttons}>

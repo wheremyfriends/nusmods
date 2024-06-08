@@ -1,10 +1,10 @@
-import * as React from 'react';
-import classnames from 'classnames';
-import { debounce } from 'lodash';
+import * as React from "react";
+import classnames from "classnames";
+import { debounce } from "lodash";
 
-import { Search, X } from 'react-feather';
-import LoadingSpinner from 'views/components/LoadingSpinner';
-import styles from './SearchBox.scss';
+import { Search, X } from "react-feather";
+import LoadingSpinner from "views/components/LoadingSpinner";
+import styles from "./SearchBox.scss";
 
 type Props = {
   className?: string;
@@ -68,7 +68,7 @@ export default class SearchBox extends React.PureComponent<Props, State> {
   };
 
   onRemoveInput = () => {
-    this.props.onChange('');
+    this.props.onChange("");
     this.setState({ hasChanges: true });
     if (this.props.useInstantSearch) this.debouncedSearch();
   };
@@ -111,11 +111,18 @@ export default class SearchBox extends React.PureComponent<Props, State> {
           }}
         >
           {isLoading ? (
-            <div className={classnames(styles.leftAccessory, styles.spinnerContainer)}>
+            <div
+              className={classnames(
+                styles.leftAccessory,
+                styles.spinnerContainer,
+              )}
+            >
               <LoadingSpinner className={styles.spinner} small />
             </div>
           ) : (
-            <Search className={classnames(styles.leftAccessory, styles.searchIcon)} />
+            <Search
+              className={classnames(styles.leftAccessory, styles.searchIcon)}
+            />
           )}
           {value && (
             <X
@@ -130,7 +137,7 @@ export default class SearchBox extends React.PureComponent<Props, State> {
             type="search"
             autoComplete="off"
             ref={this.searchElement}
-            value={value || ''}
+            value={value || ""}
             onChange={this.onInput}
             onFocus={() => this.setState({ isFocused: true })}
             onBlur={() => {
@@ -142,7 +149,9 @@ export default class SearchBox extends React.PureComponent<Props, State> {
           />
         </form>
 
-        {this.showSubmitHelp() && <p className={styles.searchHelp}>Press enter to search</p>}
+        {this.showSubmitHelp() && (
+          <p className={styles.searchHelp}>Press enter to search</p>
+        )}
       </div>
     );
   }

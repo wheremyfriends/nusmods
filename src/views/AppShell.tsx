@@ -1,37 +1,37 @@
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from "react";
 
-import { Helmet } from 'react-helmet';
-import { NavLink, useHistory } from 'react-router-dom';
-import { useDispatch, useSelector, useStore } from 'react-redux';
-import classnames from 'classnames';
-import { each } from 'lodash';
-import { DARK_MODE } from 'types/settings';
-import type { Semester } from 'types/modules';
-import type { SemTimetableConfig } from 'types/timetables';
+import { Helmet } from "react-helmet";
+import { NavLink, useHistory } from "react-router-dom";
+import { useDispatch, useSelector, useStore } from "react-redux";
+import classnames from "classnames";
+import { each } from "lodash";
+import { DARK_MODE } from "types/settings";
+import type { Semester } from "types/modules";
+import type { SemTimetableConfig } from "types/timetables";
 
-import weekText from 'utils/weekText';
-import { captureException } from 'utils/error';
-import { openNotification } from 'actions/app';
-import { fetchModuleList as fetchModuleListAction } from 'actions/moduleBank';
+import weekText from "utils/weekText";
+import { captureException } from "utils/error";
+import { openNotification } from "actions/app";
+import { fetchModuleList as fetchModuleListAction } from "actions/moduleBank";
 import {
   fetchTimetableModules as fetchTimetableModulesAction,
   validateTimetable,
-} from 'actions/timetables';
-import Navtabs from 'views/layout/Navtabs';
-import Notification from 'views/components/notfications/Notification';
-import ErrorBoundary from 'views/errors/ErrorBoundary';
-import ErrorPage from 'views/errors/ErrorPage';
-import ApiError from 'views/errors/ApiError';
-import { isIOS } from 'bootstrapping/browser';
-import Logo from 'img/nusmods-logo.svg';
-import type { Dispatch } from 'types/redux';
-import type { State } from 'types/state';
-import type { Actions } from 'types/actions';
-import LoadingSpinner from './components/LoadingSpinner';
-import FeedbackModal from './components/FeedbackModal';
-import KeyboardShortcuts from './components/KeyboardShortcuts';
+} from "actions/timetables";
+import Navtabs from "views/layout/Navtabs";
+import Notification from "views/components/notfications/Notification";
+import ErrorBoundary from "views/errors/ErrorBoundary";
+import ErrorPage from "views/errors/ErrorPage";
+import ApiError from "views/errors/ApiError";
+import { isIOS } from "bootstrapping/browser";
+import Logo from "img/nusmods-logo.svg";
+import type { Dispatch } from "types/redux";
+import type { State } from "types/state";
+import type { Actions } from "types/actions";
+import LoadingSpinner from "./components/LoadingSpinner";
+import FeedbackModal from "./components/FeedbackModal";
+import KeyboardShortcuts from "./components/KeyboardShortcuts";
 
-import styles from './AppShell.scss';
+import styles from "./AppShell.scss";
 
 /**
  * Fetch module list on mount.
@@ -56,15 +56,18 @@ function useFetchModuleListAndTimetableModules(): {
   );
 
   const fetchTimetableModules = useCallback(
-    function fetchTimetableModulesImpl(timetable: SemTimetableConfig, semester: Semester) {
+    function fetchTimetableModulesImpl(
+      timetable: SemTimetableConfig,
+      semester: Semester,
+    ) {
       dispatch(fetchTimetableModulesAction([timetable]))
         .then(() => dispatch(validateTimetable(semester)))
         .catch((error) => {
           captureException(error);
           dispatch(
-            openNotification('Data for some courses failed to load', {
+            openNotification("Data for some courses failed to load", {
               action: {
-                text: 'Retry',
+                text: "Retry",
                 handler: () => fetchTimetableModulesImpl(timetable, semester),
               },
             }),
@@ -91,7 +94,10 @@ function useFetchModuleListAndTimetableModules(): {
     // });
   }, [fetchModuleList, fetchTimetableModules, store]);
 
-  useEffect(() => fetchModuleListAndTimetableModules(), [fetchModuleListAndTimetableModules]);
+  useEffect(
+    () => fetchModuleListAndTimetableModules(),
+    [fetchModuleListAndTimetableModules],
+  );
 
   return {
     moduleListError,
@@ -112,7 +118,12 @@ const AppShell: FC = ({ children }) => {
   const theme = useSelector((state: State) => state.theme.id);
 
   if (!isModuleListReady && moduleListError) {
-    return <ApiError dataName="course information" retry={refetchModuleListAndTimetableModules} />;
+    return (
+      <ApiError
+        dataName="course information"
+        retry={refetchModuleListAndTimetableModules}
+      />
+    );
   }
 
   return (
@@ -120,9 +131,9 @@ const AppShell: FC = ({ children }) => {
       <Helmet>
         <body
           className={classnames(`theme-${theme}`, {
-            'mode-dark': isDarkMode,
-            'mdc-theme--dark': isDarkMode,
-            'mobile-safari': isIOS,
+            "mode-dark": isDarkMode,
+            "mdc-theme--dark": isDarkMode,
+            "mobile-safari": isIOS,
           })}
         />
       </Helmet>
@@ -141,15 +152,15 @@ const AppShell: FC = ({ children }) => {
       <div className="main-container">
         {/* <Navtabs /> */}
 
-      <main className="main-content">
-        {isModuleListReady ? (
-          <ErrorBoundary errorPage={() => <ErrorPage showReportDialog />}>
-            {children}
-          </ErrorBoundary>
-        ) : (
-          <LoadingSpinner />
-        )}
-      </main>
+        <main className="main-content">
+          {isModuleListReady ? (
+            <ErrorBoundary errorPage={() => <ErrorPage showReportDialog />}>
+              {children}
+            </ErrorBoundary>
+          ) : (
+            <LoadingSpinner />
+          )}
+        </main>
       </div>
 
       <ErrorBoundary>

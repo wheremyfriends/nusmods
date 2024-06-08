@@ -1,6 +1,6 @@
-import * as React from 'react';
-import classnames from 'classnames';
-import styles from './LoadingSpinner.scss';
+import * as React from "react";
+import classnames from "classnames";
+import styles from "./LoadingSpinner.scss";
 
 type Props = {
   small?: boolean;

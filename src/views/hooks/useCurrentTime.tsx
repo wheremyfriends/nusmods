@@ -1,7 +1,7 @@
-import { useRef, useState, useEffect } from 'react';
-import { differenceInMilliseconds } from 'date-fns';
+import { useRef, useState, useEffect } from "react";
+import { differenceInMilliseconds } from "date-fns";
 
-import { forceTimer } from 'utils/debug';
+import { forceTimer } from "utils/debug";
 
 function getCurrentTime() {
   return forceTimer() || new Date();
@@ -27,18 +27,21 @@ export default function useCurrentTime(intervalInMs: number = 60 * 1000) {
     const onPageVisibilityChange = () => {
       setTime((prevTime) => {
         const now = getCurrentTime();
-        if (!document.hidden && differenceInMilliseconds(now, prevTime) > intervalInMs) {
+        if (
+          !document.hidden &&
+          differenceInMilliseconds(now, prevTime) > intervalInMs
+        ) {
           return now;
         }
         return prevTime;
       });
     };
 
-    document.addEventListener('visibilitychange', onPageVisibilityChange);
+    document.addEventListener("visibilitychange", onPageVisibilityChange);
 
     return () => {
       window.clearTimeout(intervalId.current);
-      document.removeEventListener('visibilitychange', onPageVisibilityChange);
+      document.removeEventListener("visibilitychange", onPageVisibilityChange);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

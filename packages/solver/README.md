@@ -3,6 +3,7 @@
 ## Input/Output
 
 Output is the same as input with a few missing mods
+
 ```json
 [
     // User 1
@@ -46,9 +47,9 @@ Output is the same as input with a few missing mods
 import { getOptimisedTimetable } from "solver";
 
 getOptimisedTimetable(
-    timetables, // Object defined above
-    1,          // Index of the current user (with respect to the array above)
-    5,          // Max # of solutions
+  timetables, // Object defined above
+  1, // Index of the current user (with respect to the array above)
+  5, // Max # of solutions
 );
 ```
 

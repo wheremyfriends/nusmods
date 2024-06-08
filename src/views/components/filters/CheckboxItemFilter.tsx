@@ -1,8 +1,12 @@
-import * as React from 'react';
-import { CheckboxFilterAccessor, SearchkitComponent, SearchkitComponentProps } from 'searchkit';
+import * as React from "react";
+import {
+  CheckboxFilterAccessor,
+  SearchkitComponent,
+  SearchkitComponentProps,
+} from "searchkit";
 
-import { ElasticSearchFilter } from 'types/vendor/elastic-search';
-import CheckboxItem from './CheckboxItem';
+import { ElasticSearchFilter } from "types/vendor/elastic-search";
+import CheckboxItem from "./CheckboxItem";
 
 interface CheckboxItemFilterProps extends SearchkitComponentProps {
   id: string;
@@ -23,7 +27,10 @@ type State = {};
  * Note that this is less efficient than RefinementListFilter, so that should be used if the
  * queried items are distinct and mutually exclusive.
  */
-export default class CheckboxItemFilter extends SearchkitComponent<CheckboxItemFilterProps, State> {
+export default class CheckboxItemFilter extends SearchkitComponent<
+  CheckboxItemFilterProps,
+  State
+> {
   declare accessor: CheckboxFilterAccessor;
 
   static defaultProps = {

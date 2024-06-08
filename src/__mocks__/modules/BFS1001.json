@@ -65,7 +65,11 @@
           "venue": "BIZ1-0203"
         }
       ],
-      "LecturePeriods": ["Monday Afternoon", "Wednesday Morning", "Thursday Morning"]
+      "LecturePeriods": [
+        "Monday Afternoon",
+        "Wednesday Morning",
+        "Thursday Morning"
+      ]
     },
     {
       "semester": 2,

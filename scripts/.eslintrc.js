@@ -4,7 +4,7 @@ module.exports = {
   },
 
   settings: {
-    'import/resolver': {
+    "import/resolver": {
       // https://github.com/benmosher/eslint-plugin-import/issues/1396#issuecomment-509384041
       node: {},
     },
@@ -12,8 +12,8 @@ module.exports = {
 
   rules: {
     // build scripts gotta print
-    'no-console': 'off',
+    "no-console": "off",
     // eslint thinks script dev dependencies are dependencies
-    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+    "import/no-extraneous-dependencies": ["error", { devDependencies: true }],
   },
 };

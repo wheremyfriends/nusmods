@@ -1,12 +1,12 @@
-import { memo } from 'react';
-import classnames from 'classnames';
-import Downshift, { ChildrenFunction } from 'downshift';
-import _ from 'lodash';
+import { memo } from "react";
+import classnames from "classnames";
+import Downshift, { ChildrenFunction } from "downshift";
+import _ from "lodash";
 
-import { ColorIndex } from 'types/timetables';
+import { ColorIndex } from "types/timetables";
 
-import { NUM_DIFFERENT_COLORS } from 'utils/colors';
-import styles from './ColorPicker.scss';
+import { NUM_DIFFERENT_COLORS } from "utils/colors";
+import styles from "./ColorPicker.scss";
 
 type Props = {
   label: string;
@@ -36,9 +36,14 @@ const ColorPicker = memo<Props>((props) => {
           {...getToggleButtonProps({
             title: label,
           })}
-          className={classnames('btn btn-block hoverable', `color-${color}`, styles.moduleColor, {
-            [styles.hidden]: isHidden,
-          })}
+          className={classnames(
+            "btn btn-block hoverable",
+            `color-${color}`,
+            styles.moduleColor,
+            {
+              [styles.hidden]: isHidden,
+            },
+          )}
         />
         <div
           className={classnames(styles.palette, { [styles.isClosed]: !isOpen })}
@@ -60,7 +65,11 @@ const ColorPicker = memo<Props>((props) => {
   };
 
   return (
-    <Downshift onChange={(colorIndex) => colorIndex !== null && props.onChooseColor(colorIndex)}>
+    <Downshift
+      onChange={(colorIndex) =>
+        colorIndex !== null && props.onChooseColor(colorIndex)
+      }
+    >
       {renderColorPicker}
     </Downshift>
   );

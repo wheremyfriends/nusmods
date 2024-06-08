@@ -1,7 +1,7 @@
-import { getModuleCondensed } from 'selectors/moduleBank';
+import { getModuleCondensed } from "selectors/moduleBank";
 
 describe(getModuleCondensed.name, () => {
-  test('should return a function that determines if the given module code is valid', () => {
+  test("should return a function that determines if the given module code is valid", () => {
     const state: any = {
       moduleBank: {
         moduleCodes: {
@@ -13,7 +13,7 @@ describe(getModuleCondensed.name, () => {
     const checker = getModuleCondensed(state);
     expect(checker).toBeInstanceOf(Function);
 
-    expect(checker('CS1010S')).toBeTruthy();
-    expect(checker('ACC1000')).toBeFalsy();
+    expect(checker("CS1010S")).toBeTruthy();
+    expect(checker("ACC1000")).toBeFalsy();
   });
 });

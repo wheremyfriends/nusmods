@@ -5,6 +5,6 @@ export type Theme = {
   readonly name: string;
 };
 
-export type Mode = 'LIGHT' | 'DARK';
-export const LIGHT_MODE: Mode = 'LIGHT';
-export const DARK_MODE: Mode = 'DARK';
+export type Mode = "LIGHT" | "DARK";
+export const LIGHT_MODE: Mode = "LIGHT";
+export const DARK_MODE: Mode = "DARK";

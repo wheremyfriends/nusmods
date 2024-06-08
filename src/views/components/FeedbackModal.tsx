@@ -1,14 +1,14 @@
-import * as React from 'react';
-import { connect } from 'react-redux';
-import { Heart, GitHub, Facebook, Mail } from 'react-feather';
+import * as React from "react";
+import { connect } from "react-redux";
+import { Heart, GitHub, Facebook, Mail } from "react-feather";
 
-import config from 'config';
-import { toggleFeedback } from 'actions/app';
-import { State } from 'types/state';
-import ExternalLink from './ExternalLink';
-import CloseButton from './CloseButton';
-import Modal from './Modal';
-import styles from './FeedbackModal.scss';
+import config from "config";
+import { toggleFeedback } from "actions/app";
+import { State } from "types/state";
+import ExternalLink from "./ExternalLink";
+import CloseButton from "./CloseButton";
+import Modal from "./Modal";
+import styles from "./FeedbackModal.scss";
 
 type Props = {
   isOpen: boolean;
@@ -18,7 +18,10 @@ type Props = {
 export const FeedbackButtons: React.FC = () => (
   <div>
     <div className={styles.links}>
-      <ExternalLink className={styles.messenger} href={config.contact.messenger}>
+      <ExternalLink
+        className={styles.messenger}
+        href={config.contact.messenger}
+      >
         <Facebook />
         Messenger
       </ExternalLink>
@@ -26,13 +29,16 @@ export const FeedbackButtons: React.FC = () => (
         <GitHub />
         GitHub
       </ExternalLink>
-      <ExternalLink className={styles.email} href={`mailto:${config.contact.email}`}>
+      <ExternalLink
+        className={styles.email}
+        href={`mailto:${config.contact.email}`}
+      >
         <Mail />
         Email
       </ExternalLink>
     </div>
     <p className="text-muted">
-      To email us privately, such as for security issues, please use{' '}
+      To email us privately, such as for security issues, please use{" "}
       <ExternalLink href={`mailto:${config.contact.privateEmail}`}>
         {config.contact.privateEmail}
       </ExternalLink>
@@ -52,8 +58,8 @@ export const FeedbackModalComponent: React.FC<Props> = (props) => (
       <Heart className={styles.topIcon} />
       <h1>Let us know what you think!</h1>
       <p>
-        Thank you for your time! You can talk to us on Messenger, file an issue on GitHub, or send
-        us an email.
+        Thank you for your time! You can talk to us on Messenger, file an issue
+        on GitHub, or send us an email.
       </p>
       <FeedbackButtons />
     </div>

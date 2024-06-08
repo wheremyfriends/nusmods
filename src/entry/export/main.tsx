@@ -1,24 +1,28 @@
-import { createRef } from 'react';
-import ReactDOM from 'react-dom';
-import { Store } from 'redux';
+import { createRef } from "react";
+import ReactDOM from "react-dom";
+import { Store } from "redux";
 
-import { Module } from 'types/modules';
-import { ExportData } from 'types/export';
+import { Module } from "types/modules";
+import { ExportData } from "types/export";
 
-import configureStore from 'bootstrapping/configure-store';
-import { setExportedData } from 'actions/export';
-import { DARK_MODE } from 'types/settings';
-import { State as StoreState } from 'types/state';
+import configureStore from "bootstrapping/configure-store";
+import { setExportedData } from "actions/export";
+import { DARK_MODE } from "types/settings";
+import { State as StoreState } from "types/state";
 
-import TimetableOnly from './TimetableOnly';
+import TimetableOnly from "./TimetableOnly";
 
-import 'styles/main.scss';
-import './main.scss';
+import "styles/main.scss";
+import "./main.scss";
 
 declare global {
   interface Window {
     store: Store<StoreState>;
-    setData: (modules: Module[], data: ExportData, callback: () => void) => void;
+    setData: (
+      modules: Module[],
+      data: ExportData,
+      callback: () => void,
+    ) => void;
   }
 }
 
@@ -32,7 +36,10 @@ window.setData = function setData(modules, data, callback) {
   const { semester, timetable, colors } = data;
 
   if (document.body) {
-    document.body.classList.toggle('mode-dark', data.settings.mode === DARK_MODE);
+    document.body.classList.toggle(
+      "mode-dark",
+      data.settings.mode === DARK_MODE,
+    );
   }
 
   store.dispatch(setExportedData(modules, data));
@@ -50,10 +57,13 @@ window.setData = function setData(modules, data, callback) {
 };
 
 const render = () => {
-  const appElement = document.getElementById('app');
-  if (!appElement) throw new Error('#app not found');
+  const appElement = document.getElementById("app");
+  if (!appElement) throw new Error("#app not found");
 
-  ReactDOM.render(<TimetableOnly store={store} ref={timetableRef} />, appElement);
+  ReactDOM.render(
+    <TimetableOnly store={store} ref={timetableRef} />,
+    appElement,
+  );
 };
 
 render();

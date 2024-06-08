@@ -1,9 +1,9 @@
-import * as React from 'react';
-import { connect } from 'react-redux';
-import classnames from 'classnames';
-import { undo } from 'actions/undoHistory';
-import { Module } from 'types/modules';
-import styles from './TimetableModulesTable.scss';
+import * as React from "react";
+import { connect } from "react-redux";
+import classnames from "classnames";
+import { undo } from "actions/undoHistory";
+import { Module } from "types/modules";
+import styles from "./TimetableModulesTable.scss";
 
 export type Props = {
   module: Module;
@@ -18,14 +18,14 @@ const ModuleTombstone: React.FC<Props> = (props) => (
     <div className={styles.moduleActionButtons}>
       <button
         type="button"
-        className={classnames('btn btn-sm btn-link', styles.moduleAction)}
+        className={classnames("btn btn-sm btn-link", styles.moduleAction)}
         onClick={props.resetTombstone}
       >
         Dismiss
       </button>
       <button
         type="button"
-        className={classnames('btn btn-sm btn-link', styles.moduleAction)}
+        className={classnames("btn btn-sm btn-link", styles.moduleAction)}
         onClick={() => {
           props.undo();
           props.resetTombstone();

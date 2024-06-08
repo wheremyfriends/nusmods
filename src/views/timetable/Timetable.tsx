@@ -1,9 +1,13 @@
-import * as React from 'react';
-import { flattenDeep, noop, values } from 'lodash';
-import classnames from 'classnames';
+import * as React from "react";
+import { flattenDeep, noop, values } from "lodash";
+import classnames from "classnames";
 
-import { ColoredLesson, HoverLesson, TimetableArrangement } from 'types/timetables';
-import { OnModifyCell } from 'types/views';
+import {
+  ColoredLesson,
+  HoverLesson,
+  TimetableArrangement,
+} from "types/timetables";
+import { OnModifyCell } from "types/views";
 
 import {
   calculateBorderTimings,
@@ -11,14 +15,14 @@ import {
   getCurrentMinutes,
   getDayIndex,
   SCHOOLDAYS,
-} from 'utils/timify';
-import elements from 'views/elements';
-import withTimer, { TimerData } from 'views/hocs/withTimer';
+} from "utils/timify";
+import elements from "views/elements";
+import withTimer, { TimerData } from "views/hocs/withTimer";
 
-import { TimePeriod } from 'types/venues';
-import styles from './Timetable.scss';
-import TimetableTimings from './TimetableTimings';
-import TimetableDay from './TimetableDay';
+import { TimePeriod } from "types/venues";
+import styles from "./Timetable.scss";
+import TimetableTimings from "./TimetableTimings";
+import TimetableDay from "./TimetableDay";
 
 type Props = TimerData & {
   lessons: TimetableArrangement;
@@ -61,22 +65,26 @@ class Timetable extends React.PureComponent<Props, State> {
     const { highlightPeriod } = this.props;
 
     const schoolDays = SCHOOLDAYS.filter(
-      (day) => day !== 'Saturday' || this.props.lessons.Saturday,
+      (day) => day !== "Saturday" || this.props.lessons.Saturday,
     );
 
     const lessons = flattenDeep<ColoredLesson>(values(this.props.lessons));
-    const { startingIndex, endingIndex } = calculateBorderTimings(lessons, highlightPeriod);
+    const { startingIndex, endingIndex } = calculateBorderTimings(
+      lessons,
+      highlightPeriod,
+    );
     const currentDayIndex = getDayIndex(); // Monday = 0, Friday = 4
 
     // Calculate the margin offset for the CurrentTimeIndicator
     const columns = endingIndex - startingIndex;
     const currentHours = getCurrentHours();
     const currentMinutes = getCurrentMinutes();
-    const hoursMarginOffset = ((currentHours * 2 - startingIndex) / columns) * 100;
+    const hoursMarginOffset =
+      ((currentHours * 2 - startingIndex) / columns) * 100;
     const minutesMarginOffset = (currentMinutes / 30 / columns) * 100;
     const currentTimeIndicatorVisible =
       currentHours * 2 >= startingIndex && currentHours * 2 < endingIndex;
-    const dirStyle = this.props.isVerticalOrientation ? 'top' : 'marginLeft';
+    const dirStyle = this.props.isVerticalOrientation ? "top" : "marginLeft";
     const currentTimeIndicatorStyle: React.CSSProperties = {
       [dirStyle]: `${hoursMarginOffset + minutesMarginOffset}%`,
     };
@@ -84,7 +92,10 @@ class Timetable extends React.PureComponent<Props, State> {
     return (
       <div>
         <div className={classnames(styles.container, elements.timetable)}>
-          <TimetableTimings startingIndex={startingIndex} endingIndex={endingIndex} />
+          <TimetableTimings
+            startingIndex={startingIndex}
+            endingIndex={endingIndex}
+          />
           <ol className={styles.days}>
             {schoolDays.map((day, index) => (
               <TimetableDay
@@ -97,7 +108,9 @@ class Timetable extends React.PureComponent<Props, State> {
                 onCellHover={this.onCellHover}
                 verticalMode={this.props.isVerticalOrientation || false}
                 showTitle={this.props.showTitle || false}
-                isScrolledHorizontally={this.props.isScrolledHorizontally || false}
+                isScrolledHorizontally={
+                  this.props.isScrolledHorizontally || false
+                }
                 dayLessonRows={this.props.lessons[day] || EMPTY_ROW_LESSONS}
                 isCurrentDay={index === currentDayIndex}
                 currentTimeIndicatorStyle={
@@ -106,7 +119,9 @@ class Timetable extends React.PureComponent<Props, State> {
                     : nullCurrentTimeIndicatorStyle
                 }
                 highlightPeriod={
-                  highlightPeriod && index === highlightPeriod.day ? highlightPeriod : undefined
+                  highlightPeriod && index === highlightPeriod.day
+                    ? highlightPeriod
+                    : undefined
                 }
               />
             ))}

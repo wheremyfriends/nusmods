@@ -1802,7 +1802,5 @@
       ]
     }
   ],
-  "fulfillRequirements": [
-    "PR3144"
-  ]
+  "fulfillRequirements": ["PR3144"]
 }

@@ -1,16 +1,16 @@
-const path = require('path');
-const { partition } = require('lodash');
+const path = require("path");
+const { partition } = require("lodash");
 
-const { merge } = require('webpack-merge');
-const TerserJsPlugin = require('terser-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const PacktrackerPlugin = require('@packtracker/webpack-plugin');
+const { merge } = require("webpack-merge");
+const TerserJsPlugin = require("terser-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const PacktrackerPlugin = require("@packtracker/webpack-plugin");
 
-const commonConfig = require('./webpack.config.common');
-const parts = require('./webpack.parts');
-const nusmods = require('../src/apis/nusmods');
-const config = require('../src/config/app-config.json');
+const commonConfig = require("./webpack.config.common");
+const parts = require("./webpack.parts");
+const nusmods = require("../src/apis/nusmods");
+const config = require("../src/config/app-config.json");
 
 const NUSMODS_ENV = parts.env();
 
@@ -27,21 +27,22 @@ const productionConfig = ({ browserWarningPath }) =>
     {
       // Don't attempt to continue if there are any errors.
       bail: true,
-      mode: 'production',
+      mode: "production",
       // We generate sourcemaps in production. This is slow but gives good results.
       // You can exclude the *.map files from the build during deployment.
-      devtool: 'source-map',
+      devtool: "source-map",
       plugins: [
         // SEE: https://medium.com/webpack/brief-introduction-to-scope-hoisting-in-webpack-8435084c171f
         new HtmlWebpackPlugin({
-          template: path.join(parts.PATHS.src, 'index.ejs'),
+          template: path.join(parts.PATHS.src, "index.ejs"),
 
           // Inject CSS and JS files manually for optimization purposes
           inject: false,
 
           templateParameters: (compilation, assets, assetTags, options) => {
-            const [inlinedJsFiles, loadedJsFiles] = partition(assets.js, (file) =>
-              file.includes('runtime'),
+            const [inlinedJsFiles, loadedJsFiles] = partition(
+              assets.js,
+              (file) => file.includes("runtime"),
             );
             return {
               // Passthrough parameters
@@ -73,15 +74,15 @@ const productionConfig = ({ browserWarningPath }) =>
         new CopyWebpackPlugin({
           patterns: [
             {
-              from: 'static/base',
+              from: "static/base",
               context: parts.PATHS.root,
             },
-            (NUSMODS_ENV === 'preview' || NUSMODS_ENV === 'staging') && {
-              from: 'static/preview-and-staging-only',
+            (NUSMODS_ENV === "preview" || NUSMODS_ENV === "staging") && {
+              from: "static/preview-and-staging-only",
               context: parts.PATHS.root,
             },
-            NUSMODS_ENV === 'production' && {
-              from: 'static/production-only',
+            NUSMODS_ENV === "production" && {
+              from: "static/production-only",
               context: parts.PATHS.root,
             },
           ].filter(Boolean),
@@ -100,11 +101,11 @@ const productionConfig = ({ browserWarningPath }) =>
         ],
         splitChunks: {
           // include all types of chunks
-          chunks: 'all',
+          chunks: "all",
         },
         // Split off the runtime chunk and allows us to inline this directly into the HTML
         // for better performance
-        runtimeChunk: 'single',
+        runtimeChunk: "single",
       },
     },
     // If the file size is below the specified limit
@@ -113,7 +114,7 @@ const productionConfig = ({ browserWarningPath }) =>
       include: parts.PATHS.images,
       options: {
         limit: 15000,
-        name: 'img/[name].[contenthash].[ext]',
+        name: "img/[name].[contenthash].[ext]",
       },
     }),
     parts.productionCSS(),

@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { Helmet } from 'react-helmet';
-import config from 'config';
+import * as React from "react";
+import { Helmet } from "react-helmet";
+import config from "config";
 
 type Props = {
   children: string;
@@ -9,7 +9,7 @@ type Props = {
 
 const Title: React.FC<Props> = ({
   children,
-  description = 'Where are my friends?',
+  description = "Where are my friends?",
 }) => (
   // We use defer=false to allow Google Analytics autotrack to send the correct
   // page title. See bootstrapping/google-analytics.js

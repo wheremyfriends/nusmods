@@ -1,5 +1,5 @@
-import { AxiosHeaders, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import httpStatus from 'http-status';
+import { AxiosHeaders, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import httpStatus from "http-status";
 
 /**
  * Mock an Axios response object
@@ -22,7 +22,9 @@ export function mockResponse<T>(
     // TS won't recognize this as valid because httpStatus is defined as a dictionary of static values
     statusText:
       statusText ||
-      (status != null ? (httpStatus[String(status) as keyof typeof httpStatus] as string) : 'OK'),
+      (status != null
+        ? (httpStatus[String(status) as keyof typeof httpStatus] as string)
+        : "OK"),
     headers: headers || {},
     config: config || {
       headers: new AxiosHeaders(),

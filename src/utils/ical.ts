@@ -1,6 +1,6 @@
-import _ from 'lodash';
-import type { EventOption } from 'ical-generator';
-import { addDays, addMinutes, addWeeks, isValid } from 'date-fns';
+import _ from "lodash";
+import type { EventOption } from "ical-generator";
+import { addDays, addMinutes, addWeeks, isValid } from "date-fns";
 
 import {
   consumeWeeks,
@@ -12,13 +12,13 @@ import {
   Semester,
   StartTime,
   WeekRange,
-} from 'types/modules';
-import { SemTimetableConfigWithLessons } from 'types/timetables';
+} from "types/modules";
+import { SemTimetableConfigWithLessons } from "types/timetables";
 
-import config from 'config';
-import academicCalendar from 'data/academic-calendar';
-import { getExamDate, getExamDuration } from 'utils/modules';
-import { getLessonTimeHours, getLessonTimeMinutes, parseDate } from './timify';
+import config from "config";
+import academicCalendar from "data/academic-calendar";
+import { getExamDate, getExamDuration } from "utils/modules";
+import { getLessonTimeHours, getLessonTimeMinutes, parseDate } from "./timify";
 
 const SG_UTC_TIME_DIFF_MS = 8 * 60 * 60 * 1000;
 export const RECESS_WEEK = -1;
@@ -29,7 +29,9 @@ const ALL_WEEKS = [...ODD_WEEKS, ...EVEN_WEEKS];
 const DEFAULT_EXAM_DURATION = 120; // If not provided, assume exams are 2 hours long
 
 function dayIndex(weekday: string) {
-  return ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].indexOf(weekday.toLowerCase());
+  return ["monday", "tuesday", "wednesday", "thursday", "friday"].indexOf(
+    weekday.toLowerCase(),
+  );
 }
 
 /**
@@ -43,7 +45,10 @@ function addLessonOffset(date: Date, hourOffset: number): Date {
   return addMinutes(date, hourOffset * 60);
 }
 
-export function iCalEventForExam(module: Module, semester: Semester): EventOption | null {
+export function iCalEventForExam(
+  module: Module,
+  semester: Semester,
+): EventOption | null {
   const examDate = getExamDate(module, semester);
   if (!examDate) return null;
 
@@ -52,7 +57,10 @@ export function iCalEventForExam(module: Module, semester: Semester): EventOptio
 
   return {
     start,
-    end: addMinutes(start, getExamDuration(module, semester) || DEFAULT_EXAM_DURATION),
+    end: addMinutes(
+      start,
+      getExamDuration(module, semester) || DEFAULT_EXAM_DURATION,
+    ),
     summary: `${module.moduleCode} Exam`,
     description: module.title,
   };
@@ -88,14 +96,18 @@ export function calculateNumericWeek(
   firstDayOfSchool: Date,
 ): EventOption {
   const lessonDay = addDays(firstDayOfSchool, dayIndex(lesson.day));
-  const { start, end } = calculateStartEnd(lessonDay, lesson.startTime, lesson.endTime);
+  const { start, end } = calculateStartEnd(
+    lessonDay,
+    lesson.startTime,
+    lesson.endTime,
+  );
   const excludedWeeks = _.difference([RECESS_WEEK, ...ALL_WEEKS], weeks);
 
   return {
     start,
     end,
     repeating: {
-      freq: 'WEEKLY',
+      freq: "WEEKLY",
       count: NUM_WEEKS_IN_A_SEM,
       byDay: [lesson.day.slice(0, 2)],
       exclude: [
@@ -113,7 +125,11 @@ export function calculateWeekRange(
 ): EventOption {
   const rangeStart = parseDate(weekRange.start);
   const rangeEnd = parseDate(weekRange.end);
-  const { start, end } = calculateStartEnd(rangeStart, lesson.startTime, lesson.endTime);
+  const { start, end } = calculateStartEnd(
+    rangeStart,
+    lesson.startTime,
+    lesson.endTime,
+  );
 
   const interval = weekRange.weekInterval || 1;
   const exclusions = [];
@@ -125,23 +141,34 @@ export function calculateWeekRange(
       current = addWeeks(current, interval), weekNumber += interval
     ) {
       if (!weekRange.weeks.includes(weekNumber)) {
-        const lessonTime = calculateStartEnd(current, lesson.startTime, lesson.endTime);
+        const lessonTime = calculateStartEnd(
+          current,
+          lesson.startTime,
+          lesson.endTime,
+        );
         exclusions.push(lessonTime.start);
       }
     }
   }
 
-  const lastLesson = calculateStartEnd(rangeEnd, lesson.startTime, lesson.endTime);
+  const lastLesson = calculateStartEnd(
+    rangeEnd,
+    lesson.startTime,
+    lesson.endTime,
+  );
 
   return {
     start,
     end,
     repeating: {
       interval,
-      freq: 'WEEKLY',
+      freq: "WEEKLY",
       until: lastLesson.end,
       byDay: [lesson.day.slice(0, 2)],
-      exclude: [...exclusions, ...holidaysForYear(getTimeHour(lesson.startTime))],
+      exclude: [
+        ...exclusions,
+        ...holidaysForYear(getTimeHour(lesson.startTime)),
+      ],
     },
   };
 }
@@ -179,7 +206,9 @@ export default function iCalForTimetable(
 ): EventOption[] {
   const [year, month, day] = academicCalendar[academicYear][semester].start;
   // 'month - 1' because JS months are zero indexed
-  const firstDayOfSchool = new Date(Date.UTC(year, month - 1, day) - SG_UTC_TIME_DIFF_MS);
+  const firstDayOfSchool = new Date(
+    Date.UTC(year, month - 1, day) - SG_UTC_TIME_DIFF_MS,
+  );
   const events: EventOption[] = [];
 
   _.each(timetable, (lessonConfig, moduleCode) => {
@@ -187,7 +216,14 @@ export default function iCalForTimetable(
 
     _.each(lessonConfig, (lessons) => {
       lessons.forEach((lesson) => {
-        events.push(iCalEventForLesson(lesson, moduleData[moduleCode], semester, firstDayOfSchool));
+        events.push(
+          iCalEventForLesson(
+            lesson,
+            moduleData[moduleCode],
+            semester,
+            firstDayOfSchool,
+          ),
+        );
       });
     });
 

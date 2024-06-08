@@ -1,17 +1,17 @@
-import { FC, useRef, useState } from 'react';
-import Downshift, { DownshiftState, StateChangeOptions } from 'downshift';
-import { ListProps } from 'searchkit';
-import classnames from 'classnames';
-import { uniq, omit } from 'lodash';
+import { FC, useRef, useState } from "react";
+import Downshift, { DownshiftState, StateChangeOptions } from "downshift";
+import { ListProps } from "searchkit";
+import classnames from "classnames";
+import { uniq, omit } from "lodash";
 
-import { Search, ChevronDown } from 'react-feather';
-import useMediaQuery from 'views/hooks/useMediaQuery';
-import { RefinementItem, RefinementDisplayItem } from 'types/views';
-import { highlight } from 'utils/react';
-import { breakpointDown, touchScreenOnly } from 'utils/css';
-import Checklist from './Checklist';
+import { Search, ChevronDown } from "react-feather";
+import useMediaQuery from "views/hooks/useMediaQuery";
+import { RefinementItem, RefinementDisplayItem } from "types/views";
+import { highlight } from "utils/react";
+import { breakpointDown, touchScreenOnly } from "utils/css";
+import Checklist from "./Checklist";
 
-import styles from './styles.scss';
+import styles from "./styles.scss";
 
 type Props = ListProps;
 type DisplayProps = {
@@ -22,7 +22,12 @@ type DisplayProps = {
 };
 
 // Use a native select for mobile devices
-const MobileFilter: FC<DisplayProps> = ({ allItems, onSelectItem, showCount, placeholder }) => (
+const MobileFilter: FC<DisplayProps> = ({
+  allItems,
+  onSelectItem,
+  showCount,
+  placeholder,
+}) => (
   <select
     className="form-control"
     onChange={(evt) => {
@@ -36,16 +41,21 @@ const MobileFilter: FC<DisplayProps> = ({ allItems, onSelectItem, showCount, pla
     {allItems.map(({ key, doc_count: count, selected, missing }) => (
       <option key={key} value={key}>
         {/* Use a unicode checkbox to indicate to the user filters that are already enabled */}
-        {selected && '☑'} {key} {showCount && !missing && `(${count})`}
+        {selected && "☑"} {key} {showCount && !missing && `(${count})`}
       </option>
     ))}
   </select>
 );
 
 // Use a search-select combo dropdown on desktop
-const DesktopFilter: FC<DisplayProps> = ({ allItems, onSelectItem, showCount, placeholder }) => {
+const DesktopFilter: FC<DisplayProps> = ({
+  allItems,
+  onSelectItem,
+  showCount,
+  placeholder,
+}) => {
   const [isFocused, setIsFocused] = useState(false);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const searchInput = useRef<HTMLInputElement>(null);
 
   const onOuterClick = () => {
@@ -54,7 +64,8 @@ const DesktopFilter: FC<DisplayProps> = ({ allItems, onSelectItem, showCount, pl
     setInputValue(inputValue);
   };
 
-  const onInputValueChange = (newInputValue: string) => setInputValue(newInputValue);
+  const onInputValueChange = (newInputValue: string) =>
+    setInputValue(newInputValue);
 
   const focusInput = () => {
     if (searchInput.current) {
@@ -62,17 +73,21 @@ const DesktopFilter: FC<DisplayProps> = ({ allItems, onSelectItem, showCount, pl
     }
   };
 
-  const stateReducer = (_state: DownshiftState<string>, changes: StateChangeOptions<string>) => {
+  const stateReducer = (
+    _state: DownshiftState<string>,
+    changes: StateChangeOptions<string>,
+  ) => {
     switch (changes.type) {
       case Downshift.stateChangeTypes.blurInput:
-        return omit(changes, 'inputValue');
+        return omit(changes, "inputValue");
       default:
         return changes;
     }
   };
 
   const filteredItems = allItems.filter(
-    ({ key }) => !inputValue || key.toLowerCase().includes(inputValue.toLowerCase()),
+    ({ key }) =>
+      !inputValue || key.toLowerCase().includes(inputValue.toLowerCase()),
   );
 
   return (
@@ -111,43 +126,54 @@ const DesktopFilter: FC<DisplayProps> = ({ allItems, onSelectItem, showCount, pl
                   openMenu();
                 },
                 onBlur: () => setIsFocused(false),
-                className: classnames('form-control form-control-sm', styles.searchInput),
+                className: classnames(
+                  "form-control form-control-sm",
+                  styles.searchInput,
+                ),
                 placeholder,
               })}
             />
-            <ChevronDown className={styles.openIcon} onClick={() => openMenu()} />
+            <ChevronDown
+              className={styles.openIcon}
+              onClick={() => openMenu()}
+            />
           </div>
 
           {isOpen && (
             <div className="dropdown-menu show" {...getMenuProps()}>
-              {filteredItems.map(({ key, doc_count: count, selected }, index) => (
-                <div
-                  key={key}
-                  {...getItemProps({
-                    item: key,
-                    className: classnames('dropdown-item form-check', {
-                      'dropdown-selected': index === highlightedIndex,
-                      [styles.enabled]: selected,
-                    }),
-                  })}
-                >
-                  <input
-                    id={key}
-                    className="form-check-input"
-                    type="checkbox"
-                    defaultChecked={selected}
-                  />
-                  <label htmlFor={key} className={classnames('form-check-label', styles.label)}>
-                    {highlight(key, downshiftInputValue || '')}
-                    {showCount && typeof count !== 'undefined' && (
-                      <>
-                        &nbsp;
-                        <span className="text-muted">({count})</span>
-                      </>
-                    )}
-                  </label>
-                </div>
-              ))}
+              {filteredItems.map(
+                ({ key, doc_count: count, selected }, index) => (
+                  <div
+                    key={key}
+                    {...getItemProps({
+                      item: key,
+                      className: classnames("dropdown-item form-check", {
+                        "dropdown-selected": index === highlightedIndex,
+                        [styles.enabled]: selected,
+                      }),
+                    })}
+                  >
+                    <input
+                      id={key}
+                      className="form-check-input"
+                      type="checkbox"
+                      defaultChecked={selected}
+                    />
+                    <label
+                      htmlFor={key}
+                      className={classnames("form-check-label", styles.label)}
+                    >
+                      {highlight(key, downshiftInputValue || "")}
+                      {showCount && typeof count !== "undefined" && (
+                        <>
+                          &nbsp;
+                          <span className="text-muted">({count})</span>
+                        </>
+                      )}
+                    </label>
+                  </div>
+                ),
+              )}
             </div>
           )}
         </div>
@@ -186,17 +212,21 @@ const DropdownListFilters: FC<Props> = ({
     allItems,
     onSelectItem,
     showCount,
-    placeholder: translate ? translate('placeholder') : '',
+    placeholder: translate ? translate("placeholder") : "",
   };
 
-  const isMobile = useMediaQuery([breakpointDown('sm'), touchScreenOnly()]);
+  const isMobile = useMediaQuery([breakpointDown("sm"), touchScreenOnly()]);
 
   const FilterComponent = isMobile ? MobileFilter : DesktopFilter;
   return (
     <div className={styles.dropdown}>
       <FilterComponent {...displayProps} />
       {/* Show all filters that have been selected at some point */}
-      <Checklist {...displayProps} selectedItems={selectedItems} searchedItems={searchedItems} />
+      <Checklist
+        {...displayProps}
+        selectedItems={selectedItems}
+        searchedItems={searchedItems}
+      />
     </div>
   );
 };

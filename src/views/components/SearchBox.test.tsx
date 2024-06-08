@@ -1,8 +1,8 @@
-import { shallow } from 'enzyme';
-import SearchBox from './SearchBox';
+import { shallow } from "enzyme";
+import SearchBox from "./SearchBox";
 
 describe(SearchBox, () => {
-  test('should match snapshot', () => {
+  test("should match snapshot", () => {
     expect(
       shallow(
         <SearchBox

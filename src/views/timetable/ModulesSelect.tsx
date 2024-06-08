@@ -1,25 +1,25 @@
-import { FC, useCallback, useState } from 'react';
-import { omit } from 'lodash';
+import { FC, useCallback, useState } from "react";
+import { omit } from "lodash";
 import Downshift, {
   ChildrenFunction,
   ControllerStateAndHelpers,
   DownshiftState,
   StateChangeOptions,
-} from 'downshift';
-import classnames from 'classnames';
-import { Trash } from 'react-feather';
+} from "downshift";
+import classnames from "classnames";
+import { Trash } from "react-feather";
 
-import { ModuleSelectList } from 'types/reducers';
-import { ModuleCode } from 'types/modules';
+import { ModuleSelectList } from "types/reducers";
+import { ModuleCode } from "types/modules";
 
-import { breakpointUp } from 'utils/css';
-import useMediaQuery from 'views/hooks/useMediaQuery';
-import Modal from 'views/components/Modal';
-import CloseButton from 'views/components/CloseButton';
-import elements from 'views/elements';
-import Tooltip from 'views/components/Tooltip';
+import { breakpointUp } from "utils/css";
+import useMediaQuery from "views/hooks/useMediaQuery";
+import Modal from "views/components/Modal";
+import CloseButton from "views/components/CloseButton";
+import elements from "views/elements";
+import Tooltip from "views/components/Tooltip";
 
-import styles from './ModulesSelect.scss';
+import styles from "./ModulesSelect.scss";
 
 type Props = {
   moduleCount: number;
@@ -40,19 +40,22 @@ const ModulesSelect: FC<Props> = ({
   onRemoveModule,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
 
-  const matchBreakpoint = useMediaQuery(breakpointUp('md'));
+  const matchBreakpoint = useMediaQuery(breakpointUp("md"));
 
   const openSelect = useCallback(() => setIsOpen(true), []);
   const closeSelect = useCallback(() => setIsOpen(false), []);
   const closeSelectAndEmptyInput = useCallback(() => {
     closeSelect();
-    setInputValue('');
+    setInputValue("");
   }, [closeSelect]);
 
   const handleInputValueChange = useCallback(
-    (newInputValue: string, stateAndHelpers: ControllerStateAndHelpers<ModuleCode>) => {
+    (
+      newInputValue: string,
+      stateAndHelpers: ControllerStateAndHelpers<ModuleCode>,
+    ) => {
       // Don't clear input on item select
       if (stateAndHelpers.selectedItem) return;
 
@@ -67,7 +70,10 @@ const ModulesSelect: FC<Props> = ({
   );
 
   const stateReducer = useCallback(
-    (state: DownshiftState<ModuleCode>, changes: StateChangeOptions<ModuleCode>) => {
+    (
+      state: DownshiftState<ModuleCode>,
+      changes: StateChangeOptions<ModuleCode>,
+    ) => {
       switch (changes.type) {
         case Downshift.stateChangeTypes.blurInput:
           if (state.inputValue) return {}; // remain open on iOS
@@ -78,13 +84,13 @@ const ModulesSelect: FC<Props> = ({
         case Downshift.stateChangeTypes.keyDownEnter:
         case Downshift.stateChangeTypes.clickItem:
           // Don't reset isOpen, inputValue and highlightedIndex when item is selected
-          return omit(changes, ['isOpen', 'inputValue', 'highlightedIndex']);
+          return omit(changes, ["isOpen", "inputValue", "highlightedIndex"]);
 
         case Downshift.stateChangeTypes.mouseUp:
           // TODO: Uncomment when we upgrade to Downshift v3
           // case Downshift.stateChangeTypes.touchEnd:
           // Retain input on blur
-          return omit(changes, 'inputValue');
+          return omit(changes, "inputValue");
 
         default:
           return changes;
@@ -107,7 +113,8 @@ const ModulesSelect: FC<Props> = ({
     const showResults = isOpen && results.length > 0;
     const showTip = isModalOpen && !results.length;
     const showNoResultMessage = isOpen && inputValue && !results.length;
-    const removeBtnLabel = (moduleCode: ModuleCode) => `Remove ${moduleCode} from timetable`;
+    const removeBtnLabel = (moduleCode: ModuleCode) =>
+      `Remove ${moduleCode} from timetable`;
 
     return (
       <div className={styles.container}>
@@ -125,7 +132,12 @@ const ModulesSelect: FC<Props> = ({
             onFocus: openSelect,
           })}
         />
-        {isModalOpen && <CloseButton className={styles.close} onClick={closeSelectAndEmptyInput} />}
+        {isModalOpen && (
+          <CloseButton
+            className={styles.close}
+            onClick={closeSelectAndEmptyInput}
+          />
+        )}
         {showResults && (
           <ol className={styles.selectList} {...getMenuProps()}>
             {results.map((module, index) => (
@@ -146,16 +158,22 @@ const ModulesSelect: FC<Props> = ({
                 {`${module.moduleCode} ${module.title}`}
                 {module.isAdded && (
                   <div className={styles.optionActions}>
-                    <Tooltip content={removeBtnLabel(module.moduleCode)} touch="hold">
+                    <Tooltip
+                      content={removeBtnLabel(module.moduleCode)}
+                      touch="hold"
+                    >
                       <button
                         type="button"
-                        className={classnames('btn btn-svg btn-sm', styles.actionButton)}
+                        className={classnames(
+                          "btn btn-svg btn-sm",
+                          styles.actionButton,
+                        )}
                         aria-label={removeBtnLabel(module.moduleCode)}
                         onClick={() => {
                           onRemoveModule(module.moduleCode);
                         }}
                       >
-                        <Trash className={styles.actionIcon} />{' '}
+                        <Trash className={styles.actionIcon} />{" "}
                       </button>
                     </Tooltip>
                     <span className="badge badge-info">Added</span>
@@ -173,13 +191,13 @@ const ModulesSelect: FC<Props> = ({
         )}
         {showTip && (
           <div className={styles.tip}>
-            Try &quot;GER1000&quot; or &quot;Quantitative Reasoning&quot;. Searching{' '}
-            <strong>{moduleCount}</strong> modules.
+            Try &quot;GER1000&quot; or &quot;Quantitative Reasoning&quot;.
+            Searching <strong>{moduleCount}</strong> modules.
           </div>
         )}
         {showNoResultMessage && (
           <div className={styles.tip}>
-            No courses found for{' '}
+            No courses found for{" "}
             <strong>
               &quot;
               {inputValue}

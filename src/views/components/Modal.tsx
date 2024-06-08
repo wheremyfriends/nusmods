@@ -1,9 +1,9 @@
-import { FC, useCallback, useLayoutEffect, useState } from 'react';
-import ReactModal, { Props as ModalProps } from 'react-modal';
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
-import classnames from 'classnames';
+import { FC, useCallback, useLayoutEffect, useState } from "react";
+import ReactModal, { Props as ModalProps } from "react-modal";
+import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
+import classnames from "classnames";
 
-import styles from './Modal.scss';
+import styles from "./Modal.scss";
 
 type Props = ModalProps & {
   isOpen: boolean;
@@ -26,7 +26,9 @@ const Modal: FC<Props> = ({
   // executed, in order for `Modal` to react to the setting/unsetting of
   // `contentRef`, `contentRef` needs to be stored in component state, even if
   // this causes additional renders.
-  const [modalContent, setModalContent] = useState<HTMLDivElement | undefined>();
+  const [modalContent, setModalContent] = useState<
+    HTMLDivElement | undefined
+  >();
   const contentRefCallback = useCallback((node) => setModalContent(node), []);
 
   // Disable body scrolling if modal is open, but allow modal to scroll.

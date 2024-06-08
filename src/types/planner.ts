@@ -1,9 +1,15 @@
-import { Module, ModuleCode, Semester, PrereqTree, ModuleCondensed } from './modules';
-import { CustomModule } from './reducers';
+import {
+  Module,
+  ModuleCode,
+  Semester,
+  PrereqTree,
+  ModuleCondensed,
+} from "./modules";
+import { CustomModule } from "./reducers";
 
 export type AddModuleData =
-  | { type: 'module'; moduleCode: ModuleCode }
-  | { type: 'placeholder'; placeholderId: string };
+  | { type: "module"; moduleCode: ModuleCode }
+  | { type: "placeholder"; placeholderId: string };
 
 export interface PlannerPlaceholder {
   id: string;
@@ -17,20 +23,24 @@ export type PlaceholderMap = {
 };
 
 export type ExamConflict = {
-  type: 'exam';
+  type: "exam";
   conflictModules: ModuleCode[];
 };
 
 export type SemesterConflict = {
-  type: 'semester';
+  type: "semester";
   semestersOffered: readonly Semester[];
 };
 
 export type NoInfo = {
-  type: 'noInfo';
+  type: "noInfo";
 };
 
-export type Conflict = PrereqConflict | ExamConflict | SemesterConflict | NoInfo;
+export type Conflict =
+  | PrereqConflict
+  | ExamConflict
+  | SemesterConflict
+  | NoInfo;
 
 export type PlannerModulesWithInfo = {
   // Mapping acad years to a map of semester to module information object
@@ -52,6 +62,6 @@ export type PlannerModuleInfo = {
 };
 
 export type PrereqConflict = {
-  type: 'prereq';
+  type: "prereq";
   unfulfilledPrereqs: PrereqTree[];
 };

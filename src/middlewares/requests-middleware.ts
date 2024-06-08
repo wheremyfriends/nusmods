@@ -1,13 +1,15 @@
-import type { Middleware } from 'redux';
-import type { AxiosRequestConfig, AxiosError } from 'axios';
-import axios from 'axios';
+import type { Middleware } from "redux";
+import type { AxiosRequestConfig, AxiosError } from "axios";
+import axios from "axios";
 
-import type { State } from 'types/state';
-import type { Dispatch } from 'types/redux';
-import { FAILURE, REQUEST, SUCCESS } from 'types/reducers';
-import { API_REQUEST, RequestsDispatchExt } from 'actions/requests';
+import type { State } from "types/state";
+import type { Dispatch } from "types/redux";
+import { FAILURE, REQUEST, SUCCESS } from "types/reducers";
+import { API_REQUEST, RequestsDispatchExt } from "actions/requests";
 
-export type ActionType<Action extends string, Type extends string> = Action & { __type: Type };
+export type ActionType<Action extends string, Type extends string> = Action & {
+  __type: Type;
+};
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type DefaultMeta = {};
@@ -44,16 +46,20 @@ function makeRequest(request: AxiosRequestConfig) {
   return axios.request({
     ...request,
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
   });
 }
 
-export function SUCCESS_KEY<Type extends string>(key: Type): ActionType<Type, typeof SUCCESS> {
+export function SUCCESS_KEY<Type extends string>(
+  key: Type,
+): ActionType<Type, typeof SUCCESS> {
   return (key + SUCCESS) as ActionType<Type, typeof SUCCESS>;
 }
 
-export function FAILURE_KEY<Type extends string>(key: Type): ActionType<Type, typeof FAILURE> {
+export function FAILURE_KEY<Type extends string>(
+  key: Type,
+): ActionType<Type, typeof FAILURE> {
   return (key + FAILURE) as ActionType<Type, typeof FAILURE>;
 }
 

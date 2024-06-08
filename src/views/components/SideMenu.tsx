@@ -1,13 +1,13 @@
-import { FC, memo, useLayoutEffect, useRef } from 'react';
-import classnames from 'classnames';
-import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
+import { FC, memo, useLayoutEffect, useRef } from "react";
+import classnames from "classnames";
+import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 
-import { Menu, X as Close } from 'react-feather';
-import useMediaQuery from 'views/hooks/useMediaQuery';
-import { breakpointUp } from 'utils/css';
-import Fab from './Fab';
+import { Menu, X as Close } from "react-feather";
+import useMediaQuery from "views/hooks/useMediaQuery";
+import { breakpointUp } from "utils/css";
+import Fab from "./Fab";
 
-import styles from './SideMenu.scss';
+import styles from "./SideMenu.scss";
 
 type Props = {
   children: React.ReactNode;
@@ -17,8 +17,8 @@ type Props = {
   toggleMenu: (boolean: boolean) => void;
 };
 
-export const OPEN_MENU_LABEL = 'Open menu';
-export const CLOSE_MENU_LABEL = 'Close menu';
+export const OPEN_MENU_LABEL = "Open menu";
+export const CLOSE_MENU_LABEL = "Close menu";
 
 const DEFAULT_OPEN_ICON = <Menu aria-label={OPEN_MENU_LABEL} />;
 const DEFAULT_CLOSE_ICON = <Close aria-label={CLOSE_MENU_LABEL} />;
@@ -30,7 +30,7 @@ export const SideMenuComponent: FC<Props> = ({
   toggleMenu,
   children,
 }) => {
-  const matchBreakpoint = useMediaQuery(breakpointUp('md'));
+  const matchBreakpoint = useMediaQuery(breakpointUp("md"));
   const isSideMenuShown = isOpen && !matchBreakpoint;
 
   // Disable body scrolling if side menu is open, but allow side menu to scroll.

@@ -1,16 +1,24 @@
-import type { DayText, EndTime, StartTime, ModuleCode, RawLesson } from './modules';
+import type {
+  DayText,
+  EndTime,
+  StartTime,
+  ModuleCode,
+  RawLesson,
+} from "./modules";
 
 export type Venue = string;
 export type VenueList = Venue[];
 // Components within a venue availability class:
-export type VenueOccupiedState = 'vacant' | 'occupied';
-export const VACANT: VenueOccupiedState = 'vacant';
-export const OCCUPIED: VenueOccupiedState = 'occupied';
+export type VenueOccupiedState = "vacant" | "occupied";
+export const VACANT: VenueOccupiedState = "vacant";
+export const OCCUPIED: VenueOccupiedState = "occupied";
 
-export type Availability = { [lessonTime: string]: VenueOccupiedState | undefined }; // E.g. { "1000": "vacant", "1030": "occupied", ... }
+export type Availability = {
+  [lessonTime: string]: VenueOccupiedState | undefined;
+}; // E.g. { "1000": "vacant", "1030": "occupied", ... }
 
 // Raw lessons obtained from venue info API includes ModuleCode and without venue
-export type VenueLesson = Omit<RawLesson, 'venue'> & {
+export type VenueLesson = Omit<RawLesson, "venue"> & {
   moduleCode: ModuleCode;
 };
 
@@ -57,7 +65,7 @@ export type BusStop = {
   readonly displayRoutesLeft?: boolean;
 };
 
-export type NextBusTime = number | '-' | 'Arr';
+export type NextBusTime = number | "-" | "Arr";
 
 export type NextBus = {
   readonly arrivalTime: NextBusTime;

@@ -1,16 +1,16 @@
-import { Component } from 'react';
-import { connect } from 'react-redux';
+import { Component } from "react";
+import { connect } from "react-redux";
 
-import { ModuleSelectList } from 'types/reducers';
-import { ModuleCode, Semester } from 'types/modules';
-import { SemTimetableConfig, SemTimetableMultiConfig } from 'types/timetables';
+import { ModuleSelectList } from "types/reducers";
+import { ModuleCode, Semester } from "types/modules";
+import { SemTimetableConfig, SemTimetableMultiConfig } from "types/timetables";
 
-import Online from 'views/components/Online';
-import { popNotification } from 'actions/app';
-import { getSemModuleSelectList } from 'selectors/moduleBank';
-import { createSearchPredicate, sortModules } from 'utils/moduleSearch';
-import { State as StoreState } from 'types/state';
-import ModulesSelect from './ModulesSelect';
+import Online from "views/components/Online";
+import { popNotification } from "actions/app";
+import { getSemModuleSelectList } from "selectors/moduleBank";
+import { createSearchPredicate, sortModules } from "utils/moduleSearch";
+import { State as StoreState } from "types/state";
+import ModulesSelect from "./ModulesSelect";
 
 type OwnProps = {
   multiTimetable: SemTimetableMultiConfig;
@@ -52,7 +52,9 @@ class ModulesSelectContainer extends Component<Props> {
             moduleCount={this.props.moduleList.length}
             onChange={this.onChange}
             placeholder={
-              isOnline ? 'Add course to timetable' : 'You need to be online to add courses'
+              isOnline
+                ? "Add course to timetable"
+                : "You need to be online to add courses"
             }
             disabled={!isOnline}
             onRemoveModule={this.props.removeModuleRT}

@@ -1,16 +1,16 @@
-import { Store } from 'redux';
+import { Store } from "redux";
 
-import * as React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
-import { Persistor } from 'storage/persistReducer';
-import { State } from 'types/state';
+import * as React from "react";
+import { BrowserRouter as Router } from "react-router-dom";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import { Persistor } from "storage/persistReducer";
+import { State } from "types/state";
 
-import AppShell from 'views/AppShell';
-import Routes from 'views/routes/Routes';
-import ErrorBoundary from 'views/errors/ErrorBoundary';
-import ErrorPage from 'views/errors/ErrorPage';
+import AppShell from "views/AppShell";
+import Routes from "views/routes/Routes";
+import ErrorBoundary from "views/errors/ErrorBoundary";
+import ErrorPage from "views/errors/ErrorPage";
 
 type Props = {
   store: Store<State>;
@@ -20,7 +20,6 @@ type Props = {
 const App: React.FC<Props> = ({ store, persistor }) => {
   const onBeforeLift = () => {
     const { theme, settings } = store.getState();
-
   };
 
   return (

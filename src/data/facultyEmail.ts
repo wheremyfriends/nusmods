@@ -1,5 +1,5 @@
-import { FacultyEmail } from '../types/facultyEmail';
-import facultyEmailJson from './facultyEmail.json';
+import { FacultyEmail } from "../types/facultyEmail";
+import facultyEmailJson from "./facultyEmail.json";
 
 const facultyEmails = facultyEmailJson as FacultyEmail[];
 

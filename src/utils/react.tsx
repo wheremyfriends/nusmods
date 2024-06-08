@@ -1,11 +1,11 @@
-import * as React from 'react';
-import { escapeRegExp, castArray } from 'lodash';
+import * as React from "react";
+import { escapeRegExp, castArray } from "lodash";
 
 // Define some useful Unicode characters as constants
-export const NBSP = '\u00a0';
-export const ZWSP = '\u200b';
-export const BULLET = ' • ';
-export const BULLET_NBSP = '\u00a0•\u00a0';
+export const NBSP = "\u00a0";
+export const ZWSP = "\u200b";
+export const BULLET = " • ";
+export const BULLET_NBSP = "\u00a0•\u00a0";
 
 /**
  * Replace substring matching the provided regex with React nodes. This is
@@ -31,7 +31,7 @@ export function replaceWithNode(
   // This allows us to replace the even position elements with components.
   // However, if the string starts with a match, then the first element will be a match
   // so we add in an empty string to pad matches to even positions
-  if (parts.length && regex.test(parts[0])) parts.unshift('');
+  if (parts.length && regex.test(parts[0])) parts.unshift("");
 
   return (
     <>
@@ -43,10 +43,14 @@ export function replaceWithNode(
   );
 }
 
-export function highlight(str: string, search: string | string[], Tag = 'mark'): React.ReactNode {
+export function highlight(
+  str: string,
+  search: string | string[],
+  Tag = "mark",
+): React.ReactNode {
   const terms = castArray(search).filter(Boolean);
   if (!terms.length) return str;
-  const regex = new RegExp(`(${terms.map(escapeRegExp).join('|')})`, 'ig');
+  const regex = new RegExp(`(${terms.map(escapeRegExp).join("|")})`, "ig");
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore This does not type check correctly
   return replaceWithNode(str, regex, (match, i) => <Tag key={i}>{match}</Tag>);
@@ -72,8 +76,11 @@ export function defer(task: () => unknown) {
 }
 
 // We really don't care about the props here
-export function wrapComponentName<T>(Component: React.ComponentType<T>, wrapper: string): string {
-  return `${wrapper}(${Component.displayName || Component.name || 'Component'})`;
+export function wrapComponentName<T>(
+  Component: React.ComponentType<T>,
+  wrapper: string,
+): string {
+  return `${wrapper}(${Component.displayName || Component.name || "Component"})`;
 }
 
 /**

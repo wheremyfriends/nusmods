@@ -8,7 +8,7 @@ import {
   UndoHistoryState,
   VenueBank,
   ModuleBank,
-} from './reducers';
+} from "./reducers";
 
 export type State = {
   moduleBank: ModuleBank;

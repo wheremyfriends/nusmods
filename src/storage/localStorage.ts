@@ -1,4 +1,4 @@
-import { size } from 'lodash';
+import { size } from "lodash";
 
 let usableLocalStorage: Storage;
 
@@ -49,8 +49,8 @@ export function canUseBrowserLocalStorage() {
     // Ensure that if setItem throws, it's not because of private browsing
     // If storage is empty AND setItem throws, we're probably in iOS <=10 private browsing
     if (storage.length === 0) {
-      storage.setItem('____writetest', '1');
-      storage.removeItem('____writetest');
+      storage.setItem("____writetest", "1");
+      storage.removeItem("____writetest");
     }
 
     // Only return true AFTER we know it can be used

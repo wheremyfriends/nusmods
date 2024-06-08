@@ -1,14 +1,14 @@
-import { Store } from 'redux';
-import { Component } from 'react';
-import { MemoryRouter } from 'react-router-dom';
-import { Provider } from 'react-redux';
+import { Store } from "redux";
+import { Component } from "react";
+import { MemoryRouter } from "react-router-dom";
+import { Provider } from "react-redux";
 
-import { Semester } from 'types/modules';
-import { SemTimetableConfig } from 'types/timetables';
-import { fillColorMapping } from 'utils/colors';
-import TimetableContent from 'views/timetable/TimetableContent';
-import { ColorMapping } from 'types/reducers';
-import { State as StoreState } from 'types/state';
+import { Semester } from "types/modules";
+import { SemTimetableConfig } from "types/timetables";
+import { fillColorMapping } from "utils/colors";
+import TimetableContent from "views/timetable/TimetableContent";
+import { ColorMapping } from "types/reducers";
+import { State as StoreState } from "types/state";
 
 type Props = {
   store: Store<StoreState>;
@@ -35,7 +35,7 @@ export default class TimetableOnly extends Component<Props, State> {
     const timetableColors = fillColorMapping(timetable, colors);
 
     return (
-      <MemoryRouter initialEntries={['https://nusmods.com']}>
+      <MemoryRouter initialEntries={["https://nusmods.com"]}>
         <Provider store={store}>
           <div id="timetable-only" className={`theme-${theme}`}>
             <TimetableContent

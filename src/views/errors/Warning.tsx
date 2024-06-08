@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { AlertTriangle } from 'react-feather';
-import styles from './Warning.scss';
+import * as React from "react";
+import { AlertTriangle } from "react-feather";
+import styles from "./Warning.scss";
 
 type Props = {
   message: string;

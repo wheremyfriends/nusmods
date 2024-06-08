@@ -1,14 +1,14 @@
-import * as React from 'react';
-import { Link } from 'react-router-dom';
-import * as Sentry from '@sentry/browser';
+import * as React from "react";
+import { Link } from "react-router-dom";
+import * as Sentry from "@sentry/browser";
 
-import RandomKawaii from 'views/components/RandomKawaii';
-import Title from 'views/components/Title';
-import styles from './ErrorPage.scss';
+import RandomKawaii from "views/components/RandomKawaii";
+import Title from "views/components/Title";
+import styles from "./ErrorPage.scss";
 
 const NotFoundPage: React.FC = () => {
   Sentry.withScope(() => {
-    Sentry.captureMessage('404 - Page Not Found');
+    Sentry.captureMessage("404 - Page Not Found");
   });
 
   return (

@@ -1,10 +1,10 @@
-import * as React from 'react';
-import { XSquare } from 'react-feather';
+import * as React from "react";
+import { XSquare } from "react-feather";
 
-import Modal from 'views/components/Modal';
-import CloseButton from 'views/components/CloseButton';
+import Modal from "views/components/Modal";
+import CloseButton from "views/components/CloseButton";
 
-import styles from './ShareTimetable.scss';
+import styles from "./ShareTimetable.scss";
 
 type Props = {
   resetTimetable: () => void;
@@ -37,7 +37,11 @@ export default class ResetTimetable extends React.PureComponent<Props, State> {
 
     return (
       <>
-        <button type="button" className="btn btn-outline-primary btn-svg" onClick={this.openModal}>
+        <button
+          type="button"
+          className="btn btn-outline-primary btn-svg"
+          onClick={this.openModal}
+        >
           <XSquare className="svg svg-small" />
           Reset
         </button>
@@ -49,8 +53,8 @@ export default class ResetTimetable extends React.PureComponent<Props, State> {
 
             <h3>Do you want to reset your timetable?</h3>
             <p>
-              This will permanently remove all courses that are in the timetable for the current
-              semester.
+              This will permanently remove all courses that are in the timetable
+              for the current semester.
             </p>
           </div>
 

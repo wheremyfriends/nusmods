@@ -1,7 +1,7 @@
-import classnames from 'classnames';
-import * as React from 'react';
+import classnames from "classnames";
+import * as React from "react";
 
-import styles from './TimetableHighlight.scss';
+import styles from "./TimetableHighlight.scss";
 
 type Props = {
   style?: React.CSSProperties;
@@ -12,7 +12,10 @@ type Props = {
  * A highlighted time period in the timetable.
  */
 const TimetableHighlight: React.FC<Props> = (props) => (
-  <div className={classnames(styles.highlight, props.className)} style={props.style} />
+  <div
+    className={classnames(styles.highlight, props.className)}
+    style={props.style}
+  />
 );
 
 export default TimetableHighlight;

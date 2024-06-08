@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { connect } from 'react-redux';
-import { State } from 'types/state';
+import * as React from "react";
+import { connect } from "react-redux";
+import { State } from "types/state";
 
 type Props = {
   children: React.ReactNode | ((isOnline: boolean) => React.ReactNode);
@@ -23,7 +23,7 @@ export class OnlineComponent extends React.Component<Props> {
   override render() {
     const { children, isOnline } = this.props;
 
-    if (typeof children === 'function') {
+    if (typeof children === "function") {
       // Not technically safe, since some ReactNodes are also functions, but this is safe enough
       return (children as (online: boolean) => React.ReactNode)(isOnline);
     }

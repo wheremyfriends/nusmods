@@ -1,6 +1,6 @@
-import { NotificationOptions } from 'types/reducers';
+import { NotificationOptions } from "types/reducers";
 
-export const SET_ONLINE_STATUS = 'SET_ONLINE_STATUS' as const;
+export const SET_ONLINE_STATUS = "SET_ONLINE_STATUS" as const;
 export function setOnlineStatus(isOnline: boolean) {
   return {
     type: SET_ONLINE_STATUS,
@@ -8,7 +8,7 @@ export function setOnlineStatus(isOnline: boolean) {
   };
 }
 
-export const TOGGLE_FEEDBACK_MODAL = 'TOGGLE_FEEDBACK_MODAL' as const;
+export const TOGGLE_FEEDBACK_MODAL = "TOGGLE_FEEDBACK_MODAL" as const;
 export function toggleFeedback() {
   return {
     type: TOGGLE_FEEDBACK_MODAL,
@@ -16,8 +16,11 @@ export function toggleFeedback() {
   };
 }
 
-export const OPEN_NOTIFICATION = 'OPEN_NOTIFICATION' as const;
-export function openNotification(message: string, options: NotificationOptions = {}) {
+export const OPEN_NOTIFICATION = "OPEN_NOTIFICATION" as const;
+export function openNotification(
+  message: string,
+  options: NotificationOptions = {},
+) {
   return {
     type: OPEN_NOTIFICATION,
     payload: {
@@ -27,7 +30,7 @@ export function openNotification(message: string, options: NotificationOptions =
   };
 }
 
-export const POP_NOTIFICATION = 'POP_NOTIFICATION' as const;
+export const POP_NOTIFICATION = "POP_NOTIFICATION" as const;
 export function popNotification() {
   return {
     type: POP_NOTIFICATION,
@@ -35,7 +38,7 @@ export function popNotification() {
   };
 }
 
-export const PROMPT_REFRESH = 'PROMPT_REFRESH' as const;
+export const PROMPT_REFRESH = "PROMPT_REFRESH" as const;
 export function promptRefresh() {
   return {
     type: PROMPT_REFRESH,

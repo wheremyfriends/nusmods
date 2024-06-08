@@ -6,14 +6,23 @@ export type Tracker = {
   // Logs an event with an event category (Videos, Music, Games...),
   // an event action (Play, Pause, Duration, Add Playlist, Downloaded, Clicked...),
   // and an optional event name and optional numeric value.
-  trackEvent: (category: string, action: string, name?: string, value?: number) => void;
+  trackEvent: (
+    category: string,
+    action: string,
+    name?: string,
+    value?: number,
+  ) => void;
 
   // Logs a visit to this page
   trackPageView: (pageTitle?: string) => void;
 
   // Log an internal site search for a specific keyword, in an optional category,
   // specifying the optional count of search results in the page.
-  trackSiteSearch: (keyword: string, category?: string, resultsCount?: number) => void;
+  trackSiteSearch: (
+    keyword: string,
+    category?: string,
+    resultsCount?: number,
+  ) => void;
 
   // Manually log a conversion for the numeric goal ID, with an optional numeric
   // custom revenue customRevenue.
@@ -21,10 +30,13 @@ export type Tracker = {
 
   // Manually log a click from your own code. url is the full URL which is to be
   // tracked as a click. linkType can either be 'link' for an outlink or 'download' for a download.
-  trackLink: (url: string, linkType: 'link' | 'download') => void;
+  trackLink: (url: string, linkType: "link" | "download") => void;
 
   trackAllContentImpressions: () => void;
-  trackVisibleContentImpressions: (checkOnScroll: boolean, timeIntervalInMs: number) => void;
+  trackVisibleContentImpressions: (
+    checkOnScroll: boolean,
+    timeIntervalInMs: number,
+  ) => void;
 
   // Scans the given DOM node and its children for content blocks and tracks an
   // impression for them if no impression was already tracked for it.

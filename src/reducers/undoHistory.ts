@@ -1,8 +1,8 @@
-import { get, last, pick, set, takeRight } from 'lodash';
+import { get, last, pick, set, takeRight } from "lodash";
 
-import { REDO, UNDO } from 'actions/constants';
-import { UndoHistoryState } from 'types/reducers';
-import { Actions } from 'types/actions';
+import { REDO, UNDO } from "actions/constants";
+import { UndoHistoryState } from "types/reducers";
+import { Actions } from "types/actions";
 
 export type UndoHistoryConfig = {
   limit?: number;
@@ -14,7 +14,9 @@ export type UndoHistoryConfig = {
 // Basically a reducer but not really, as it needs to know the previous state.
 // Passing state in even though state === presentAppState[config.reducerName] as the "reducer"
 // doesn't need to know that.
-export function computeUndoStacks<T extends { undoHistory: UndoHistoryState<T> }>(
+export function computeUndoStacks<
+  T extends { undoHistory: UndoHistoryState<T> },
+>(
   state: UndoHistoryState<T> = {
     past: [],
     present: undefined, // Don't pretend to know the present
@@ -31,8 +33,12 @@ export function computeUndoStacks<T extends { undoHistory: UndoHistoryState<T> }
   if (config.actionsToWatch.includes(action.type)) {
     // Append actual present to past, and drop history past config.limit
     // Limit only enforced here since undo/redo only shift the history around without adding new history
-    const appendedPast = [...past, pick(previousAppState, config.storedKeyPaths)];
-    const newPast = 'limit' in config ? takeRight(appendedPast, config.limit) : appendedPast;
+    const appendedPast = [
+      ...past,
+      pick(previousAppState, config.storedKeyPaths),
+    ];
+    const newPast =
+      "limit" in config ? takeRight(appendedPast, config.limit) : appendedPast;
 
     return {
       past: newPast,
@@ -86,9 +92,9 @@ export function mergePresent<T extends Record<string, unknown>>(
 
 // Given a config object, returns function which compute new state after
 // undoing/redoing/storing present as required by action.
-export default function createUndoReducer<T extends { undoHistory: UndoHistoryState<T> }>(
-  config: UndoHistoryConfig,
-) {
+export default function createUndoReducer<
+  T extends { undoHistory: UndoHistoryState<T> },
+>(config: UndoHistoryConfig) {
   return (previousState: T, presentState: T, action: Actions) => {
     // Calculate un/redone history
     const undoHistoryState = presentState.undoHistory;
@@ -104,8 +110,15 @@ export default function createUndoReducer<T extends { undoHistory: UndoHistorySt
     // Applies undo and redo actions on overall app state
     // Applies updatedHistory.present to state if action.type === {UNDO,REDO}
     // Assumes updatedHistory.present is the final present state
-    if ((action.type === UNDO || action.type === REDO) && updatedHistory.present) {
-      return mergePresent(updatedState, updatedHistory.present, config.storedKeyPaths);
+    if (
+      (action.type === UNDO || action.type === REDO) &&
+      updatedHistory.present
+    ) {
+      return mergePresent(
+        updatedState,
+        updatedHistory.present,
+        config.storedKeyPaths,
+      );
     }
     return updatedState;
   };

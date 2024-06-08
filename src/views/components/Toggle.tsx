@@ -1,5 +1,5 @@
-import * as React from 'react';
-import classnames from 'classnames';
+import * as React from "react";
+import classnames from "classnames";
 
 type Props = {
   labels?: [string, string];
@@ -9,7 +9,12 @@ type Props = {
   onChange: (boolean: boolean) => void;
 };
 
-const Toggle: React.FC<Props> = ({ labels = ['On', 'Off'], isOn, className, onChange }) => (
+const Toggle: React.FC<Props> = ({
+  labels = ["On", "Off"],
+  isOn,
+  className,
+  onChange,
+}) => (
   <div className="btn-group" role="group">
     {labels.map((label, index) => {
       const value = index === 0;
@@ -18,9 +23,9 @@ const Toggle: React.FC<Props> = ({ labels = ['On', 'Off'], isOn, className, onCh
         <button
           key={label}
           type="button"
-          className={classnames('btn', className, {
-            'btn-primary': value === isOn,
-            'btn-outline-primary': value !== isOn,
+          className={classnames("btn", className, {
+            "btn-primary": value === isOn,
+            "btn-outline-primary": value !== isOn,
           })}
           onClick={() => {
             if (value !== isOn) onChange(value);

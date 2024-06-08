@@ -1,4 +1,4 @@
-import academicCalendar from './academicCalendar';
+import academicCalendar from "./academicCalendar";
 
 export default {
   academicCalendar,

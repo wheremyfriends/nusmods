@@ -1,8 +1,8 @@
-import { Middleware } from 'redux';
-import { size } from 'lodash';
-import * as Sentry from '@sentry/browser';
-import produce from 'immer';
-import { State } from 'types/state';
+import { Middleware } from "redux";
+import { size } from "lodash";
+import * as Sentry from "@sentry/browser";
+import produce from "immer";
+import { State } from "types/state";
 
 const stateTransformer = (state: State): Record<string, unknown> => ({
   ...state,
@@ -20,7 +20,7 @@ const ravenMiddleware: Middleware<{}, State> = (store) => {
       produce(event, (draft) => {
         draft.extra = {
           ...(draft.extra ?? {}),
-          'redux:state': stateTransformer(store.getState()),
+          "redux:state": stateTransformer(store.getState()),
         };
       }),
     );
@@ -28,7 +28,7 @@ const ravenMiddleware: Middleware<{}, State> = (store) => {
 
   return (next) => (action) => {
     Sentry.addBreadcrumb({
-      category: 'redux-action',
+      category: "redux-action",
       message: action.type,
     });
 

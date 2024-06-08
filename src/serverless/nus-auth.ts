@@ -1,18 +1,18 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as validator from '@authenio/samlify-node-xmllint';
-import _ from 'lodash';
-import * as samlify from 'samlify';
-import type { ESamlHttpRequest } from 'samlify/types/src/entity';
-import type { Handler, Request } from './handler';
+import * as fs from "fs";
+import * as path from "path";
+import * as validator from "@authenio/samlify-node-xmllint";
+import _ from "lodash";
+import * as samlify from "samlify";
+import type { ESamlHttpRequest } from "samlify/types/src/entity";
+import type { Handler, Request } from "./handler";
 
 const samlifyErrors = {
-  assertionExpired: 'ERR_SUBJECT_UNCONFIRMED',
-  invalidAssertion: 'ERR_EXCEPTION_VALIDATE_XML',
+  assertionExpired: "ERR_SUBJECT_UNCONFIRMED",
+  invalidAssertion: "ERR_EXCEPTION_VALIDATE_XML",
 };
 
 const errors = {
-  noTokenSupplied: 'ERR_NO_TOKEN_SUPPLIED',
+  noTokenSupplied: "ERR_NO_TOKEN_SUPPLIED",
 };
 
 export type User = {
@@ -21,32 +21,34 @@ export type User = {
   email: string;
 };
 const samlRespAttributes: { [key in keyof User]: string } = {
-  accountName: 'http://schemas.nus.edu.sg/ws/2015/07/identity/claims/samaccountname',
-  upn: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn',
-  email: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress',
+  accountName:
+    "http://schemas.nus.edu.sg/ws/2015/07/identity/claims/samaccountname",
+  upn: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn",
+  email: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
 };
 
 samlify.setSchemaValidator(validator);
 
 const idp = samlify.IdentityProvider({
-  metadata: fs.readFileSync(path.join(__dirname, './FederationMetadata.xml')),
+  metadata: fs.readFileSync(path.join(__dirname, "./FederationMetadata.xml")),
   isAssertionEncrypted: true,
 });
 
 const sp = samlify.ServiceProvider({
-  metadata: fs.readFileSync(path.join(__dirname, './sp.xml')),
-  encPrivateKey: process.env.NUS_EXCHANGE_SP_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  metadata: fs.readFileSync(path.join(__dirname, "./sp.xml")),
+  encPrivateKey: process.env.NUS_EXCHANGE_SP_PRIVATE_KEY?.replace(/\\n/g, "\n"),
 });
 
-export const createLoginURL = (relayState = '') => {
-  const { context } = sp.createLoginRequest(idp, 'redirect');
+export const createLoginURL = (relayState = "") => {
+  const { context } = sp.createLoginRequest(idp, "redirect");
   const ssoLoginURL = new URL(context);
-  ssoLoginURL.searchParams.append('RelayState', relayState);
+  ssoLoginURL.searchParams.append("RelayState", relayState);
   return ssoLoginURL.toString();
 };
 
 export const authenticate = async (req: Request) => {
-  const tokenProvided = req.headers.authorization || (req.body && req.body.SAMLResponse);
+  const tokenProvided =
+    req.headers.authorization || (req.body && req.body.SAMLResponse);
   if (!tokenProvided) {
     throw new Error(errors.noTokenSupplied);
   }
@@ -62,7 +64,7 @@ export const authenticate = async (req: Request) => {
 
   const {
     extract: { attributes },
-  } = await sp.parseLoginResponse(idp, 'post', requestToProcess);
+  } = await sp.parseLoginResponse(idp, "post", requestToProcess);
 
   const user: User = _.mapValues(
     samlRespAttributes,
@@ -94,17 +96,17 @@ export const verifyLogin =
       (req as any).user = user;
     } catch (err) {
       const errResp = {
-        message: '',
+        message: "",
       };
 
       if (err === samlifyErrors.assertionExpired) {
-        errResp.message = 'Token has expired, please login again';
+        errResp.message = "Token has expired, please login again";
       } else if (err === samlifyErrors.invalidAssertion) {
-        errResp.message = 'Invalid token supplied';
+        errResp.message = "Invalid token supplied";
       } else if (err.message === errors.noTokenSupplied) {
-        errResp.message = 'No token is supplied';
+        errResp.message = "No token is supplied";
       } else {
-        errResp.message = 'Invalid authentication, please login again';
+        errResp.message = "Invalid authentication, please login again";
         // eslint-disable-next-line no-console
         console.error(err);
       }

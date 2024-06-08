@@ -1,4 +1,4 @@
-const elements = require('../../views/elements');
+const elements = require("../../views/elements");
 
 module.exports = {
   url() {

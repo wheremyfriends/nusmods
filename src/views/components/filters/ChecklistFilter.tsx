@@ -1,8 +1,8 @@
-import { memo } from 'react';
+import { memo } from "react";
 
-import { ElasticSearchFilter } from 'types/vendor/elastic-search';
-import FilterContainer from './FilterContainer';
-import CheckboxItemFilter from './CheckboxItemFilter';
+import { ElasticSearchFilter } from "types/vendor/elastic-search";
+import FilterContainer from "./FilterContainer";
+import CheckboxItemFilter from "./CheckboxItemFilter";
 
 export type FilterItem = {
   key: string;
@@ -36,6 +36,6 @@ const ChecklistFilter = memo<ChecklistFilterProps>(
   ),
 );
 
-ChecklistFilter.displayName = 'ChecklistFilter';
+ChecklistFilter.displayName = "ChecklistFilter";
 
 export default ChecklistFilter;

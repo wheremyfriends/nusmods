@@ -1,7 +1,7 @@
-import nusmoderator from './index';
+import nusmoderator from "./index";
 
-describe('nusmoderator', () => {
-  test('academicCalendar', () => {
+describe("nusmoderator", () => {
+  test("academicCalendar", () => {
     expect(nusmoderator.academicCalendar).toBeDefined();
   });
 });

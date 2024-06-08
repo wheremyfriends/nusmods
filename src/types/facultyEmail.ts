@@ -1,31 +1,35 @@
-import { Department, Faculty, ModuleCode } from './modules';
+import { Department, Faculty, ModuleCode } from "./modules";
 
-export type Division = 'undergrad' | 'grad';
+export type Division = "undergrad" | "grad";
 
 // Each of these match config declaratively matches an email address to a module
 export interface ModuleCodeMatch {
-  type: 'moduleCode';
+  type: "moduleCode";
   moduleCode: ModuleCode | ModuleCode[];
 }
 
 export interface ModuleCodePrefixMatch {
-  type: 'modulePrefix';
+  type: "modulePrefix";
   prefix: string;
 }
 
 export interface DepartmentMatch {
-  type: 'department';
+  type: "department";
   department: Department;
   level: Division;
 }
 
 export interface FacultyMatch {
-  type: 'faculty';
+  type: "faculty";
   faculty: Faculty;
   level: Division;
 }
 
-export type ModuleMatch = ModuleCodeMatch | ModuleCodePrefixMatch | DepartmentMatch | FacultyMatch;
+export type ModuleMatch =
+  | ModuleCodeMatch
+  | ModuleCodePrefixMatch
+  | DepartmentMatch
+  | FacultyMatch;
 
 export interface FacultyEmail<M extends ModuleMatch = ModuleMatch> {
   id: string;

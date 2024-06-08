@@ -1,8 +1,12 @@
-import { range, sample, without } from 'lodash';
+import { range, sample, without } from "lodash";
 
-import { ColorIndex, SemTimetableConfig, SemTimetableMultiConfig } from 'types/timetables';
-import { ColorMapping } from 'types/reducers';
-import { ModuleCode } from 'types/modules';
+import {
+  ColorIndex,
+  SemTimetableConfig,
+  SemTimetableMultiConfig,
+} from "types/timetables";
+import { ColorMapping } from "types/reducers";
+import { ModuleCode } from "types/modules";
 
 export const NUM_DIFFERENT_COLORS = 8;
 
@@ -13,7 +17,10 @@ function generateInitialColors(): ColorIndex[] {
 // Returns a new index that is not present in the current color index.
 // If there are more than NUM_DIFFERENT_COLORS modules already present,
 // will try to balance the color distribution if randomize === true.
-export function getNewColor(currentColors: ColorIndex[], randomize = true): ColorIndex {
+export function getNewColor(
+  currentColors: ColorIndex[],
+  randomize = true,
+): ColorIndex {
   let availableColors = generateInitialColors();
   currentColors.forEach((index: ColorIndex) => {
     availableColors = without(availableColors, index);

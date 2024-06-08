@@ -1,5 +1,5 @@
-import { sortBy } from 'lodash';
-import { ModuleCode, ModuleTitle, SearchableModule } from 'types/modules';
+import { sortBy } from "lodash";
+import { ModuleCode, ModuleTitle, SearchableModule } from "types/modules";
 
 export function tokenize(str: string): string[] {
   return str.trim().split(/\W+/g);
@@ -7,8 +7,8 @@ export function tokenize(str: string): string[] {
 
 // Match only start of words, case insensitively
 export function regexify(str: string): RegExp {
-  const terms = str.trim().replace(/\W+/g, '\\W+');
-  return RegExp(`\\b${terms}`, 'i');
+  const terms = str.trim().replace(/\W+/g, "\\W+");
+  return RegExp(`\\b${terms}`, "i");
 }
 
 export function createSearchPredicate(
@@ -21,7 +21,7 @@ export function createSearchPredicate(
       if (
         regex.test(module.moduleCode) ||
         regex.test(module.title) ||
-        regex.test(module.moduleCode.replace(/\D+/, ''))
+        regex.test(module.moduleCode.replace(/\D+/, ""))
       ) {
         return true;
       }
@@ -45,7 +45,7 @@ export function sortModules<
     for (let i = 0; i < searchRegexes.length; i++) {
       if (
         searchRegexes[i].test(module.moduleCode) ||
-        searchRegexes[i].test(module.moduleCode.replace(/\D+/, ''))
+        searchRegexes[i].test(module.moduleCode.replace(/\D+/, ""))
       ) {
         sum += 1;
       } else if (searchRegexes[i].test(module.title)) {

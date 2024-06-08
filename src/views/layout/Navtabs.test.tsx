@@ -1,14 +1,14 @@
-import { render, screen } from '@testing-library/react';
-import produce from 'immer';
-import React from 'react';
-import { Provider } from 'react-redux';
-import { MemoryRouter } from 'react-router-dom';
-import { showCPExTab } from 'featureFlags';
-import configureStore from 'bootstrapping/configure-store';
-import reducers from 'reducers';
-import { initAction } from 'test-utils/redux';
+import { render, screen } from "@testing-library/react";
+import produce from "immer";
+import React from "react";
+import { Provider } from "react-redux";
+import { MemoryRouter } from "react-router-dom";
+import { showCPExTab } from "featureFlags";
+import configureStore from "bootstrapping/configure-store";
+import reducers from "reducers";
+import { initAction } from "test-utils/redux";
 
-import Navtabs from './Navtabs';
+import Navtabs from "./Navtabs";
 
 const relevantStoreContents = {
   app: { activeSemester: 1 },
@@ -21,8 +21,10 @@ function make(storeOverrides: Partial<typeof relevantStoreContents> = {}) {
   const { store } = configureStore(
     produce(initialState, (draft) => {
       draft.app.activeSemester =
-        storeOverrides.app?.activeSemester ?? relevantStoreContents.app.activeSemester;
-      draft.settings.beta = storeOverrides.settings?.beta ?? relevantStoreContents.settings.beta;
+        storeOverrides.app?.activeSemester ??
+        relevantStoreContents.app.activeSemester;
+      draft.settings.beta =
+        storeOverrides.settings?.beta ?? relevantStoreContents.settings.beta;
     }),
   );
   render(
@@ -35,10 +37,11 @@ function make(storeOverrides: Partial<typeof relevantStoreContents> = {}) {
 }
 
 describe(Navtabs, () => {
-  test('should render into nav element', () => {
+  test("should render into nav element", () => {
     make();
     if (showCPExTab) {
-      expect(screen.getAllByRole('link').map((elem) => elem.textContent)).toMatchInlineSnapshot(`
+      expect(screen.getAllByRole("link").map((elem) => elem.textContent))
+        .toMatchInlineSnapshot(`
         [
           "Today",
           "Timetable",
@@ -51,7 +54,8 @@ describe(Navtabs, () => {
         ]
       `);
     } else {
-      expect(screen.getAllByRole('link').map((elem) => elem.textContent)).toMatchInlineSnapshot(`
+      expect(screen.getAllByRole("link").map((elem) => elem.textContent))
+        .toMatchInlineSnapshot(`
         [
           "Today",
           "Timetable",
@@ -65,10 +69,11 @@ describe(Navtabs, () => {
     }
   });
 
-  test('should show beta tabs if beta is true', () => {
+  test("should show beta tabs if beta is true", () => {
     make({ settings: { beta: true } });
     if (showCPExTab) {
-      expect(screen.getAllByRole('link').map((elem) => elem.textContent)).toMatchInlineSnapshot(`
+      expect(screen.getAllByRole("link").map((elem) => elem.textContent))
+        .toMatchInlineSnapshot(`
         [
           "Today",
           "Timetable",
@@ -82,7 +87,8 @@ describe(Navtabs, () => {
         ]
       `);
     } else {
-      expect(screen.getAllByRole('link').map((elem) => elem.textContent)).toMatchInlineSnapshot(`
+      expect(screen.getAllByRole("link").map((elem) => elem.textContent))
+        .toMatchInlineSnapshot(`
         [
           "Today",
           "Timetable",

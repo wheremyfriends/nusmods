@@ -1,8 +1,8 @@
-import axios from 'axios';
-import { nextBus } from 'apis/nextbus';
-import arrival from './__mocks__/arrival.json';
+import axios from "axios";
+import { nextBus } from "apis/nextbus";
+import arrival from "./__mocks__/arrival.json";
 
-jest.mock('axios');
+jest.mock("axios");
 
 describe(nextBus, () => {
   beforeEach(() => {
@@ -11,15 +11,15 @@ describe(nextBus, () => {
     });
   });
 
-  test('should extract arrival times', async () => {
-    await expect(nextBus('STAFFCLUB-OPP')).resolves.toEqual({
+  test("should extract arrival times", async () => {
+    await expect(nextBus("STAFFCLUB-OPP")).resolves.toEqual({
       A1: {
-        arrivalTime: 'Arr',
+        arrivalTime: "Arr",
         nextArrivalTime: 19,
       },
       A1E: {
         arrivalTime: 1,
-        nextArrivalTime: '-',
+        nextArrivalTime: "-",
       },
       D2: {
         arrivalTime: 2,

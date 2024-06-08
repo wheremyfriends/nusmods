@@ -1,10 +1,10 @@
-import { shallow } from 'enzyme';
-import { Link } from 'react-router-dom';
-import LoadingSpinner from 'views/components/LoadingSpinner';
-import { moduleArchive } from 'views/routes/paths';
-import { ModuleNotFoundPageComponent } from './ModuleNotFoundPage';
+import { shallow } from "enzyme";
+import { Link } from "react-router-dom";
+import LoadingSpinner from "views/components/LoadingSpinner";
+import { moduleArchive } from "views/routes/paths";
+import { ModuleNotFoundPageComponent } from "./ModuleNotFoundPage";
 
-test('should fetch archive pages if moduleCode looks like a module code', () => {
+test("should fetch archive pages if moduleCode looks like a module code", () => {
   const fetchModuleArchive = jest.fn();
   shallow(
     <ModuleNotFoundPageComponent
@@ -19,7 +19,7 @@ test('should fetch archive pages if moduleCode looks like a module code', () => 
   expect(fetchModuleArchive).toBeCalled();
 });
 
-test('should not fetch archive pages if tryArchive is false', () => {
+test("should not fetch archive pages if tryArchive is false", () => {
   const fetchModuleArchive = jest.fn();
   shallow(
     <ModuleNotFoundPageComponent
@@ -49,7 +49,7 @@ test("should not fetch archive pages if moduleCode doesn't look like module code
   expect(fetchModuleArchive).not.toBeCalled();
 });
 
-test('should show spinner while archive pages are loading', () => {
+test("should show spinner while archive pages are loading", () => {
   const wrapper = shallow(
     <ModuleNotFoundPageComponent
       moduleCode="CS1010S"
@@ -63,23 +63,23 @@ test('should show spinner while archive pages are loading', () => {
   expect(wrapper.type()).toEqual(LoadingSpinner);
 });
 
-test('should suggest archive pages if they are available', () => {
+test("should suggest archive pages if they are available", () => {
   const wrapper = shallow(
     <ModuleNotFoundPageComponent
       moduleCode="CS1010S"
-      availableArchive={['2015/2016', '2017/2018']}
+      availableArchive={["2015/2016", "2017/2018"]}
       fetchModuleArchive={jest.fn()}
       isLoading={false}
       tryArchive
     />,
   );
 
-  const links = wrapper.find(Link).map((link) => link.prop('to'));
+  const links = wrapper.find(Link).map((link) => link.prop("to"));
 
   expect(links).toEqual(
     expect.arrayContaining([
-      moduleArchive('CS1010S', '2015/2016'),
-      moduleArchive('CS1010S', '2017/2018'),
+      moduleArchive("CS1010S", "2015/2016"),
+      moduleArchive("CS1010S", "2017/2018"),
     ]),
   );
 });

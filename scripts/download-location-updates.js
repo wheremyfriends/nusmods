@@ -1,33 +1,34 @@
-const path = require('path');
-const fs = require('fs');
-const axios = require('axios');
-const _ = require('lodash');
+const path = require("path");
+const fs = require("fs");
+const axios = require("axios");
+const _ = require("lodash");
 
-const VENUES_PATH = path.join(__dirname, '../src/data/venues.json');
+const VENUES_PATH = path.join(__dirname, "../src/data/venues.json");
 
 /**
  * Downloads location update issues from GitHub and allows for easy
  * copy pasting into venues.json
  */
 
-const ISSUES_URL = 'https://api.github.com/repos/nusmodifications/nusmods/issues';
+const ISSUES_URL =
+  "https://api.github.com/repos/nusmodifications/nusmods/issues";
 
 /**
  * Returns the last code block from the issue
  */
 function getCodeBlock(body) {
-  const lines = body.trim().split('\n');
+  const lines = body.trim().split("\n");
 
   const blocks = [];
-  let currentBlock = '';
+  let currentBlock = "";
   let inCodeBlock = false;
 
   lines.forEach((line) => {
-    if (line.indexOf('```') === 0) {
+    if (line.indexOf("```") === 0) {
       if (inCodeBlock) {
         inCodeBlock = false;
         blocks.push(currentBlock.trim());
-        currentBlock = '';
+        currentBlock = "";
       } else {
         inCodeBlock = true;
       }
@@ -49,13 +50,13 @@ async function downloadIssues() {
 
   const res = await axios.get(ISSUES_URL, {
     params: {
-      labels: 'venue data',
-      state: 'open',
+      labels: "venue data",
+      state: "open",
       // Apply earlier issues first
-      direction: 'asc',
+      direction: "asc",
     },
     headers: {
-      'user-agent': 'nusmodifications',
+      "user-agent": "nusmodifications",
     },
   });
 
@@ -77,7 +78,9 @@ async function downloadIssues() {
     venues = { ...venues, ...data };
   });
 
-  console.log(issuesFound.map(([id, venue]) => `Closes #${id} - ${venue}`).join('\n'));
+  console.log(
+    issuesFound.map(([id, venue]) => `Closes #${id} - ${venue}`).join("\n"),
+  );
   console.log();
 
   fs.writeFileSync(VENUES_PATH, JSON.stringify(venues, null, 2));

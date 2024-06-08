@@ -1,5 +1,5 @@
-const _ = require('lodash');
-const browserslist = require('browserslist');
+const _ = require("lodash");
+const browserslist = require("browserslist");
 
 function getTemplate() {
   return _.mapValues(browserslist.data, (info) => {
@@ -12,22 +12,22 @@ function getTemplate() {
 }
 
 function getVersionMapping(browserCode, versionString) {
-  const versions = _.get(browserslist, ['data', browserCode, 'versions']);
+  const versions = _.get(browserslist, ["data", browserCode, "versions"]);
   if (!versions) {
     return undefined;
   }
 
   let version;
-  if (browserCode === 'edge') {
-    version = versionString.split('.')[0];
-  } else if (browserCode === 'ios_saf') {
+  if (browserCode === "edge") {
+    version = versionString.split(".")[0];
+  } else if (browserCode === "ios_saf") {
     // Handle special case where ios_saf has no version
     version = versionString ? versionString : _.last(versions);
   } else if (versionString) {
     version = versionString
-      .split('.')
+      .split(".")
       .filter((str) => parseInt(str, 10))
-      .join('.');
+      .join(".");
   } else {
     return undefined;
   }
@@ -37,7 +37,7 @@ function getVersionMapping(browserCode, versionString) {
     return version;
   }
   // Return alias if it exists
-  const alias = _.get(browserslist, ['versionAliases', browserCode, version]);
+  const alias = _.get(browserslist, ["versionAliases", browserCode, version]);
   if (alias) {
     return alias;
   }

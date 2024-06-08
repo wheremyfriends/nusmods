@@ -1,8 +1,8 @@
-import * as React from 'react';
-import classnames from 'classnames';
-import { X as Close } from 'react-feather';
+import * as React from "react";
+import classnames from "classnames";
+import { X as Close } from "react-feather";
 
-import styles from './CloseButton.scss';
+import styles from "./CloseButton.scss";
 
 type Props = {
   onClick: () => void;
@@ -12,7 +12,7 @@ type Props = {
 
 const RawCloseButton: React.FC<Props> = ({ onClick, className }) => (
   <button
-    className={classnames('close', className)}
+    className={classnames("close", className)}
     type="button"
     onClick={onClick}
     aria-label="Close"
@@ -25,7 +25,10 @@ const CloseButton: React.FC<Props> = (props) => {
   if (!props.absolutePositioned) return <RawCloseButton {...props} />;
   return (
     <div className={styles.closeContainer}>
-      <RawCloseButton {...props} className={classnames(props.className, styles.absCloseBtn)} />
+      <RawCloseButton
+        {...props}
+        className={classnames(props.className, styles.absCloseBtn)}
+      />
     </div>
   );
 };

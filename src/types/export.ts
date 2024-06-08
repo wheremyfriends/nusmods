@@ -1,7 +1,7 @@
-import { SemTimetableConfig } from 'types/timetables';
-import { Semester, ModuleCode } from 'types/modules';
-import { Mode } from 'types/settings';
-import { ColorMapping, ThemeState } from 'types/reducers';
+import { SemTimetableConfig } from "types/timetables";
+import { Semester, ModuleCode } from "types/modules";
+import { Mode } from "types/settings";
+import { ColorMapping, ThemeState } from "types/reducers";
 
 export type ExportData = {
   readonly semester: Semester;

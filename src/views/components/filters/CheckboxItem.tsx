@@ -1,7 +1,7 @@
-import * as React from 'react';
-import classnames from 'classnames';
-import { NBSP } from 'utils/react';
-import styles from './styles.scss';
+import * as React from "react";
+import classnames from "classnames";
+import { NBSP } from "utils/react";
+import styles from "./styles.scss";
 
 interface Props {
   onClick: React.ChangeEventHandler<HTMLInputElement>;
@@ -22,7 +22,7 @@ const CheckboxItem: React.FC<Props> = ({
   showCount,
   onClick,
 }) => (
-  <li key={itemKey} className={classnames(styles.label, 'form-check')}>
+  <li key={itemKey} className={classnames(styles.label, "form-check")}>
     <input
       id={itemKey}
       className="form-check-input"
@@ -33,15 +33,15 @@ const CheckboxItem: React.FC<Props> = ({
 
     <label
       htmlFor={itemKey}
-      className={classnames('form-check-label', {
+      className={classnames("form-check-label", {
         [styles.enabled]: !disabled,
       })}
     >
       {label}
-      {showCount && typeof count !== 'undefined' && (
+      {showCount && typeof count !== "undefined" && (
         <>
           {NBSP}
-          <span className="text-muted">({count})</span>{' '}
+          <span className="text-muted">({count})</span>{" "}
         </>
       )}
     </label>

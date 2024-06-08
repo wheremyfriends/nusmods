@@ -9,10 +9,10 @@ import {
   setMinutes,
   setSeconds,
   startOfDay,
-} from 'date-fns';
-import { DayText, LessonTime } from 'types/modules';
-import { TimePeriod } from 'types/venues';
-import { Lesson } from 'types/timetables';
+} from "date-fns";
+import { DayText, LessonTime } from "types/modules";
+import { TimePeriod } from "types/venues";
+import { Lesson } from "types/timetables";
 
 const SGT_OFFSET = -8 * 60;
 
@@ -51,46 +51,55 @@ export function convertTimeToIndex(time: LessonTime): number {
 export function convertIndexToTime(index: number): LessonTime {
   const timeIndex = Math.min(index, 48);
   const hour: number = Math.floor(timeIndex / 2);
-  const minute: string = timeIndex % 2 === 0 ? '00' : '30';
+  const minute: string = timeIndex % 2 === 0 ? "00" : "30";
   return (hour < 10 ? `0${hour}` : hour.toString()) + minute;
 }
 
 export function formatHour(hour: number): string {
-  if (hour === 12) return '12 noon';
-  if (hour === 0 || hour === 24) return '12 midnight';
+  if (hour === 12) return "12 noon";
+  if (hour === 0 || hour === 24) return "12 midnight";
   if (hour < 12) return `${hour}am`;
   return `${hour - 12}pm`;
 }
 
-export function getTimeAsDate(time: string | number, date: Date = new Date()): Date {
-  const dateNumber = typeof time === 'string' ? parseInt(time, 10) : time;
-  return setHours(setMinutes(startOfDay(date), dateNumber % 100), Math.floor(dateNumber / 100));
+export function getTimeAsDate(
+  time: string | number,
+  date: Date = new Date(),
+): Date {
+  const dateNumber = typeof time === "string" ? parseInt(time, 10) : time;
+  return setHours(
+    setMinutes(startOfDay(date), dateNumber % 100),
+    Math.floor(dateNumber / 100),
+  );
 }
 
 export function formatTime(time: string | number): string {
-  const timeNumber = typeof time === 'string' ? parseInt(time, 10) : time;
+  const timeNumber = typeof time === "string" ? parseInt(time, 10) : time;
 
-  if (timeNumber === 0) return '12 midnight';
-  if (timeNumber === 1200) return '12 noon';
+  if (timeNumber === 0) return "12 midnight";
+  if (timeNumber === 1200) return "12 noon";
 
-  return format(getTimeAsDate(timeNumber), 'h:mm a').toLowerCase();
+  return format(getTimeAsDate(timeNumber), "h:mm a").toLowerCase();
 }
 
 // Create a new date object with time from the second date object
 export function setTime(date: Date, time: Date): Date {
-  return setHours(setMinutes(setSeconds(date, getSeconds(time)), getMinutes(time)), getHours(time));
+  return setHours(
+    setMinutes(setSeconds(date, getSeconds(time)), getMinutes(time)),
+    getHours(time),
+  );
 }
 
 export const SCHOOLDAYS: DayText[] = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
 ];
-export const DEFAULT_EARLIEST_TIME: LessonTime = '1000';
-export const DEFAULT_LATEST_TIME: LessonTime = '1800';
+export const DEFAULT_EARLIEST_TIME: LessonTime = "1000";
+export const DEFAULT_LATEST_TIME: LessonTime = "1800";
 
 // Given an array of lessons, we calculate the earliest and latest timings based on the lesson timings.
 // This bounds will then be used to decide the starting and ending hours of the timetable.
@@ -169,7 +178,10 @@ export function daysAfter(startDate: Date, days: number): Date {
  */
 export function toSingaporeTime(date: string | number | Date): Date {
   const localDate = new Date(date);
-  return new Date(localDate.getTime() + (localDate.getTimezoneOffset() - SGT_OFFSET) * 60 * 1000);
+  return new Date(
+    localDate.getTime() +
+      (localDate.getTimezoneOffset() - SGT_OFFSET) * 60 * 1000,
+  );
 }
 
 /**

@@ -1,18 +1,18 @@
-import { createLoginURL } from '../../../src/serverless/nus-auth';
+import { createLoginURL } from "../../../src/serverless/nus-auth";
 import {
   createRouteHandler,
   defaultFallback,
   defaultRescue,
   Handler,
   MethodHandlers,
-} from '../../../src/serverless/handler';
+} from "../../../src/serverless/handler";
 
 const errors = {
-  noCallbackUrl: 'ERR_NO_REFERER',
+  noCallbackUrl: "ERR_NO_REFERER",
 };
 
 function getCallbackUrl(callback: string | string[] | undefined) {
-  if (typeof callback === 'string') return callback;
+  if (typeof callback === "string") return callback;
   if (Array.isArray(callback) && callback.length > 0) return callback[0];
   throw new Error(errors.noCallbackUrl);
 }
@@ -28,7 +28,7 @@ const handleGet: Handler = async (req, res) => {
   } catch (err) {
     if (err.message === errors.noCallbackUrl) {
       res.json({
-        message: 'Request needs a referer',
+        message: "Request needs a referer",
       });
     } else {
       throw err;
@@ -40,4 +40,8 @@ const methodHandlers: MethodHandlers = {
   GET: handleGet,
 };
 
-export default createRouteHandler(methodHandlers, defaultFallback, defaultRescue(true));
+export default createRouteHandler(
+  methodHandlers,
+  defaultFallback,
+  defaultRescue(true),
+);
