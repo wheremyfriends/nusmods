@@ -1,10 +1,10 @@
-import type { Module, ModuleCode, Semester } from 'types/modules';
+import type { Module, ModuleCode, Semester, UserID } from 'types/modules';
 import type { ExportData } from 'types/export';
 import type { Dispatch, GetState } from 'types/redux';
-import { hydrateSemTimetableWithLessons } from 'utils/timetables';
+import { hydrateSemTimetableWithMultiLessons } from 'utils/timetables';
 import { captureException } from 'utils/error';
 import retryImport from 'utils/retryImport';
-import { getSemesterTimetableLessons } from 'selectors/timetables';
+import { getSemesterTimetableMultiLessons } from 'selectors/timetables';
 import { SET_EXPORTED_DATA } from './constants';
 
 function downloadUrl(blob: Blob, filename: string) {
@@ -22,7 +22,7 @@ function downloadUrl(blob: Blob, filename: string) {
 
 export const SUPPORTS_DOWNLOAD = 'download' in document.createElement('a');
 
-export function downloadAsIcal(semester: Semester) {
+export function downloadAsIcal(userID: UserID, semester: Semester) {
   return (_dispatch: Dispatch, getState: GetState) => {
     Promise.all([
       retryImport(() => import(/* webpackChunkName: "export" */ 'ical-generator')),
@@ -31,10 +31,11 @@ export function downloadAsIcal(semester: Semester) {
       .then(([ical, icalUtils]) => {
         const state = getState();
         const { modules } = state.moduleBank;
-        const hiddenModules: ModuleCode[] = state.timetables.hidden[semester] || [];
+        const hiddenModules: ModuleCode[] = state.timetables.multiUserHidden?.[userID]?.[semester] || [];
 
-        const timetable = getSemesterTimetableLessons(state)(semester);
-        const timetableWithLessons = hydrateSemTimetableWithLessons(timetable, modules, semester);
+        const timetable = getSemesterTimetableMultiLessons(state)(userID, semester);
+        const timetableWithLessons = hydrateSemTimetableWithMultiLessons(timetable, modules, semester);
+        // const timetableWithLessons = hydrateSemTimetableWithLessons(timetable, modules, semester);
 
         const events = icalUtils.default(semester, timetableWithLessons, modules, hiddenModules);
         const cal = ical.default({
