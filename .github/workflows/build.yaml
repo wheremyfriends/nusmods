@@ -2,7 +2,7 @@ name: Create and build static site
 
 on:
   push:
-    branches: ['main']
+    branches: ["main"]
   pull_request:
 
 jobs:
@@ -21,13 +21,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'yarn'
+          cache: "yarn"
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
       - name: Build
-        env: 
+        env:
           VERCEL_ENV: production
         run: yarn build
 
@@ -35,4 +35,4 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload dist folder
-          path: './dist'
+          path: "./dist"
