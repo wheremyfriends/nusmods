@@ -12,9 +12,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "yarn"
-      - run: yarn install --frozen-lockfile
-      - run: yarn format
+          cache: "npm"
+      - run: npx prettier --write .
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
