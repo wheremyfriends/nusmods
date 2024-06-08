@@ -1,19 +1,19 @@
-declare module 'ical-generator' {
+declare module "ical-generator" {
   // Partial types - see https://github.com/sebbo2002/ical-generator/tree/0.2.9 for
   // complete types
 
   export type Timezone = string; // TZ database name
 
   export type RepeatFreq =
-    | 'YEARLY'
-    | 'MONTHLY'
-    | 'WEEKLY'
-    | 'DAILY'
-    | 'HOURLY'
-    | 'MINUTELY'
-    | 'SECONDLY';
+    | "YEARLY"
+    | "MONTHLY"
+    | "WEEKLY"
+    | "DAILY"
+    | "HOURLY"
+    | "MINUTELY"
+    | "SECONDLY";
 
-  export type EventStatus = 'confirmed' | 'tentative' | 'cancelled';
+  export type EventStatus = "confirmed" | "tentative" | "cancelled";
 
   export type RepeatingEvent = {
     freq: RepeatFreq;

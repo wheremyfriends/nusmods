@@ -1,10 +1,10 @@
-import { requestAction } from 'actions/requests';
-import NUSModsApi from 'apis/nusmods';
-import config from 'config';
-import type { RequestActions } from 'middlewares/requests-middleware';
-import type { VenueList } from 'types/venues';
+import { requestAction } from "actions/requests";
+import NUSModsApi from "apis/nusmods";
+import config from "config";
+import type { RequestActions } from "middlewares/requests-middleware";
+import type { VenueList } from "types/venues";
 
-export const FETCH_VENUE_LIST = 'FETCH_VENUE_LIST';
+export const FETCH_VENUE_LIST = "FETCH_VENUE_LIST";
 export function fetchVenueList() {
   return requestAction(FETCH_VENUE_LIST, {
     url: NUSModsApi.venueListUrl(config.semester),

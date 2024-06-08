@@ -1,7 +1,7 @@
-import type { ComponentType } from 'react';
-import type { MediaQuery } from 'types/views';
+import type { ComponentType } from "react";
+import type { MediaQuery } from "types/views";
 
-import useMediaQuery from 'views/hooks/useMediaQuery';
+import useMediaQuery from "views/hooks/useMediaQuery";
 
 export type WithBreakpoint = {
   matchBreakpoint: boolean;
@@ -18,6 +18,11 @@ export default function makeResponsive<Props extends WithBreakpoint>(
     const matchBreakpoint = useMediaQuery(mediaQuery);
     // TODO: remove as Props hack as defined in:
     // https://github.com/Microsoft/TypeScript/issues/28938#issuecomment-450636046
-    return <WrappedComponent {...(props as Props)} matchBreakpoint={matchBreakpoint} />;
+    return (
+      <WrappedComponent
+        {...(props as Props)}
+        matchBreakpoint={matchBreakpoint}
+      />
+    );
   };
 }

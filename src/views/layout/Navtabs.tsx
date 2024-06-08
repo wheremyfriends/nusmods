@@ -1,21 +1,18 @@
-import { useEffect, useState, type FC } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import classnames from 'classnames';
-import {
-  UserPlus,
-  User,
-} from 'react-feather';
+import { useEffect, useState, type FC } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import classnames from "classnames";
+import { UserPlus, User } from "react-feather";
 
-import type { State } from 'types/state';
+import type { State } from "types/state";
 
-import styles from './Navtabs.scss';
-import { apolloClient } from 'views/timetable/TimetableContent';
-import { gql } from '@apollo/client';
-import { RoomUser, UserChange } from 'types/timetables';
-import { Action } from 'actions/constants';
-import { switchUser } from 'actions/settings';
-import store from 'entry/main';
-import { UserID } from 'types/modules';
+import styles from "./Navtabs.scss";
+import { apolloClient } from "views/timetable/TimetableContent";
+import { gql } from "@apollo/client";
+import { RoomUser, UserChange } from "types/timetables";
+import { Action } from "actions/constants";
+import { switchUser } from "actions/settings";
+import store from "entry/main";
+import { UserID } from "types/modules";
 
 export const NAVTAB_HEIGHT = 48;
 
@@ -27,7 +24,7 @@ export const USER_CHANGE_SUBSCRIPTION = gql`
       name
     }
   }
-  `;
+`;
 
 export const CREATE_USER = gql`
   mutation CreateUser($roomID: String!) {
@@ -45,7 +42,6 @@ const Navtabs: FC<{
 
   const [users, setUsers] = useState<RoomUser[]>([]);
 
-
   useEffect(() => {
     apolloClient
       .subscribe({
@@ -62,15 +58,17 @@ const Navtabs: FC<{
 
             switch (action) {
               case Action.CREATE_USER: {
-                setUsers(users => [...users, { userID, name }]);
+                setUsers((users) => [...users, { userID, name }]);
                 if (store.getState().app.activeUserID == -1) {
                   dispatch(switchUser(userID));
                 }
                 return;
               }
               case Action.UPDATE_USER: {
-                setUsers(users => {
-                  const index = users.findIndex(user => user.userID === userID);
+                setUsers((users) => {
+                  const index = users.findIndex(
+                    (user) => user.userID === userID,
+                  );
                   if (index !== -1) {
                     users[index].name = name;
                   }
@@ -79,7 +77,9 @@ const Navtabs: FC<{
                 return;
               }
               case Action.DELETE_USER: {
-                setUsers(users => users.filter((user) => user.userID == userID));
+                setUsers((users) =>
+                  users.filter((user) => user.userID == userID),
+                );
                 return;
               }
             }
@@ -88,28 +88,32 @@ const Navtabs: FC<{
         error(error) {
           console.log("Apollo subscribe error", error);
         },
-        complete() {
-        },
-      })
+        complete() {},
+      });
   }, [roomID]);
 
   const navUsers = users.map((user) => {
-
-    return <a
-    key={user.userID}
-    className={activeUserID === user.userID ? classnames(styles.link, styles.linkActive) : styles.link}
-    onClick={(e) => {
-      const userIDString = e.currentTarget.getAttribute('data-userid');
-      if (userIDString) {
-        const userID: UserID = +userIDString;
-        dispatch(switchUser(userID));
-      }
-    }}
-    data-userid={user.userID}
-    >
-      <User />
-      <span className={styles.title}>{user.name}</span>
-    </a>
+    return (
+      <a
+        key={user.userID}
+        className={
+          activeUserID === user.userID
+            ? classnames(styles.link, styles.linkActive)
+            : styles.link
+        }
+        onClick={(e) => {
+          const userIDString = e.currentTarget.getAttribute("data-userid");
+          if (userIDString) {
+            const userID: UserID = +userIDString;
+            dispatch(switchUser(userID));
+          }
+        }}
+        data-userid={user.userID}
+      >
+        <User />
+        <span className={styles.title}>{user.name}</span>
+      </a>
+    );
   });
 
   return (
@@ -124,10 +128,10 @@ const Navtabs: FC<{
               mutation: CREATE_USER,
               variables: {
                 roomID: roomID,
-              }
+              },
             })
             .catch((err) => {
-              console.error("CREATE_USER error: ", err)
+              console.error("CREATE_USER error: ", err);
             });
         }}
       >

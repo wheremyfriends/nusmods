@@ -1,17 +1,17 @@
-import * as React from 'react';
-import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import * as React from "react";
+import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 
-import { ModuleCode, ModuleCondensed } from 'types/modules';
-import { State } from 'types/state';
+import { ModuleCode, ModuleCondensed } from "types/modules";
+import { State } from "types/state";
 
-import { modulePage } from 'views/routes/paths';
-import Tooltip from 'views/components/Tooltip';
-import SemesterBadge from 'views/components/SemesterBadge';
-import { getModuleCondensed } from 'selectors/moduleBank';
-import { replaceWithNode } from 'utils/react';
-import { MODULE_CODE_REGEX } from 'utils/modules';
-import styles from './LinkModuleCodes.scss';
+import { modulePage } from "views/routes/paths";
+import Tooltip from "views/components/Tooltip";
+import SemesterBadge from "views/components/SemesterBadge";
+import { getModuleCondensed } from "selectors/moduleBank";
+import { replaceWithNode } from "utils/react";
+import { MODULE_CODE_REGEX } from "utils/modules";
+import styles from "./LinkModuleCodes.scss";
 
 type Props = {
   children: string;
@@ -23,13 +23,17 @@ export const LinkModuleCodesComponent: React.FC<Props> = (props) => {
   const { children, className } = props;
 
   return replaceWithNode(children, MODULE_CODE_REGEX, (part, i) => {
-    const code = part.replace(/\s*/g, '');
+    const code = part.replace(/\s*/g, "");
     const module = props.getModuleCondensed(code);
     if (!module) return part;
 
     const tooltip = (
       <>
-        {module.title} <SemesterBadge className={styles.semesters} semesters={module.semesters} />{' '}
+        {module.title}{" "}
+        <SemesterBadge
+          className={styles.semesters}
+          semesters={module.semesters}
+        />{" "}
       </>
     );
 

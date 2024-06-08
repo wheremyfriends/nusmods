@@ -16,7 +16,12 @@
  * - `test`: we are in a test environment, e.g. a jest test run.
  * - `development`: all other situations.
  */
-declare const NUSMODS_ENV: 'development' | 'production' | 'staging' | 'preview' | 'test';
+declare const NUSMODS_ENV:
+  | "development"
+  | "production"
+  | "staging"
+  | "preview"
+  | "test";
 
 declare const DATA_API_BASE_URL: string | undefined;
 declare const VERSION_STR: string | undefined;
@@ -28,12 +33,12 @@ declare const DEBUG_SERVICE_WORKER: boolean;
  * The declarations below let us use Webpack loaders to load non-JS files
  */
 
-declare module '*.scss' {
+declare module "*.scss" {
   const content: { [className: string]: string };
   export = content;
 }
 
-declare module '*.svg' {
+declare module "*.svg" {
   // SVG files are loaded as React components
   type SVGProps = React.SVGAttributes<SVGElement> & {
     // Added by SVGR
@@ -45,27 +50,27 @@ declare module '*.svg' {
   export = content;
 }
 
-declare module '*.svg?url' {
+declare module "*.svg?url" {
   const content: string;
   export = content;
 }
 
-declare module '*.png' {
+declare module "*.png" {
   const content: string;
   export = content;
 }
 
-declare module '*.jpeg' {
+declare module "*.jpeg" {
   const content: string;
   export = content;
 }
 
-declare module '*.jpg' {
+declare module "*.jpg" {
   const content: string;
   export = content;
 }
 
-declare module '*.gif' {
+declare module "*.gif" {
   const content: string;
   export = content;
 }

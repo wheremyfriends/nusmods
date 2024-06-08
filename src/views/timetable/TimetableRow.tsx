@@ -1,11 +1,11 @@
-import * as React from 'react';
+import * as React from "react";
 
-import { HoverLesson, ModifiableLesson } from 'types/timetables';
-import { OnHoverCell, OnModifyCell } from 'types/views';
+import { HoverLesson, ModifiableLesson } from "types/timetables";
+import { OnHoverCell, OnModifyCell } from "types/views";
 
-import { convertTimeToIndex } from 'utils/timify';
-import styles from './TimetableRow.scss';
-import TimetableCell from './TimetableCell';
+import { convertTimeToIndex } from "utils/timify";
+import styles from "./TimetableRow.scss";
+import TimetableCell from "./TimetableCell";
 
 type Props = {
   verticalMode: boolean;
@@ -29,7 +29,8 @@ type Props = {
  * children's height, in which absolute positioning would not allow.
  */
 const TimetableRow: React.FC<Props> = (props) => {
-  const { startingIndex, endingIndex, lessons, onModifyCell, verticalMode } = props;
+  const { startingIndex, endingIndex, lessons, onModifyCell, verticalMode } =
+    props;
   const totalCols = endingIndex - startingIndex;
 
   let lastStartIndex = startingIndex;
@@ -42,10 +43,11 @@ const TimetableRow: React.FC<Props> = (props) => {
 
         const size = Math.max(endIndex - startIndex, 1);
 
-        const dirStyle = verticalMode ? 'top' : 'marginLeft';
-        const sizeStyle = verticalMode ? 'height' : 'width';
+        const dirStyle = verticalMode ? "top" : "marginLeft";
+        const sizeStyle = verticalMode ? "height" : "width";
 
-        const dirValue = startIndex - (verticalMode ? startingIndex : lastStartIndex);
+        const dirValue =
+          startIndex - (verticalMode ? startingIndex : lastStartIndex);
         const style = {
           // calc() adds a 1px gap between cells
           [dirStyle]: `calc(${(dirValue / totalCols) * 100}% + 1px)`,
@@ -57,7 +59,8 @@ const TimetableRow: React.FC<Props> = (props) => {
         const conditionalProps =
           lesson.isModifiable && onModifyCell
             ? {
-                onClick: (position: ClientRect) => onModifyCell(lesson, position),
+                onClick: (position: ClientRect) =>
+                  onModifyCell(lesson, position),
               }
             : {};
 

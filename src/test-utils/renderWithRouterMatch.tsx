@@ -1,7 +1,7 @@
-import { render } from '@testing-library/react';
-import type { ReactNode } from 'react';
-import { Route, Router } from 'react-router-dom';
-import createHistory from './createHistory';
+import { render } from "@testing-library/react";
+import type { ReactNode } from "react";
+import { Route, Router } from "react-router-dom";
+import createHistory from "./createHistory";
 
 /**
  * `render` `children` in a `Router` and `Route` so that `children` have
@@ -12,8 +12,8 @@ import createHistory from './createHistory';
 export default function renderWithRouterMatch(
   children: ReactNode,
   {
-    path = '/',
-    location = '/',
+    path = "/",
+    location = "/",
   }: {
     path?: string;
     location?: Parameters<typeof createHistory>[0];

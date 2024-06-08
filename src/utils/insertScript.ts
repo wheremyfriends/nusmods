@@ -3,7 +3,7 @@ export default function insertScript(
   options: Partial<HTMLScriptElement> = {},
 ): Promise<Event> {
   return new Promise((resolve, reject) => {
-    const script = window.document.createElement('script');
+    const script = window.document.createElement("script");
 
     Object.assign(script, options);
     script.src = src;

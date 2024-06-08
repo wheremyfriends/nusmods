@@ -1,11 +1,11 @@
-import { isEmpty, sortBy, values, isEqual } from 'lodash';
-import { differenceInCalendarDays } from 'date-fns';
+import { isEmpty, sortBy, values, isEqual } from "lodash";
+import { differenceInCalendarDays } from "date-fns";
 
-import { ModRegNotificationSettings, ModRegRoundKey } from 'types/reducers';
-import { RegPeriodView } from 'types/views';
-import { notNull } from 'types/utils';
-import config, { RegPeriod, RegPeriodType } from 'config';
-import { forceTimer } from 'utils/debug';
+import { ModRegNotificationSettings, ModRegRoundKey } from "types/reducers";
+import { RegPeriodView } from "types/views";
+import { notNull } from "types/utils";
+import config, { RegPeriod, RegPeriodType } from "config";
+import { forceTimer } from "utils/debug";
 
 const NO_NOTIFICATIONS: RegPeriodView[] = [];
 
@@ -15,8 +15,13 @@ export function getModRegRoundKey({ type, name }: RegPeriod): ModRegRoundKey {
   return { type, name };
 }
 
-export function isRoundDismissed(key: ModRegRoundKey, dismissed: ModRegRoundKey[]) {
-  return Boolean(dismissed.find((dismissedRound) => isEqual(dismissedRound, key)));
+export function isRoundDismissed(
+  key: ModRegRoundKey,
+  dismissed: ModRegRoundKey[],
+) {
+  return Boolean(
+    dismissed.find((dismissedRound) => isEqual(dismissedRound, key)),
+  );
 }
 
 export function getRounds(
@@ -46,8 +51,13 @@ export function getRounds(
   if (isEmpty(nextRoundByType)) return NO_NOTIFICATIONS;
 
   // Sort and return all rounds within 3 days of today
-  const nextRounds = sortBy(values(nextRoundByType).filter(notNull), (period) => period.startDate);
+  const nextRounds = sortBy(
+    values(nextRoundByType).filter(notNull),
+    (period) => period.startDate,
+  );
   return nextRounds.filter(
-    (round) => differenceInCalendarDays(round.startDate, now) < NOTIFICATIONS_BEFORE_DAYS,
+    (round) =>
+      differenceInCalendarDays(round.startDate, now) <
+      NOTIFICATIONS_BEFORE_DAYS,
   );
 }

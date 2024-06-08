@@ -1,7 +1,7 @@
-import * as React from 'react';
-import { differenceInMilliseconds } from 'date-fns';
-import { wrapComponentName } from 'utils/react';
-import { forceTimer } from 'utils/debug';
+import * as React from "react";
+import { differenceInMilliseconds } from "date-fns";
+import { wrapComponentName } from "utils/react";
+import { forceTimer } from "utils/debug";
 
 export interface TimerData {
   readonly currentTime: Date;
@@ -15,7 +15,10 @@ function withTimer<Props extends TimerData>(
   WrappedComponent: React.ComponentType<Props>,
   intervalInMs: number = 60 * 1000,
 ): React.ComponentType<Omit<Props, keyof TimerData>> {
-  return class extends React.Component<Omit<Props, keyof TimerData>, TimerData> {
+  return class extends React.Component<
+    Omit<Props, keyof TimerData>,
+    TimerData
+  > {
     intervalId?: number;
 
     static displayName = wrapComponentName(WrappedComponent, withTimer.name);
@@ -29,12 +32,18 @@ function withTimer<Props extends TimerData>(
         () => this.setState({ currentTime: getCurrentTime() }),
         intervalInMs,
       );
-      document.addEventListener('visibilitychange', this.onPageVisibilityChange);
+      document.addEventListener(
+        "visibilitychange",
+        this.onPageVisibilityChange,
+      );
     }
 
     override componentWillUnmount() {
       clearInterval(this.intervalId);
-      document.removeEventListener('visibilitychange', this.onPageVisibilityChange);
+      document.removeEventListener(
+        "visibilitychange",
+        this.onPageVisibilityChange,
+      );
     }
 
     onPageVisibilityChange = () => {

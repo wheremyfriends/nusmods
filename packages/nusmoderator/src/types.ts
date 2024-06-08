@@ -1,12 +1,16 @@
 export type WeekType =
-  | 'Instructional'
-  | 'Reading'
-  | 'Examination'
-  | 'Recess'
-  | 'Vacation'
-  | 'Orientation';
+  | "Instructional"
+  | "Reading"
+  | "Examination"
+  | "Recess"
+  | "Vacation"
+  | "Orientation";
 
-export type Semester = 'Semester 1' | 'Semester 2' | 'Special Term I' | 'Special Term II';
+export type Semester =
+  | "Semester 1"
+  | "Semester 2"
+  | "Special Term I"
+  | "Special Term II";
 
 export interface AcadYear {
   year: string;

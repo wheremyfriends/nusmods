@@ -1,10 +1,10 @@
-import produce, { Draft } from 'immer';
-import { keyBy, omit, size, zipObject } from 'lodash';
+import produce, { Draft } from "immer";
+import { keyBy, omit, size, zipObject } from "lodash";
 
-import { createMigrate, REHYDRATE } from 'redux-persist';
-import type { Actions } from 'types/actions';
-import type { Module } from 'types/modules';
-import type { ModuleBank, ModuleList } from 'types/reducers';
+import { createMigrate, REHYDRATE } from "redux-persist";
+import type { Actions } from "types/actions";
+import type { Module } from "types/modules";
+import type { ModuleBank, ModuleList } from "types/reducers";
 
 import {
   FETCH_ARCHIVE_MODULE,
@@ -13,8 +13,8 @@ import {
   REMOVE_LRU_MODULE,
   UPDATE_MODULE_TIMESTAMP,
   SET_EXPORTED_DATA,
-} from 'actions/constants';
-import { SUCCESS_KEY } from 'middlewares/requests-middleware';
+} from "actions/constants";
+import { SUCCESS_KEY } from "middlewares/requests-middleware";
 
 const defaultModuleBankState: ModuleBank = {
   moduleList: [], // List of basic modules data (module code, name, semester)
@@ -34,14 +34,18 @@ function precomputeFromModuleList(moduleList: ModuleList) {
   return { moduleCodes };
 }
 
-function moduleBank(state: ModuleBank = defaultModuleBankState, action: Actions): ModuleBank {
+function moduleBank(
+  state: ModuleBank = defaultModuleBankState,
+  action: Actions,
+): ModuleBank {
   switch (action.type) {
     case SUCCESS_KEY(FETCH_MODULE_LIST):
       return {
         ...state,
         ...precomputeFromModuleList(action.payload),
         moduleList: action.payload,
-        apiLastUpdatedTimestamp: action.meta?.responseHeaders['last-modified'] || null,
+        apiLastUpdatedTimestamp:
+          action.meta?.responseHeaders["last-modified"] || null,
       };
 
     case SUCCESS_KEY(FETCH_MODULE):
@@ -49,7 +53,10 @@ function moduleBank(state: ModuleBank = defaultModuleBankState, action: Actions)
         ...state,
         modules: {
           ...state.modules,
-          [action.payload.moduleCode]: { ...action.payload, timestamp: Date.now() },
+          [action.payload.moduleCode]: {
+            ...action.payload,
+            timestamp: Date.now(),
+          },
         },
       };
 
@@ -80,7 +87,10 @@ function moduleBank(state: ModuleBank = defaultModuleBankState, action: Actions)
       }
 
       // Type hack to get this to work with the assignment below
-      const module = { ...action.payload, timestamp: Date.now() } as Draft<Module>;
+      const module = {
+        ...action.payload,
+        timestamp: Date.now(),
+      } as Draft<Module>;
       return produce(state, (draft) => {
         if (!draft.moduleArchive[module.moduleCode]) {
           draft.moduleArchive[module.moduleCode] = {};
@@ -93,7 +103,10 @@ function moduleBank(state: ModuleBank = defaultModuleBankState, action: Actions)
     case SET_EXPORTED_DATA:
       return {
         ...state,
-        modules: keyBy(action.payload.modules, (module: Module) => module.moduleCode),
+        modules: keyBy(
+          action.payload.modules,
+          (module: Module) => module.moduleCode,
+        ),
       };
 
     case REHYDRATE:
@@ -116,7 +129,7 @@ export default moduleBank;
 export const persistConfig = {
   version: 1,
   throttle: 1000,
-  whitelist: ['modules', 'moduleList'],
+  whitelist: ["modules", "moduleList"],
   migrate: createMigrate({
     // Clear out modules - after switching to API v2 we need to flush all of the
     // old module data

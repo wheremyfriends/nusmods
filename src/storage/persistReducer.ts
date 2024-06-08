@@ -1,9 +1,9 @@
-import { Reducer } from 'redux';
-import { PersistConfig, Persistor } from 'redux-persist/lib/types';
-import { persistReducer as basePersistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+import { Reducer } from "redux";
+import { PersistConfig, Persistor } from "redux-persist/lib/types";
+import { persistReducer as basePersistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
 
-import { Actions } from 'types/actions';
+import { Actions } from "types/actions";
 
 // Re-export type for easier consumption in other parts of the project
 export { PersistConfig, Persistor };
@@ -16,14 +16,17 @@ export default function persistReducer<S>(
   reducer: Reducer<S, Actions>,
   options: Pick<
     PersistConfig<S>,
-    Exclude<keyof PersistConfig<S>, keyof { key: string; storage: Record<string, unknown> }>
+    Exclude<
+      keyof PersistConfig<S>,
+      keyof { key: string; storage: Record<string, unknown> }
+    >
   > = {},
 ) {
   return basePersistReducer<S, Actions>(
     {
       key,
       storage,
-      debug: NUSMODS_ENV === 'development',
+      debug: NUSMODS_ENV === "development",
       ...options,
     },
     reducer,

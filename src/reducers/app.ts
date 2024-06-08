@@ -1,17 +1,21 @@
-import { AppState } from 'types/reducers';
-import { Actions } from 'types/actions';
-import config from 'config';
+import { AppState } from "types/reducers";
+import { Actions } from "types/actions";
+import config from "config";
 
-import { forceRefreshPrompt } from 'utils/debug';
-import { MODIFY_LESSON, CHANGE_LESSON, CANCEL_MODIFY_LESSON } from 'actions/timetables';
-import { SELECT_SEMESTER, SWITCH_USER } from 'actions/settings';
+import { forceRefreshPrompt } from "utils/debug";
+import {
+  MODIFY_LESSON,
+  CHANGE_LESSON,
+  CANCEL_MODIFY_LESSON,
+} from "actions/timetables";
+import { SELECT_SEMESTER, SWITCH_USER } from "actions/settings";
 import {
   OPEN_NOTIFICATION,
   POP_NOTIFICATION,
   PROMPT_REFRESH,
   SET_ONLINE_STATUS,
   TOGGLE_FEEDBACK_MODAL,
-} from 'actions/app';
+} from "actions/app";
 
 const defaultAppState = (): AppState => ({
   // Default to the current semester from config.
@@ -69,7 +73,10 @@ function app(state: AppState = defaultAppState(), action: Actions): AppState {
       if (state.notifications.length) {
         // If the ONLY notification in the queue can be discarded, we replace
         // it with the current one
-        if (state.notifications.length === 1 && state.notifications[0].overwritable) {
+        if (
+          state.notifications.length === 1 &&
+          state.notifications[0].overwritable
+        ) {
           return {
             ...state,
             notifications: [action.payload],

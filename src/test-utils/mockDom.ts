@@ -24,7 +24,9 @@ export function mockDomReset() {
   Element.prototype.scrollIntoView = nativeScrollIntoView;
 }
 
-export function mockWindowMatchMedia(overrides: Partial<typeof window.matchMedia> = {}) {
+export function mockWindowMatchMedia(
+  overrides: Partial<typeof window.matchMedia> = {},
+) {
   // Source: https://jestjs.io/docs/en/manual-mocks#mocking-methods-which-are-not-implemented-in-jsdom
   window.matchMedia = jest.fn((query) => ({
     matches: true,

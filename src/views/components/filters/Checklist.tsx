@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { RefinementDisplayItem } from 'types/views';
-import CheckboxItem from './CheckboxItem';
+import * as React from "react";
+import { RefinementDisplayItem } from "types/views";
+import CheckboxItem from "./CheckboxItem";
 
 type Props = {
   allItems: RefinementDisplayItem[];
@@ -18,20 +18,26 @@ const Checklist: React.FC<Props> = ({
   showCount,
 }) => {
   const displayItems = searchedItems.map(
-    (key) => allItems.find((i) => i.key === key) || { key, selected: selectedItems.includes(key) },
+    (key) =>
+      allItems.find((i) => i.key === key) || {
+        key,
+        selected: selectedItems.includes(key),
+      },
   );
 
-  const itemComponents = displayItems.map(({ key, doc_count: count, selected }) => (
-    <CheckboxItem
-      key={key}
-      active={selected}
-      count={count || 0}
-      showCount={showCount === true && typeof count !== 'undefined'}
-      itemKey={key}
-      label={key}
-      onClick={() => onSelectItem(key)}
-    />
-  ));
+  const itemComponents = displayItems.map(
+    ({ key, doc_count: count, selected }) => (
+      <CheckboxItem
+        key={key}
+        active={selected}
+        count={count || 0}
+        showCount={showCount === true && typeof count !== "undefined"}
+        itemKey={key}
+        label={key}
+        onClick={() => onSelectItem(key)}
+      />
+    ),
+  );
 
   return <ul className="list-unstyled">{itemComponents}</ul>;
 };

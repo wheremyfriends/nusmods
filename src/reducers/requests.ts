@@ -1,5 +1,5 @@
-import { Requests, FAILURE, REQUEST, SUCCESS } from 'types/reducers';
-import { API_REQUEST } from 'actions/requests';
+import { Requests, FAILURE, REQUEST, SUCCESS } from "types/reducers";
+import { API_REQUEST } from "actions/requests";
 
 /**
  * Flux Standard Action: https://github.com/acdlite/flux-standard-action

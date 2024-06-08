@@ -1,8 +1,8 @@
-import axios from 'axios';
+import axios from "axios";
 
-import { NextBus, NextBusTime, NextBusTimings } from 'types/venues';
+import { NextBus, NextBusTime, NextBusTimings } from "types/venues";
 
-const baseUrl = 'https://nextbus.nusmods.com';
+const baseUrl = "https://nextbus.nusmods.com";
 
 interface ShuttleServiceResult {
   caption: string;
@@ -21,7 +21,7 @@ interface Shuttle {
 function convertArrivalTime(arrivalTime: string): NextBusTime {
   const numericTime = +arrivalTime;
   if (!Number.isNaN(numericTime)) return numericTime;
-  if (arrivalTime === 'Arr' || arrivalTime === '-') return arrivalTime;
+  if (arrivalTime === "Arr" || arrivalTime === "-") return arrivalTime;
   throw new Error(`Unknown arrival time ${arrivalTime}`);
 }
 
@@ -34,14 +34,16 @@ export function nextBus(code: string): Promise<NextBusTimings> {
     .then((response) => {
       const shuttles: NextBusTimings = {};
 
-      response.data.ShuttleServiceResult.shuttles.forEach((arrival: Shuttle) => {
-        const timing: NextBus = {
-          arrivalTime: convertArrivalTime(arrival.arrivalTime),
-          nextArrivalTime: convertArrivalTime(arrival.nextArrivalTime),
-        };
+      response.data.ShuttleServiceResult.shuttles.forEach(
+        (arrival: Shuttle) => {
+          const timing: NextBus = {
+            arrivalTime: convertArrivalTime(arrival.arrivalTime),
+            nextArrivalTime: convertArrivalTime(arrival.nextArrivalTime),
+          };
 
-        shuttles[arrival.name] = timing;
-      });
+          shuttles[arrival.name] = timing;
+        },
+      );
 
       return shuttles;
     });

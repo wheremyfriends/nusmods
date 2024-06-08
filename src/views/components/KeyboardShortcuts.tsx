@@ -1,24 +1,24 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import { useDispatch, useStore } from 'react-redux';
-import Mousetrap from 'mousetrap';
-import { groupBy, map } from 'lodash';
+import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { useHistory } from "react-router-dom";
+import { useDispatch, useStore } from "react-redux";
+import Mousetrap from "mousetrap";
+import { groupBy, map } from "lodash";
 
-import { DARK_MODE } from 'types/settings';
-import themes from 'data/themes.json';
-import { cycleTheme, toggleTimetableOrientation } from 'actions/theme';
-import { openNotification } from 'actions/app';
-import { toggleMode } from 'actions/settings';
-import { intersperse } from 'utils/array';
-import ComponentMap from 'utils/ComponentMap';
-import type { State } from 'types/state';
-import Modal from './Modal';
-import styles from './KeyboardShortcuts.scss';
+import { DARK_MODE } from "types/settings";
+import themes from "data/themes.json";
+import { cycleTheme, toggleTimetableOrientation } from "actions/theme";
+import { openNotification } from "actions/app";
+import { toggleMode } from "actions/settings";
+import { intersperse } from "utils/array";
+import ComponentMap from "utils/ComponentMap";
+import type { State } from "types/state";
+import Modal from "./Modal";
+import styles from "./KeyboardShortcuts.scss";
 
-type Section = 'Appearance' | 'Navigation' | 'Timetable';
-const APPEARANCE: Section = 'Appearance';
-const NAVIGATION: Section = 'Navigation';
-const TIMETABLE: Section = 'Timetable';
+type Section = "Appearance" | "Navigation" | "Timetable";
+const APPEARANCE: Section = "Appearance";
+const NAVIGATION: Section = "Navigation";
+const TIMETABLE: Section = "Timetable";
 
 type Shortcut = string | string[];
 type KeyBinding = {
@@ -53,11 +53,11 @@ const KeyboardShortcuts: React.FC = () => {
     }
 
     // Timetable shortcuts
-    bind('o', TIMETABLE, 'Switch timetable orientation', () => {
+    bind("o", TIMETABLE, "Switch timetable orientation", () => {
       dispatch(toggleTimetableOrientation());
     });
 
-    bind('d', TIMETABLE, 'Open download timetable menu', () => {
+    bind("d", TIMETABLE, "Open download timetable menu", () => {
       const button = ComponentMap.downloadButton;
       if (button) {
         button.focus();
@@ -66,7 +66,7 @@ const KeyboardShortcuts: React.FC = () => {
     });
 
     // Toggle night mode
-    bind('x', APPEARANCE, 'Toggle Night Mode', () => {
+    bind("x", APPEARANCE, "Toggle Night Mode", () => {
       dispatch(toggleMode());
 
       // We fetch the current mode from the redux store directly, instead of
@@ -74,7 +74,7 @@ const KeyboardShortcuts: React.FC = () => {
       const { mode } = store.getState().settings;
 
       dispatch(
-        openNotification(`Night mode ${mode === DARK_MODE ? 'on' : 'off'}`, {
+        openNotification(`Night mode ${mode === DARK_MODE ? "on" : "off"}`, {
           overwritable: true,
         }),
       );
@@ -97,12 +97,12 @@ const KeyboardShortcuts: React.FC = () => {
       }
     }
 
-    bind('z', APPEARANCE, 'Previous Theme', () => {
+    bind("z", APPEARANCE, "Previous Theme", () => {
       dispatch(cycleTheme(-1));
       notifyThemeChange();
     });
 
-    bind('c', APPEARANCE, 'Next Theme', () => {
+    bind("c", APPEARANCE, "Next Theme", () => {
       dispatch(cycleTheme(1));
       notifyThemeChange();
     });
@@ -114,17 +114,22 @@ const KeyboardShortcuts: React.FC = () => {
   }, [dispatch, helpShown, history, store]);
 
   function renderShortcut(shortcut: Shortcut): React.ReactNode {
-    if (typeof shortcut === 'string') {
+    if (typeof shortcut === "string") {
       const capitalized = shortcut.replace(/\b([a-z])/, (c) => c.toUpperCase());
       return <kbd key={shortcut}>{capitalized}</kbd>;
     }
-    return intersperse(shortcut.map(renderShortcut), ' or ');
+    return intersperse(shortcut.map(renderShortcut), " or ");
   }
 
   const sections = groupBy(shortcuts.current, (shortcut) => shortcut.section);
 
   return (
-    <Modal isOpen={helpShown} onRequestClose={closeModal} className={styles.modal} animate>
+    <Modal
+      isOpen={helpShown}
+      onRequestClose={closeModal}
+      className={styles.modal}
+      animate
+    >
       <h2>Keyboard shortcuts</h2>
 
       <table className="table table-sm">

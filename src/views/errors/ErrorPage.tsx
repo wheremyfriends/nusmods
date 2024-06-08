@@ -1,11 +1,11 @@
-import * as React from 'react';
-import * as Sentry from '@sentry/browser';
-import classnames from 'classnames';
+import * as React from "react";
+import * as Sentry from "@sentry/browser";
+import classnames from "classnames";
 
-import RandomKawaii from 'views/components/RandomKawaii';
-import Title from 'views/components/Title';
-import Online from 'views/components/Online';
-import styles from './ErrorPage.scss';
+import RandomKawaii from "views/components/RandomKawaii";
+import Title from "views/components/Title";
+import Online from "views/components/Online";
+import styles from "./ErrorPage.scss";
 
 type Props = {
   error?: string;
@@ -13,9 +13,13 @@ type Props = {
   showRefresh?: boolean;
 };
 
-const ErrorPage: React.FC<Props> = ({ error, showReportDialog, showRefresh = true }) => {
+const ErrorPage: React.FC<Props> = ({
+  error,
+  showReportDialog,
+  showRefresh = true,
+}) => {
   const errorMessage = () => {
-    let message = 'something went wrong';
+    let message = "something went wrong";
     if (error) message = `${message} - ${error}`;
     return message;
   };
@@ -28,22 +32,22 @@ const ErrorPage: React.FC<Props> = ({ error, showReportDialog, showRefresh = tru
         <RandomKawaii size={100} />
       </div>
 
-      <h1 className={classnames('h3', styles.header)}>
+      <h1 className={classnames("h3", styles.header)}>
         <span className={styles.expr}>Uh oh</span> {errorMessage()}
       </h1>
 
       {showReportDialog && (
         <Online isLive={false}>
           <p>
-            An error report has been made and we will look into this. We would really appreciate it
-            if you could{' '}
+            An error report has been made and we will look into this. We would
+            really appreciate it if you could{" "}
             <button
               type="button"
-              className={classnames('btn btn-link', styles.link)}
+              className={classnames("btn btn-link", styles.link)}
               onClick={() => Sentry.showReportDialog()}
             >
               tell us more about what happened
-            </button>{' '}
+            </button>{" "}
             so we can better fix this.
           </p>
         </Online>

@@ -1,8 +1,11 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 export type Request = VercelRequest;
 export type Response = VercelResponse;
-export type Handler = (req: VercelRequest, res: VercelResponse) => void | Promise<void>;
+export type Handler = (
+  req: VercelRequest,
+  res: VercelResponse,
+) => void | Promise<void>;
 
 export type MethodHandlers = {
   GET?: Handler;
@@ -50,16 +53,19 @@ export const createRouteHandler =
 export const defaultFallback =
   (methodHandlers: MethodHandlers) =>
   async (_req: Request, res: Response): Promise<void> => {
-    const allowedMethods = Object.entries(methodHandlers).reduce((acc, [method, handler]) => {
-      if (handler !== undefined) {
-        if (acc === '') return method;
-        return `${acc}, ${method}`;
-      }
-      return acc;
-    }, '');
-    res.setHeader('Allow', allowedMethods);
+    const allowedMethods = Object.entries(methodHandlers).reduce(
+      (acc, [method, handler]) => {
+        if (handler !== undefined) {
+          if (acc === "") return method;
+          return `${acc}, ${method}`;
+        }
+        return acc;
+      },
+      "",
+    );
+    res.setHeader("Allow", allowedMethods);
     res.status(405).json({
-      message: 'Method not allowed',
+      message: "Method not allowed",
     });
   };
 
@@ -72,14 +78,16 @@ export const defaultRescue =
       console.error(err);
     }
     res.status(500).json({
-      message: 'An unexpected error occurred',
+      message: "An unexpected error occurred",
     });
   };
 
 const getHandlerByMethod = (
   methodHandlers: MethodHandlers,
-  methodName = '',
+  methodName = "",
 ): Handler | undefined => {
-  const entry = Object.entries(methodHandlers).find(([method]) => method === methodName);
+  const entry = Object.entries(methodHandlers).find(
+    ([method]) => method === methodName,
+  );
   return entry !== undefined ? entry[1] : undefined;
 };

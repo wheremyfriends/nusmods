@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { scrollToHash } from 'utils/react';
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { scrollToHash } from "utils/react";
 
 function scrollToTop() {
   window.scrollTo(0, 0);

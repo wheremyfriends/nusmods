@@ -4,20 +4,20 @@
 // This scraper assumes that format and that all public holidays
 // are no longer than a single day.
 
-const fs = require('fs');
-const path = require('path');
-const axios = require('axios');
-const icalendar = require('icalendar');
-const { addDays, format, isSunday } = require('date-fns');
+const fs = require("fs");
+const path = require("path");
+const axios = require("axios");
+const icalendar = require("icalendar");
+const { addDays, format, isSunday } = require("date-fns");
 
 const args = process.argv.slice(2);
 const years = args[0];
 if (!years) {
-  console.error('Please specify the year(s).');
+  console.error("Please specify the year(s).");
   process.exit(1);
 }
 
-const OUT_DIR = path.join(__dirname, 'holidays');
+const OUT_DIR = path.join(__dirname, "holidays");
 if (!fs.existsSync(OUT_DIR)) {
   fs.mkdirSync(OUT_DIR);
 }
@@ -25,7 +25,7 @@ if (!fs.existsSync(OUT_DIR)) {
 async function fetchPublicHolidaysIcs(year) {
   console.log(`Fetching ICS for ${year}...`);
   const URL =
-    'https://www.mom.gov.sg/~/media/mom/documents/employment-practices/' +
+    "https://www.mom.gov.sg/~/media/mom/documents/employment-practices/" +
     `public-holidays/public-holidays-sg-${year}.ics`;
   const res = await axios.get(URL);
   console.log(`Fetched ICS for ${year}...`);
@@ -33,7 +33,7 @@ async function fetchPublicHolidaysIcs(year) {
 }
 
 years
-  .split(',')
+  .split(",")
   .map((s) => s.trim())
   .forEach((year) => {
     fetchPublicHolidaysIcs(year)
@@ -43,14 +43,14 @@ years
         const calendarEvents = ical
           .events()
           .map((event) => ({
-            date: new Date(event.getPropertyValue('DTSTART').valueOf()),
-            name: event.getPropertyValue('SUMMARY'),
+            date: new Date(event.getPropertyValue("DTSTART").valueOf()),
+            name: event.getPropertyValue("SUMMARY"),
           }))
           // Order not guaranteed. Have to sort (in ascending order).
           .sort((a, b) => a.date - b.date);
 
         const data = [];
-        const DATE_FORMAT = 'yyyy-MM-dd';
+        const DATE_FORMAT = "yyyy-MM-dd";
         for (let i = 0; i < calendarEvents.length; i++) {
           const event = calendarEvents[i];
           const { name, date } = event;
@@ -63,27 +63,42 @@ years
           if (
             isSunday(date) &&
             i < calendarEvents.length &&
-            calendarEvents[i + 1].name !== 'Chinese New Year'
+            calendarEvents[i + 1].name !== "Chinese New Year"
           ) {
             actualDay = false;
           }
           data.push({
             date: format(date, DATE_FORMAT),
             name,
-            day: format(date, 'EEEE'), // The day in text, e.g. Monday.
-            observance: format(addDays(date, actualDay ? 0 : 1, 'day'), DATE_FORMAT),
-            observance_strategy: actualDay ? 'actual_day' : 'next_monday',
+            day: format(date, "EEEE"), // The day in text, e.g. Monday.
+            observance: format(
+              addDays(date, actualDay ? 0 : 1, "day"),
+              DATE_FORMAT,
+            ),
+            observance_strategy: actualDay ? "actual_day" : "next_monday",
           });
         }
 
-        const HEADERS = ['Date', 'Name', 'Day', 'Observance', 'Observance Strategy'];
+        const HEADERS = [
+          "Date",
+          "Name",
+          "Day",
+          "Observance",
+          "Observance Strategy",
+        ];
         const rows = [HEADERS];
         data.forEach((row) => {
-          rows.push([row.date, row.name, row.day, row.observance, row.observance_strategy]);
+          rows.push([
+            row.date,
+            row.name,
+            row.day,
+            row.observance,
+            row.observance_strategy,
+          ]);
         });
         const outPath = path.join(OUT_DIR, `${year}_singapore_holidays.csv`);
         console.log(`Writing holidays CSV for ${year} to ${outPath}`);
-        fs.writeFileSync(outPath, `${rows.join('\n')}\n`);
+        fs.writeFileSync(outPath, `${rows.join("\n")}\n`);
       })
       .catch((err) => {
         console.error(err);

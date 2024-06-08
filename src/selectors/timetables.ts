@@ -1,11 +1,11 @@
-import { createSelector } from 'reselect';
+import { createSelector } from "reselect";
 
-import type { ModuleCode, Semester, UserID } from 'types/modules';
-import type { State } from 'types/state';
+import type { ModuleCode, Semester, UserID } from "types/modules";
+import type { State } from "types/state";
 
-import { fetchArchiveRequest } from 'actions/constants';
-import config from 'config';
-import { isOngoing, isSuccess } from 'selectors/requests';
+import { fetchArchiveRequest } from "actions/constants";
+import config from "config";
+import { isOngoing, isSuccess } from "selectors/requests";
 
 export function isArchiveLoading(state: State, moduleCode: ModuleCode) {
   return config.archiveYears.some((year) =>
@@ -13,7 +13,10 @@ export function isArchiveLoading(state: State, moduleCode: ModuleCode) {
   );
 }
 
-export function availableArchive(state: State, moduleCode: ModuleCode): string[] {
+export function availableArchive(
+  state: State,
+  moduleCode: ModuleCode,
+): string[] {
   return config.archiveYears.filter((year) =>
     isSuccess(state, fetchArchiveRequest(moduleCode, year)),
   );
@@ -27,7 +30,9 @@ const EMPTY_OBJECT = {};
 export const getSemesterTimetableMultiLessons = createSelector(
   ({ timetables }: State) => timetables.multiUserLessons,
   (multiUserLessons) => (userID: UserID, semester: Semester | null) =>
-    semester === null ? EMPTY_OBJECT : multiUserLessons?.[userID]?.[semester] ?? EMPTY_OBJECT,
+    semester === null
+      ? EMPTY_OBJECT
+      : multiUserLessons?.[userID]?.[semester] ?? EMPTY_OBJECT,
 );
 
 /**

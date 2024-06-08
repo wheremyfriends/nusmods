@@ -10,13 +10,13 @@
 
 const excludedFromFreeRooms = new Set<string>([
   // Dept Meeting Room (CNM) - Requested by Dept Staff to Delist from Free Rooms
-  'AS6-0333',
+  "AS6-0333",
   // Play Room (CNM) - Requested by Dept Staff to Delist from Free Rooms
-  'AS6-0338',
+  "AS6-0338",
   // Metaverse Foundry (SoC)
-  'COM3-B1-11',
+  "COM3-B1-11",
   // Makers@SoC (SoC)
-  'COM3-01-19',
+  "COM3-01-19",
 ]);
 
 export default excludedFromFreeRooms;

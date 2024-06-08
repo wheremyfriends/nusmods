@@ -1,10 +1,10 @@
-import { useMemo } from 'react';
-import { Subscription, useSubscription } from 'use-subscription';
-import json2mq from 'json2mq';
-import type { MediaQuery } from 'types/views';
+import { useMemo } from "react";
+import { Subscription, useSubscription } from "use-subscription";
+import json2mq from "json2mq";
+import type { MediaQuery } from "types/views";
 
 export function getMedia(mediaQuery: MediaQuery): string {
-  return typeof mediaQuery === 'string' ? mediaQuery : json2mq(mediaQuery);
+  return typeof mediaQuery === "string" ? mediaQuery : json2mq(mediaQuery);
 }
 
 /**
@@ -20,7 +20,7 @@ export default function useMediaQuery(mediaQuery: MediaQuery) {
       subscribe(callback) {
         const mediaQueryList = window.matchMedia(media);
         if (mediaQueryList.addEventListener) {
-          mediaQueryList.addEventListener('change', callback);
+          mediaQueryList.addEventListener("change", callback);
         } else {
           // To support quirk on Safari versions prior to Safari 14
           // See https://github.com/nusmodifications/nusmods/issues/3029
@@ -28,7 +28,7 @@ export default function useMediaQuery(mediaQuery: MediaQuery) {
         }
         return () => {
           if (mediaQueryList.removeEventListener) {
-            mediaQueryList.removeEventListener('change', callback);
+            mediaQueryList.removeEventListener("change", callback);
           } else {
             mediaQueryList.removeListener(callback);
           }

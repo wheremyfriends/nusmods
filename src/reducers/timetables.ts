@@ -1,13 +1,19 @@
-import { get, omit, values } from 'lodash';
-import produce from 'immer';
-import { createMigrate } from 'redux-persist';
+import { get, omit, values } from "lodash";
+import produce from "immer";
+import { createMigrate } from "redux-persist";
 
-import { PersistConfig } from 'storage/persistReducer';
-import { ModuleCode, Semester } from 'types/modules';
-import { ModuleLessonConfig, SemTimetableConfig, SemTimetableMultiConfig, TimetableConfig, TimetableMultiConfig } from 'types/timetables';
-import { ColorMapping, TimetablesState } from 'types/reducers';
+import { PersistConfig } from "storage/persistReducer";
+import { ModuleCode, Semester } from "types/modules";
+import {
+  ModuleLessonConfig,
+  SemTimetableConfig,
+  SemTimetableMultiConfig,
+  TimetableConfig,
+  TimetableMultiConfig,
+} from "types/timetables";
+import { ColorMapping, TimetablesState } from "types/reducers";
 
-import config from 'config';
+import config from "config";
 import {
   ADD_MODULE,
   CHANGE_LESSON,
@@ -25,11 +31,11 @@ import {
   ADD_SELECTED_MODULE,
   REMOVE_SELECTED_MODULE,
   RESET_ALL_TIMETABLES,
-} from 'actions/timetables';
-import { getNewColor } from 'utils/colors';
-import { SET_EXPORTED_DATA } from 'actions/constants';
-import { Actions } from '../types/actions';
-import { SWITCH_USER } from 'actions/settings';
+} from "actions/timetables";
+import { getNewColor } from "utils/colors";
+import { SET_EXPORTED_DATA } from "actions/constants";
+import { Actions } from "../types/actions";
+import { SWITCH_USER } from "actions/settings";
 
 export const persistConfig = {
   /* eslint-disable no-useless-computed-key */
@@ -62,7 +68,7 @@ export const persistConfig = {
     if (debug) {
       // eslint-disable-next-line no-console
       console.log(
-        'New academic year detected - resetting timetable and adding timetable to archive',
+        "New academic year detected - resetting timetable and adding timetable to archive",
       );
     }
 
@@ -108,7 +114,7 @@ function semTimetable(
   state: SemTimetableConfig = DEFAULT_SEM_TIMETABLE_CONFIG,
   action: Actions,
 ): SemTimetableConfig {
-  const moduleCode = get(action, 'payload.moduleCode');
+  const moduleCode = get(action, "payload.moduleCode");
   if (!moduleCode) return state;
 
   switch (action.type) {
@@ -132,8 +138,11 @@ function semTimetable(
 
 // Map of semester to color mapping
 const DEFAULT_SEM_COLOR_MAP = {};
-function semColors(state: ColorMapping = DEFAULT_SEM_COLOR_MAP, action: Actions): ColorMapping {
-  const moduleCode = get(action, 'payload.moduleCode');
+function semColors(
+  state: ColorMapping = DEFAULT_SEM_COLOR_MAP,
+  action: Actions,
+): ColorMapping {
+  const moduleCode = get(action, "payload.moduleCode");
   if (!moduleCode) return state;
 
   switch (action.type) {
@@ -194,12 +203,15 @@ function timetables(
   // All normal timetable actions should specify their semester
   switch (action.type) {
     case ADD_SELECTED_MODULE: {
-      const { userID, semester, moduleCode, lessonType, classNo } = action.payload;
+      const { userID, semester, moduleCode, lessonType, classNo } =
+        action.payload;
 
-      const oldClassNoArray = state.multiUserLessons[userID]?.[semester]?.[moduleCode]?.[lessonType] || [];
+      const oldClassNoArray =
+        state.multiUserLessons[userID]?.[semester]?.[moduleCode]?.[
+          lessonType
+        ] || [];
       // Prevent duplicates
-      if (oldClassNoArray.includes(classNo))
-        return state;
+      if (oldClassNoArray.includes(classNo)) return state;
 
       return {
         ...state,
@@ -211,16 +223,17 @@ function timetables(
               ...state.multiUserLessons[userID]?.[semester],
               [moduleCode]: {
                 ...state.multiUserLessons[userID]?.[semester]?.[moduleCode],
-                [lessonType]: [...oldClassNoArray, classNo]
-              }
-            }
-          }
-        }
+                [lessonType]: [...oldClassNoArray, classNo],
+              },
+            },
+          },
+        },
       };
     }
 
     case REMOVE_SELECTED_MODULE: {
-      const { userID, semester, moduleCode, lessonType, classNo } = action.payload;
+      const { userID, semester, moduleCode, lessonType, classNo } =
+        action.payload;
 
       return {
         ...state,
@@ -232,37 +245,40 @@ function timetables(
               ...state.multiUserLessons[userID]?.[semester],
               [moduleCode]: {
                 ...state.multiUserLessons[userID]?.[semester]?.[moduleCode],
-                [lessonType]: (state.multiUserLessons[userID]?.[semester]?.[moduleCode]?.[lessonType] || [])
-                  .filter(e => e !== classNo)
-              }
-            }
-          }
-        }
+                [lessonType]: (
+                  state.multiUserLessons[userID]?.[semester]?.[moduleCode]?.[
+                    lessonType
+                  ] || []
+                ).filter((e) => e !== classNo),
+              },
+            },
+          },
+        },
       };
     }
 
-    case EDIT_LESSON:
-      {
-        const { semester } = action.payload;
-        const { moduleCode, lessonType, classNo } = action.payload.lesson;
+    case EDIT_LESSON: {
+      const { semester } = action.payload;
+      const { moduleCode, lessonType, classNo } = action.payload.lesson;
 
-        return {
-          ...state,
-          editingType: {
-            moduleCode: moduleCode,
-            lessonType: lessonType,
-          },
-        };
-      }
+      return {
+        ...state,
+        editingType: {
+          moduleCode: moduleCode,
+          lessonType: lessonType,
+        },
+      };
+    }
     case SWITCH_USER:
     case CANCEL_EDIT_LESSON:
       return {
         ...state,
         editingType: null,
-      }
+      };
 
     case SET_TIMETABLE: {
-      const { userID, semester, timetable, colors, hiddenModules } = action.payload;
+      const { userID, semester, timetable, colors, hiddenModules } =
+        action.payload;
 
       return produce(state, (draft) => {
         draft.colors[semester] = colors || {};
@@ -296,21 +312,26 @@ function timetables(
       const { userID, semester, moduleCode } = action.payload;
       return produce(state, (draft) => {
         draft.colors[semester] = semColors(state.colors[semester], action);
-        draft.multiUserHidden[userID] = { [semester]: [] }
+        draft.multiUserHidden[userID] = { [semester]: [] };
       });
     }
-    case REMOVE_MODULE:
-      {
-        const { userID, semester, moduleCode } = action.payload;
-        return produce(state, (draft) => {
-          // Exit edit mode if editing module is removed
-          if (moduleCode == state.editingType?.moduleCode)
-            draft.editingType = null;
-          draft.multiUserLessons[userID][semester] = omit(draft.multiUserLessons[userID][semester], moduleCode);
-          draft.colors[semester] = semColors(state.colors[semester], action);
-          draft.multiUserHidden[userID][semester] = semHiddenModules(state.multiUserHidden[userID][semester], action);
-        });
-      }
+    case REMOVE_MODULE: {
+      const { userID, semester, moduleCode } = action.payload;
+      return produce(state, (draft) => {
+        // Exit edit mode if editing module is removed
+        if (moduleCode == state.editingType?.moduleCode)
+          draft.editingType = null;
+        draft.multiUserLessons[userID][semester] = omit(
+          draft.multiUserLessons[userID][semester],
+          moduleCode,
+        );
+        draft.colors[semester] = semColors(state.colors[semester], action);
+        draft.multiUserHidden[userID][semester] = semHiddenModules(
+          state.multiUserHidden[userID][semester],
+          action,
+        );
+      });
+    }
 
     case SELECT_MODULE_COLOR: {
       const { semester, moduleCode } = action.payload;
@@ -323,7 +344,10 @@ function timetables(
     case SHOW_LESSON_IN_TIMETABLE: {
       const { userID, semester, moduleCode } = action.payload;
       return produce(state, (draft) => {
-        draft.multiUserHidden[userID][semester] = semHiddenModules(state.multiUserHidden[userID][semester], action);
+        draft.multiUserHidden[userID][semester] = semHiddenModules(
+          state.multiUserHidden[userID][semester],
+          action,
+        );
       });
     }
 
@@ -350,4 +374,3 @@ function timetables(
 }
 
 export default timetables;
-

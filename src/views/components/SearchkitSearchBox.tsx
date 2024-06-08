@@ -3,21 +3,25 @@ import {
   SearchkitComponent,
   SearchkitComponentProps,
   SearchOptions,
-} from 'searchkit';
-import classnames from 'classnames';
+} from "searchkit";
+import classnames from "classnames";
 
-import elements from 'views/elements';
-import SearchBox from 'views/components/SearchBox';
-import styles from './SearchkitSearchBox.scss';
+import elements from "views/elements";
+import SearchBox from "views/components/SearchBox";
+import styles from "./SearchkitSearchBox.scss";
 
 // The default URL query string key used for the search term
-const DEFAULT_SEARCH_QUERY_KEY = 'q';
+const DEFAULT_SEARCH_QUERY_KEY = "q";
 
 // This should be SearchBoxProps from https://github.com/searchkit/searchkit/blob/016c899c97f72ea3ad5afc017345e41c9003172a/packages/searchkit/src/components/search/search-box/SearchBox.tsx
 type SearchBoxProps = SearchkitComponentProps &
   Pick<
     SearchOptions,
-    'queryFields' | 'queryBuilder' | 'queryOptions' | 'prefixQueryFields' | 'prefixQueryOptions'
+    | "queryFields"
+    | "queryBuilder"
+    | "queryOptions"
+    | "prefixQueryFields"
+    | "prefixQueryOptions"
   > & {
     id?: string;
     placeholder?: string;
@@ -35,7 +39,10 @@ type State = {
  * A Searchkit wrapper around our SearchBox.
  * @see Adapted from [Searchkit's SearchBox component](https://github.com/searchkit/searchkit/blob/016c899c97f72ea3ad5afc017345e41c9003172a/packages/searchkit/src/components/search/search-box/SearchBox.tsx).
  */
-export default class SearchkitSearchBox extends SearchkitComponent<Props, State> {
+export default class SearchkitSearchBox extends SearchkitComponent<
+  Props,
+  State
+> {
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -48,12 +55,18 @@ export default class SearchkitSearchBox extends SearchkitComponent<Props, State>
   }
 
   override defineAccessor() {
-    const { id, prefixQueryFields, queryFields, queryBuilder, queryOptions, prefixQueryOptions } =
-      this.props;
+    const {
+      id,
+      prefixQueryFields,
+      queryFields,
+      queryBuilder,
+      queryOptions,
+      prefixQueryOptions,
+    } = this.props;
     return new QueryAccessor(id || DEFAULT_SEARCH_QUERY_KEY, {
       prefixQueryFields,
       prefixQueryOptions: { ...prefixQueryOptions },
-      queryFields: queryFields || ['_all'],
+      queryFields: queryFields || ["_all"],
       queryOptions: { ...queryOptions },
       queryBuilder,
       onQueryStateChange: () => {
@@ -66,14 +79,14 @@ export default class SearchkitSearchBox extends SearchkitComponent<Props, State>
 
   getValue() {
     const { input } = this.state;
-    if (typeof input === 'undefined') {
+    if (typeof input === "undefined") {
       return this.getAccessorValue();
     }
     return input;
   }
 
   getAccessorValue() {
-    return (this.queryAccessor().state.getValue() || '').toString();
+    return (this.queryAccessor().state.getValue() || "").toString();
   }
 
   handleQueryChange = (searchString: string) => {

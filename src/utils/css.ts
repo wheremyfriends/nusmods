@@ -1,4 +1,4 @@
-import type { QueryObject } from 'json2mq';
+import type { QueryObject } from "json2mq";
 
 // NOTE: Keep in sync with Bootstrap's breakpoints.
 // Breakpoints at time of writing: https://getbootstrap.com/docs/4.5/layout/overview/
@@ -29,10 +29,10 @@ export function breakpointUp(size: Breakpoint) {
 }
 
 export function touchScreenOnly() {
-  return { pointer: 'coarse' } satisfies QueryObject;
+  return { pointer: "coarse" } satisfies QueryObject;
 }
 
 export function supportsCSSVariables() {
   // Safari does not support supports('--var', 'red')
-  return CSS.supports && CSS.supports('(--var: red)');
+  return CSS.supports && CSS.supports("(--var: red)");
 }

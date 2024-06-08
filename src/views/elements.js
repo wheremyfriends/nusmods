@@ -4,18 +4,18 @@
 
 const elements = {
   // Global
-  timetable: 'timetable',
-  lessons: 'timetable-cell',
+  timetable: "timetable",
+  lessons: "timetable-cell",
 
   // Timetable page
-  addModuleInput: 'add-module-input',
-  moduleTable: 'module-table',
-  examCalendar: 'exam-calendar',
-  examCalendarBtn: 'exam-calendar-btn',
+  addModuleInput: "add-module-input",
+  moduleTable: "module-table",
+  examCalendar: "exam-calendar",
+  examCalendarBtn: "exam-calendar-btn",
 
   // Module finder
-  moduleFinderSearchBox: 'module-finder-input',
-  moduleResultItem: 'module-result-item',
+  moduleFinderSearchBox: "module-finder-input",
+  moduleResultItem: "module-result-item",
 };
 
 module.exports = elements;

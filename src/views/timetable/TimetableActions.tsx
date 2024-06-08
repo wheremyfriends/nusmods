@@ -1,18 +1,18 @@
-import * as React from 'react';
-import classnames from 'classnames';
-import { connect } from 'react-redux';
+import * as React from "react";
+import classnames from "classnames";
+import { connect } from "react-redux";
 
-import { Calendar, Grid, Sidebar, Type } from 'react-feather';
-import { toggleTimetableOrientation, toggleTitleDisplay } from 'actions/theme';
-import { ModuleCode, Semester } from 'types/modules';
-import { SemTimetableConfig, SemTimetableMultiConfig } from 'types/timetables';
+import { Calendar, Grid, Sidebar, Type } from "react-feather";
+import { toggleTimetableOrientation, toggleTitleDisplay } from "actions/theme";
+import { ModuleCode, Semester } from "types/modules";
+import { SemTimetableConfig, SemTimetableMultiConfig } from "types/timetables";
 
-import elements from 'views/elements';
-import config from 'config';
-import ResetTimetable from './ResetTimetable';
-import ShareTimetable from './ShareTimetable';
+import elements from "views/elements";
+import config from "config";
+import ResetTimetable from "./ResetTimetable";
+import ShareTimetable from "./ShareTimetable";
 
-import styles from './TimetableActions.scss';
+import styles from "./TimetableActions.scss";
 
 type Props = {
   semester: Semester;
@@ -38,32 +38,42 @@ const TimetableActions: React.FC<Props> = (props) => (
     role="toolbar"
     aria-label="Timetable utilities"
   >
-    <div className={styles.buttonGroup} role="group" aria-label="Timetable manipulation">
+    <div
+      className={styles.buttonGroup}
+      role="group"
+      aria-label="Timetable manipulation"
+    >
       <button
         type="button"
-        className={classnames('btn btn-outline-primary btn-svg')}
+        className={classnames("btn btn-outline-primary btn-svg")}
         onClick={props.toggleTimetableOrientation}
         disabled={props.showExamCalendar}
       >
         <Sidebar className={styles.sidebarIcon} />
-        {props.isVerticalOrientation ? 'Horizontal Mode' : 'Vertical Mode'}
+        {props.isVerticalOrientation ? "Horizontal Mode" : "Vertical Mode"}
       </button>
 
       {!props.isVerticalOrientation && (
         <button
           type="button"
-          className={classnames(styles.titleBtn, 'btn-outline-primary btn btn-svg')}
+          className={classnames(
+            styles.titleBtn,
+            "btn-outline-primary btn btn-svg",
+          )}
           onClick={props.toggleTitleDisplay}
           disabled={props.showExamCalendar}
         >
           <Type className={styles.titleIcon} />
-          {props.showTitle ? 'Hide Titles' : 'Show Titles'}
+          {props.showTitle ? "Hide Titles" : "Show Titles"}
         </button>
       )}
-
     </div>
 
-    <div className={styles.buttonGroup} role="group" aria-label="Timetable exporting">
+    <div
+      className={styles.buttonGroup}
+      role="group"
+      aria-label="Timetable exporting"
+    >
       <ResetTimetable resetTimetable={props.resetTimetable} />
     </div>
   </div>

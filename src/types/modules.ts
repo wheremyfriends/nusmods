@@ -36,42 +36,48 @@ export type PrereqTree =
 
 // Auxiliary data types
 export type Day =
-  | 'Monday'
-  | 'Tuesday'
-  | 'Wednesday'
-  | 'Thursday'
-  | 'Friday'
-  | 'Saturday'
-  | 'Sunday';
+  | "Monday"
+  | "Tuesday"
+  | "Wednesday"
+  | "Thursday"
+  | "Friday"
+  | "Saturday"
+  | "Sunday";
 
 export const WorkingDays: readonly Day[] = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
 ];
 
-export const DaysOfWeek: readonly Day[] = [...WorkingDays, 'Sunday'];
+export const DaysOfWeek: readonly Day[] = [...WorkingDays, "Sunday"];
 
 export const Semesters: readonly Semester[] = [1, 2, 3, 4];
 
-export type WorkloadComponent = 'Lecture' | 'Tutorial' | 'Laboratory' | 'Project' | 'Preparation';
+export type WorkloadComponent =
+  | "Lecture"
+  | "Tutorial"
+  | "Laboratory"
+  | "Project"
+  | "Preparation";
 
 // Workload components as defined by CORS, in their correct positions (see below).
 export const WORKLOAD_COMPONENTS: WorkloadComponent[] = [
-  'Lecture',
-  'Tutorial',
-  'Laboratory',
-  'Project',
-  'Preparation',
+  "Lecture",
+  "Tutorial",
+  "Laboratory",
+  "Project",
+  "Preparation",
 ];
 
 /**
  * Typesafe helper functions for consuming Weeks
  */
-export const isWeekRange = (week: Weeks): week is WeekRange => !Array.isArray(week);
+export const isWeekRange = (week: Weeks): week is WeekRange =>
+  !Array.isArray(week);
 
 export const consumeWeeks = <T = void>(
   weeks: Weeks,
@@ -112,15 +118,15 @@ type AttributeMap = {
 export type NUSModuleAttributes = Partial<AttributeMap>;
 
 export const attributeDescription: { [key in keyof AttributeMap]: string } = {
-  year: 'Year long course',
-  su: 'Has S/U option for Undergraduate students only',
-  grsu: 'Has S/U option for relevant Graduate (Research) students only',
-  ssgf: 'SkillsFuture funded',
-  sfs: 'SkillsFuture series',
-  lab: 'Lab based course',
-  ism: 'Independent study course',
-  urop: 'Undergraduate Research Opportunities Program',
-  fyp: 'Honours / Final Year Project',
+  year: "Year long course",
+  su: "Has S/U option for Undergraduate students only",
+  grsu: "Has S/U option for relevant Graduate (Research) students only",
+  ssgf: "SkillsFuture funded",
+  sfs: "SkillsFuture series",
+  lab: "Lab based course",
+  ism: "Independent study course",
+  urop: "Undergraduate Research Opportunities Program",
+  fyp: "Honours / Final Year Project",
   mpes1: "Included in Semester 1's Course Planning Exercise",
   mpes2: "Included in Semester 2's Course Planning Exercise",
 };

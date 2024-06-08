@@ -1,4 +1,4 @@
-@import '~styles/utils/modules-entry';
+@import "~styles/utils/modules-entry";
 
 $header-margin-top: 1rem;
 $animation-duration: 0.3s;
@@ -65,7 +65,9 @@ $offset-top: $navbar-height + 1rem;
 
     // Entry/exit animation
     transform: translateY($closed-menu-translation);
-    transition: transform $animation-duration, box-shadow $animation-duration;
+    transition:
+      transform $animation-duration,
+      box-shadow $animation-duration;
     &.isOpen {
       box-shadow: 0 -10px 20px var(--navtab-shadow);
       transform: translateY(0);

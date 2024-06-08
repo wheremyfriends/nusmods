@@ -1,4 +1,4 @@
-import { flatMap } from 'lodash';
+import { flatMap } from "lodash";
 
 /**
  * Mixes the delimiter into the array between each element
@@ -11,7 +11,11 @@ export function intersperse<T, U>(array: T[], delimiter: U): (T | U)[] {
   return flatMap(array, (item): (T | U)[] => [item, delimiter]).slice(0, -1);
 }
 
-export function takeUntil<T>(array: T[], max: number, predicate: (t: T) => boolean): T[] {
+export function takeUntil<T>(
+  array: T[],
+  max: number,
+  predicate: (t: T) => boolean,
+): T[] {
   const filtered = [];
 
   for (let i = 0; i < array.length && filtered.length < max; i++) {
@@ -33,7 +37,7 @@ export function firstNonNull<T>(producers: (() => T | null)[]): T | null {
 export function deltas(numbers: readonly number[]): number[] {
   const result: number[] = [];
   let previous = numbers[0];
-  if (typeof previous !== 'number') return result;
+  if (typeof previous !== "number") return result;
 
   numbers.slice(1).forEach((element) => {
     result.push(element - previous);

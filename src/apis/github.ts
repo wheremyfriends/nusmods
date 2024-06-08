@@ -1,8 +1,8 @@
-import axios from 'axios';
-import qs from 'query-string';
-import { preferRepoVenues } from 'utils/debug';
-import { Contributor } from 'types/contributor';
-import { VenueLocationMap } from 'types/venues';
+import axios from "axios";
+import qs from "query-string";
+import { preferRepoVenues } from "utils/debug";
+import { Contributor } from "types/contributor";
+import { VenueLocationMap } from "types/venues";
 
 // We proxy https://api.github.com/repos/nusmodifications/nusmods -> https://github.nusmods.com/repo
 // This allows us to cache the response to stop 403 rate limit error caused by the
@@ -10,7 +10,7 @@ import { VenueLocationMap } from 'types/venues';
 
 // As of https://github.com/nusmodifications/nusmods/pull/3655, we will directly use https://api.github.com
 // until https://github.nusmods.com behaviour is separately restored
-const baseUrl = 'https://api.github.com/repos/nusmodifications/nusmods';
+const baseUrl = "https://api.github.com/repos/nusmodifications/nusmods";
 
 const ignoredContributors = new Set([
   // Renovate used to report outdated dependencies as a user via the GitHub API,
@@ -31,7 +31,9 @@ export function getContributors(): Promise<Contributor[]> {
     .get<Contributor[]>(url)
     .then((response) =>
       response.data.filter(
-        (contributor) => contributor.type === 'User' && !ignoredContributors.has(contributor.id),
+        (contributor) =>
+          contributor.type === "User" &&
+          !ignoredContributors.has(contributor.id),
       ),
     );
 }
@@ -43,7 +45,7 @@ let memoizedVenuePromise: Promise<VenueLocationMap> | null = null;
  */
 export function getVenueLocations(): Promise<VenueLocationMap> {
   if (preferRepoVenues()) {
-    return import(/* webpackChunkName: "venueData" */ 'data/venues').then(
+    return import(/* webpackChunkName: "venueData" */ "data/venues").then(
       (module) => module.default,
     );
   }
@@ -57,7 +59,9 @@ export function getVenueLocations(): Promise<VenueLocationMap> {
     .then((response) => response.data)
     .catch(() =>
       // Fall back to loading the bundled version if the venues cannot be fetched
-      import(/* webpackChunkName: "venueData" */ 'data/venues').then((module) => module.default),
+      import(/* webpackChunkName: "venueData" */ "data/venues").then(
+        (module) => module.default,
+      ),
     );
 
   memoizedVenuePromise = promise;

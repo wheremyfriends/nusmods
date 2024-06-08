@@ -1,7 +1,7 @@
-import { mount } from 'enzyme';
-import { SearchkitManager } from 'searchkit';
+import { mount } from "enzyme";
+import { SearchkitManager } from "searchkit";
 
-import CheckboxItemFilter from './CheckboxItemFilter';
+import CheckboxItemFilter from "./CheckboxItemFilter";
 
 describe(CheckboxItemFilter, () => {
   let mockSearchkit: SearchkitManager;
@@ -10,7 +10,7 @@ describe(CheckboxItemFilter, () => {
     mockSearchkit = SearchkitManager.mock();
   });
 
-  it('renders', () => {
+  it("renders", () => {
     const wrapper = mount(
       <CheckboxItemFilter
         searchkit={mockSearchkit}
@@ -27,7 +27,7 @@ describe(CheckboxItemFilter, () => {
 
     const checkboxInputs = wrapper.find('input[type="checkbox"]');
     expect(checkboxInputs).toHaveLength(1);
-    expect(checkboxInputs.at(0).prop('checked')).toBeFalsy();
-    expect(wrapper.text()).toMatch('Test Checkbox');
+    expect(checkboxInputs.at(0).prop("checked")).toBeFalsy();
+    expect(wrapper.text()).toMatch("Test Checkbox");
   });
 });

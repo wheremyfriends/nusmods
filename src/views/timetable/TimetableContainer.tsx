@@ -1,17 +1,20 @@
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Redirect, useHistory, useLocation, useParams } from 'react-router-dom';
-import { Repeat } from 'react-feather';
-import classnames from 'classnames';
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Redirect, useHistory, useLocation, useParams } from "react-router-dom";
+import { Repeat } from "react-feather";
+import classnames from "classnames";
 
-import type { ModuleCode, Semester } from 'types/modules';
-import type { ColorMapping } from 'types/reducers';
-import type { State } from 'types/state';
-import type { LessonChange, SemTimetableConfig } from 'types/timetables';
+import type { ModuleCode, Semester } from "types/modules";
+import type { ColorMapping } from "types/reducers";
+import type { State } from "types/state";
+import type { LessonChange, SemTimetableConfig } from "types/timetables";
 
-import Navtabs from 'views/layout/Navtabs';
-import { selectSemester } from 'actions/settings';
-import { getSemesterTimetableColors, getSemesterTimetableMultiLessons } from 'selectors/timetables';
+import Navtabs from "views/layout/Navtabs";
+import { selectSemester } from "actions/settings";
+import {
+  getSemesterTimetableColors,
+  getSemesterTimetableMultiLessons,
+} from "selectors/timetables";
 import {
   addModule,
   cancelEditLesson,
@@ -20,25 +23,30 @@ import {
   resetAllTimetables,
   resetTimetable,
   selectLesson,
-} from 'actions/timetables';
-import { openNotification } from 'actions/app';
-import { undo } from 'actions/undoHistory';
-import { getModuleCondensed } from 'selectors/moduleBank';
-import { fillColorMapping } from 'utils/colors';
-import { generateRoomID, semesterForTimetablePage, TIMETABLE_SHARE, timetablePage, pageWithRoomID } from 'views/routes/paths';
-import deferComponentRender from 'views/hocs/deferComponentRender';
-import SemesterSwitcher from 'views/components/semester-switcher/SemesterSwitcher';
-import LoadingSpinner from 'views/components/LoadingSpinner';
-import useScrollToTop from 'views/hooks/useScrollToTop';
-import TimetableContent, { apolloClient } from './TimetableContent';
+} from "actions/timetables";
+import { openNotification } from "actions/app";
+import { undo } from "actions/undoHistory";
+import { getModuleCondensed } from "selectors/moduleBank";
+import { fillColorMapping } from "utils/colors";
+import {
+  generateRoomID,
+  semesterForTimetablePage,
+  TIMETABLE_SHARE,
+  timetablePage,
+  pageWithRoomID,
+} from "views/routes/paths";
+import deferComponentRender from "views/hocs/deferComponentRender";
+import SemesterSwitcher from "views/components/semester-switcher/SemesterSwitcher";
+import LoadingSpinner from "views/components/LoadingSpinner";
+import useScrollToTop from "views/hooks/useScrollToTop";
+import TimetableContent, { apolloClient } from "./TimetableContent";
 
-import styles from './TimetableContainer.scss';
-import { gql } from '@apollo/client';
-import { Action } from 'actions/constants';
-import store from 'entry/main';
-import _ from 'lodash';
-import config from 'config';
-
+import styles from "./TimetableContainer.scss";
+import { gql } from "@apollo/client";
+import { Action } from "actions/constants";
+import store from "entry/main";
+import _ from "lodash";
+import config from "config";
 
 export const LESSON_CHANGE_SUBSCRIPTION = gql`
   subscription LessonChange($roomID: String!) {
@@ -51,7 +59,7 @@ export const LESSON_CHANGE_SUBSCRIPTION = gql`
       classNo
     }
   }
-  `;
+`;
 
 type Params = {
   roomID: string;
@@ -62,13 +70,18 @@ function handleLessonChange(lessonChange: LessonChange) {
   // TODO: Check if request is intended for correct user via name
   const state = store.getState();
   const dispatch = store.dispatch;
-  const { action, userID, semester, moduleCode, lessonType, classNo } = lessonChange;
+  const { action, userID, semester, moduleCode, lessonType, classNo } =
+    lessonChange;
 
   switch (action) {
     case Action.CREATE_LESSON: {
       // Presence of moduleCode should guarantee module is being/already added
       // Prevents multiple adding
-      if (_.isEmpty(state.timetables.multiUserLessons[userID]?.[semester]?.[moduleCode])) {
+      if (
+        _.isEmpty(
+          state.timetables.multiUserLessons[userID]?.[semester]?.[moduleCode],
+        )
+      ) {
         dispatch(addModule(userID, semester, moduleCode)); // TODO: define typed dispatch
       }
 
@@ -77,9 +90,10 @@ function handleLessonChange(lessonChange: LessonChange) {
     }
 
     case Action.DELETE_LESSON: {
-      dispatch(deselectLesson(userID, semester, moduleCode, lessonType, classNo));
+      dispatch(
+        deselectLesson(userID, semester, moduleCode, lessonType, classNo),
+      );
       return;
-
     }
     case Action.DELETE_MODULE: {
       dispatch(removeModule(userID, semester, moduleCode));
@@ -93,7 +107,6 @@ function handleLessonChange(lessonChange: LessonChange) {
       return;
   }
 }
-
 
 const TimetableHeader: FC<{
   semester: Semester;
@@ -136,7 +149,10 @@ export const TimetableContainerComponent: FC = () => {
   const userID = useSelector(({ app }: State) => app.activeUserID);
   const roomID = params.roomID;
 
-  const multiTimetable = useSelector(getSemesterTimetableMultiLessons)(userID, semester);
+  const multiTimetable = useSelector(getSemesterTimetableMultiLessons)(
+    userID,
+    semester,
+  );
   const colors = useSelector(getSemesterTimetableColors)(semester);
   const getModule = useSelector(getModuleCondensed);
   const modules = useSelector(({ moduleBank }: State) => moduleBank.modules);
@@ -145,13 +161,12 @@ export const TimetableContainerComponent: FC = () => {
 
   const dispatch = useDispatch();
 
-  // Resubscribe if roomID changes 
+  // Resubscribe if roomID changes
   // TODO: Unsubscribe
   useEffect(() => {
     // TODO: states should not even be saved in the first place
     dispatch(cancelEditLesson());
     dispatch(resetAllTimetables());
-
 
     apolloClient
       .subscribe({
@@ -169,9 +184,8 @@ export const TimetableContainerComponent: FC = () => {
         error(error) {
           console.log("Apollo subscribe error", error);
         },
-        complete() {
-        },
-      })
+        complete() {},
+      });
   }, [roomID]);
 
   // Not needed as modules are fetched on demand

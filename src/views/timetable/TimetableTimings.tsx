@@ -1,8 +1,8 @@
-import * as React from 'react';
-import { range } from 'lodash';
+import * as React from "react";
+import { range } from "lodash";
 
-import { convertIndexToTime } from 'utils/timify';
-import styles from './TimetableTimings.scss';
+import { convertIndexToTime } from "utils/timify";
+import styles from "./TimetableTimings.scss";
 
 type Props = {
   startingIndex: number;

@@ -22,7 +22,7 @@
  * For other events: https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope#Events
  */
 
-self.addEventListener('install', () => {
+self.addEventListener("install", () => {
   /**
    * Force the waiting service worker to become the active service worker.
    * Note: If we're adding functionalities here, do not run `skipWaiting` on install
@@ -34,10 +34,12 @@ self.addEventListener('install', () => {
   self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
+self.addEventListener("activate", (event) => {
   // Remove all the cache
   event.waitUntil(
-    caches.keys().then((keyList) => Promise.all(keyList.map((key) => caches.delete(key)))),
+    caches
+      .keys()
+      .then((keyList) => Promise.all(keyList.map((key) => caches.delete(key)))),
   );
 });
 
@@ -53,13 +55,13 @@ self.addEventListener('activate', (event) => {
  * and introduce a new one. The service worker will need to handle both keys for while,
  * before the old key can be safely removed. If possible, avoid renaming keys at all.
  */
-self.addEventListener('message', (event) => {
+self.addEventListener("message", (event) => {
   if (!event.data) {
     return;
   }
 
   switch (event.data) {
-    case 'skipWaiting':
+    case "skipWaiting":
       // Forces the waiting service worker to become the active service worker.
       self.skipWaiting();
       break;
@@ -76,10 +78,12 @@ self.addEventListener('message', (event) => {
  * we have to wrap everything below in a try/catch block.
  */
 try {
-  self.importScripts('https://browser.sentry-cdn.com/5.5.0/bundle.min.js');
-  Sentry.init({ dsn: 'https://4b4fe71954424fd39ac88a4f889ffe20@sentry.io/213986' });
+  self.importScripts("https://browser.sentry-cdn.com/5.5.0/bundle.min.js");
+  Sentry.init({
+    dsn: "https://4b4fe71954424fd39ac88a4f889ffe20@sentry.io/213986",
+  });
 
-  self.addEventListener('error', (error) => {
+  self.addEventListener("error", (error) => {
     Sentry.captureException(error);
   });
 } catch (error) {

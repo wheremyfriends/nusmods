@@ -1,4 +1,9 @@
-import { History, LocationDescriptorObject, LocationState, createPath } from 'history'; // eslint-disable-line import/no-extraneous-dependencies
+import {
+  History,
+  LocationDescriptorObject,
+  LocationState,
+  createPath,
+} from "history"; // eslint-disable-line import/no-extraneous-dependencies
 
 /**
  * Wrapper around `RouterHistory` that converts `history.push()` to `history.replace()` if
@@ -16,7 +21,10 @@ export default class HistoryDebouncer<HistoryLocationState = LocationState> {
 
   lastPush: number;
 
-  constructor(history: History<HistoryLocationState>, wait: number = 30 * 1000) {
+  constructor(
+    history: History<HistoryLocationState>,
+    wait: number = 30 * 1000,
+  ) {
     this.history = history;
     this.wait = wait;
     this.lastPush = -wait - 1;
@@ -24,7 +32,7 @@ export default class HistoryDebouncer<HistoryLocationState = LocationState> {
 
   push(path: string | LocationDescriptorObject, state?: HistoryLocationState) {
     // Do not navigate if the path object matches
-    const nextPath = typeof path === 'string' ? path : createPath(path);
+    const nextPath = typeof path === "string" ? path : createPath(path);
     if (nextPath === createPath(this.history.location)) return;
 
     if (Date.now() - this.lastPush > this.wait) {
@@ -38,8 +46,8 @@ export default class HistoryDebouncer<HistoryLocationState = LocationState> {
         // Ignore Safari's history.replaceState() rate limit error.
         // See https://github.com/nusmodifications/nusmods/issues/763
         if (
-          e.name === 'SecurityError' &&
-          e.message.includes('Attempt to use history.replaceState()')
+          e.name === "SecurityError" &&
+          e.message.includes("Attempt to use history.replaceState()")
         ) {
           return;
         }

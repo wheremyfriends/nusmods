@@ -1,22 +1,22 @@
-import * as React from 'react';
-import classnames from 'classnames';
-import { isEqual } from 'lodash';
-import { addWeeks, format, parseISO } from 'date-fns';
-import NUSModerator, { AcadWeekInfo } from 'nusmoderator';
+import * as React from "react";
+import classnames from "classnames";
+import { isEqual } from "lodash";
+import { addWeeks, format, parseISO } from "date-fns";
+import NUSModerator, { AcadWeekInfo } from "nusmoderator";
 
-import { consumeWeeks, WeekRange } from 'types/modules';
-import { HoverLesson, ModifiableLesson } from 'types/timetables';
-import { OnHoverCell } from 'types/views';
+import { consumeWeeks, WeekRange } from "types/modules";
+import { HoverLesson, ModifiableLesson } from "types/timetables";
+import { OnHoverCell } from "types/views";
 
 import {
   formatNumericWeeks,
   getHoverLesson,
   getLessonIdentifier,
   LESSON_TYPE_ABBREV,
-} from 'utils/timetables';
-import elements from 'views/elements';
-import Tooltip from 'views/components/Tooltip/Tooltip';
-import styles from './TimetableCell.scss';
+} from "utils/timetables";
+import elements from "views/elements";
+import Tooltip from "views/components/Tooltip/Tooltip";
+import styles from "./TimetableCell.scss";
 
 type Props = {
   showTitle: boolean;
@@ -28,10 +28,10 @@ type Props = {
   transparent: boolean;
 };
 
-const lessonDateFormat = 'MMM dd';
+const lessonDateFormat = "MMM dd";
 
 function formatWeekInfo(weekInfo: AcadWeekInfo) {
-  if (weekInfo.type === 'Instructional') return `Week ${weekInfo.num}`;
+  if (weekInfo.type === "Instructional") return `Week ${weekInfo.num}`;
   return weekInfo.type;
 }
 
@@ -58,14 +58,20 @@ function formatWeekRange(weekRange: WeekRange) {
   const table = (
     <div className={styles.classes}>
       <h5>Classes</h5>
-      <ol className={classnames({ [styles.twoColumn]: weekRange.weeks.length > 6 })}>
+      <ol
+        className={classnames({
+          [styles.twoColumn]: weekRange.weeks.length > 6,
+        })}
+      >
         {weekRange.weeks.map((week) => {
           const date = addWeeks(start, week - 1);
           const weekInfo = NUSModerator.academicCalendar.getAcadWeekInfo(date);
           return (
             <li key={week}>
-              {format(date, lessonDateFormat)}{' '}
-              <span className={styles.weekInfo}>({formatWeekInfo(weekInfo)})</span>
+              {format(date, lessonDateFormat)}{" "}
+              <span className={styles.weekInfo}>
+                ({formatWeekInfo(weekInfo)})
+              </span>
             </li>
           );
         })}
@@ -86,10 +92,13 @@ function formatWeekRange(weekRange: WeekRange) {
  * might explore other representations e.g. grouped lessons
  */
 const TimetableCell: React.FC<Props> = (props) => {
-  const { lesson, showTitle, onClick, onHover, hoverLesson, transparent } = props;
+  const { lesson, showTitle, onClick, onHover, hoverLesson, transparent } =
+    props;
 
-  const moduleName = showTitle ? `${lesson.moduleCode} ${lesson.title}` : lesson.moduleCode;
-  const Cell = props.onClick ? 'button' : 'div';
+  const moduleName = showTitle
+    ? `${lesson.moduleCode} ${lesson.title}`
+    : lesson.moduleCode;
+  const Cell = props.onClick ? "button" : "div";
   const isHoveredOver = isEqual(getHoverLesson(lesson), hoverLesson);
 
   const conditionalProps = onClick
@@ -102,13 +111,19 @@ const TimetableCell: React.FC<Props> = (props) => {
       }
     : {};
 
-  const weekText = consumeWeeks<React.ReactNode>(lesson.weeks, formatNumericWeeks, formatWeekRange);
+  const weekText = consumeWeeks<React.ReactNode>(
+    lesson.weeks,
+    formatNumericWeeks,
+    formatWeekRange,
+  );
 
   const className = classnames(
     styles.baseCell,
     getLessonIdentifier(lesson),
     elements.lessons,
-    transparent ? styles.transparentCell : [styles.coloredCell, `color-${lesson.colorIndex}`],
+    transparent
+      ? styles.transparentCell
+      : [styles.coloredCell, `color-${lesson.colorIndex}`],
     {
       hoverable: !!onClick,
       [styles.clickable]: !!onClick,
@@ -137,7 +152,9 @@ const TimetableCell: React.FC<Props> = (props) => {
         <div>
           {LESSON_TYPE_ABBREV[lesson.lessonType]} [{lesson.classNo}]
         </div>
-        <div>{lesson.venue.startsWith('E-Learn') ? 'E-Learning' : lesson.venue}</div>
+        <div>
+          {lesson.venue.startsWith("E-Learn") ? "E-Learning" : lesson.venue}
+        </div>
         {weekText && <div>{weekText}</div>}
       </div>
     </Cell>

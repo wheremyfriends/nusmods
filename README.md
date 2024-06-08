@@ -87,7 +87,7 @@ Currently CSS variables are used only for colors that change under night mode.
 Prefer SVG when possible. SVG images are usually smaller and more flexible. `.svg` files are loaded using [SVGR][svgr] as React components - this means you can add classnames, inline styles and other SVG attributes to the component loaded. SVGR also automatically optimizes the image.
 
 ```tsx
-import CloudyIcon from 'img/weather/cloudy.svg';
+import CloudyIcon from "img/weather/cloudy.svg";
 
 const cloud = <CloudyIcon className={styles.myIcon} />;
 ```
@@ -95,7 +95,7 @@ const cloud = <CloudyIcon className={styles.myIcon} />;
 PNG, JPEG and GIF files will be loaded using `url-loader` and can be imported as a string representing the URL of the asset after bundling. In production files smaller than 15kb will be converted into data URL
 
 ```tsx
-import partyParrot from 'img/gif/partyparrot.gif';
+import partyParrot from "img/gif/partyparrot.gif";
 
 const danceParty = <img src={partyParrot} alt=":partyparrot:" />;
 ```
@@ -103,9 +103,9 @@ const danceParty = <img src={partyParrot} alt=":partyparrot:" />;
 To load SVG as files using `url-loader` instead, add the `?url` resource query to the end of the path.
 
 ```ts
-import { Icon } from 'leaflet';
+import { Icon } from "leaflet";
 // eslint-disable-next-line import/extensions
-import marker from 'img/marker.svg?url';
+import marker from "img/marker.svg?url";
 
 // Leaflet expects iconUrl to be a URL string, not a React component
 new Icon({
@@ -128,12 +128,12 @@ To write an action that makes a request, simple call and return the result from 
 **Example**
 
 ```ts
-import { requestAction } from 'actions/requests';
+import { requestAction } from "actions/requests";
 
-export const FETCH_DATA = 'FETCH_DATA';
+export const FETCH_DATA = "FETCH_DATA";
 export function fetchData() {
   return requestAction(FETCH_DATA, {
-    url: 'http://example.com/api/my-data',
+    url: "http://example.com/api/my-data",
   });
 }
 ```
@@ -145,16 +145,16 @@ Components should dispatch the action to fetch data. The dispatch function retur
 **Example**
 
 ```tsx
-import { fetchData } from 'actions/example';
+import { fetchData } from "actions/example";
 
 type Props = {
-  fetchData: () => Promise<MyData>,
-}
+  fetchData: () => Promise<MyData>;
+};
 
 type State = {
-  data: MyData | null,
-  error?: any,
-}
+  data: MyData | null;
+  error?: any;
+};
 
 class MyComponent extends React.Component<Props, State> {
   state: State = {
@@ -162,9 +162,10 @@ class MyComponent extends React.Component<Props, State> {
   };
 
   componentDidMount() {
-    this.props.fetchData()
-      .then(data => this.setState({ data }))
-      .catch(error => this.setState({ error }));
+    this.props
+      .fetchData()
+      .then((data) => this.setState({ data }))
+      .catch((error) => this.setState({ error }));
   }
 
   render() {
@@ -196,8 +197,8 @@ This is the [cache-then-network strategy described in the Offline Cookbook][offl
 **Reducer example**
 
 ```ts
-import { SUCCESS } from 'types/reducers';
-import { FETCH_DATA } from 'actions/example';
+import { SUCCESS } from "types/reducers";
+import { FETCH_DATA } from "actions/example";
 
 export function exampleBank(state: ExampleBank, action: FSA): ExampleBank {
   switch (action.type) {
@@ -215,18 +216,17 @@ export function exampleBank(state: ExampleBank, action: FSA): ExampleBank {
 
 ```tsx
 type Props = {
-  myData: MyData | null,
-  fetchData: () => Promise<MyData>,
-}
+  myData: MyData | null;
+  fetchData: () => Promise<MyData>;
+};
 
 type State = {
-  error?: any,
-}
+  error?: any;
+};
 
 class MyComponent extends React.Component<Props, State> {
   componentDidMount() {
-    this.props.fetchData()
-      .catch(error => this.setState({ error }));
+    this.props.fetchData().catch((error) => this.setState({ error }));
   }
 
   render() {
@@ -246,9 +246,12 @@ class MyComponent extends React.Component<Props, State> {
   }
 }
 
-export default connect(state => ({
-  myData: state.exampleBank,
-}), { fetchData })(MyComponent);
+export default connect(
+  (state) => ({
+    myData: state.exampleBank,
+  }),
+  { fetchData },
+)(MyComponent);
 ```
 
 #### Getting request status

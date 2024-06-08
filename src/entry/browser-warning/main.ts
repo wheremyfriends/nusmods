@@ -2,21 +2,31 @@
 // is incompatible or not optimal for using the app, a banner is appended into the DOM body.
 // This is so that in cases where the React app completely fails to render anything at all, the
 // user will at least be able to see the dialog warning them of the browser incompatibility.
-import 'core-js/stable';
+import "core-js/stable";
 
-import { BROWSER_WARNING_KEY } from '../../storage/keys';
-import { isBrowserSupported, isIOS, isAndroidChrome } from '../../bootstrapping/browser';
-import { canUseBrowserLocalStorage } from '../../storage/localStorage';
+import { BROWSER_WARNING_KEY } from "../../storage/keys";
+import {
+  isBrowserSupported,
+  isIOS,
+  isAndroidChrome,
+} from "../../bootstrapping/browser";
+import { canUseBrowserLocalStorage } from "../../storage/localStorage";
 
-import styles from './browser-warning.scss';
+import styles from "./browser-warning.scss";
 
 const composeAnchorText = (innerHTML: string, href: string) =>
   `<a href=${href} target="_blank" rel="noopener noreferrer">${innerHTML}</a>`;
-const linkForChrome = composeAnchorText('Google Chrome', 'https://www.google.com/chrome/');
-const linkForFirefox = composeAnchorText('Mozilla Firefox', 'https://www.mozilla.org/en-US/');
+const linkForChrome = composeAnchorText(
+  "Google Chrome",
+  "https://www.google.com/chrome/",
+);
+const linkForFirefox = composeAnchorText(
+  "Mozilla Firefox",
+  "https://www.mozilla.org/en-US/",
+);
 const linkForChromePlayStore = composeAnchorText(
-  'updating your web browser',
-  'http://play.google.com/store/apps/details?id=com.android.chrome',
+  "updating your web browser",
+  "http://play.google.com/store/apps/details?id=com.android.chrome",
 );
 
 const browserCanUseLocalStorage = canUseBrowserLocalStorage();
@@ -52,21 +62,25 @@ if (
                 </div>
               </div>
               `
-            : ''
+            : ""
         }
         </div>
       </div>
     `;
-  const container = document.createElement('div');
+  const container = document.createElement("div");
   container.className = styles.browserWarning;
   container.innerHTML = template;
   document.body.appendChild(container);
 
-  const element = document.getElementById('browserWarning-continue');
+  const element = document.getElementById("browserWarning-continue");
   if (element) {
-    element.addEventListener('click', () => {
-      const checkbox = document.getElementById('browserWarning-ignore');
-      if (browserCanUseLocalStorage && checkbox && (checkbox as HTMLInputElement).checked) {
+    element.addEventListener("click", () => {
+      const checkbox = document.getElementById("browserWarning-ignore");
+      if (
+        browserCanUseLocalStorage &&
+        checkbox &&
+        (checkbox as HTMLInputElement).checked
+      ) {
         localStorage.setItem(BROWSER_WARNING_KEY, navigator.userAgent);
       }
       document.body.removeChild(container);

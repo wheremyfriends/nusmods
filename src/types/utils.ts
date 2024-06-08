@@ -33,7 +33,7 @@ export const notNull = <T>(x: T | null | undefined): x is T => x != null;
 
 // TypeScript by default only allows string in parseFloat, even though this works fine
 export const parseFloat = (float: number | string): number =>
-  typeof float === 'string' ? window.parseFloat(float) : float;
+  typeof float === "string" ? window.parseFloat(float) : float;
 
 /**
  * Used to assert that a value is never, usually used to verify that all values of a
@@ -44,7 +44,9 @@ export const parseFloat = (float: number | string): number =>
  * crash if called at run time. Use verifyNever instead in those cases.
  */
 export function assertNever(value: never): never {
-  throw new Error(`Should be unreachable, unexpected value: ${JSON.stringify(value)}`);
+  throw new Error(
+    `Should be unreachable, unexpected value: ${JSON.stringify(value)}`,
+  );
 }
 
 /**

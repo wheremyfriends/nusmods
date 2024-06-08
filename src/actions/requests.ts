@@ -1,8 +1,8 @@
-import type { AxiosRequestConfig } from 'axios';
-import type { RequestKey } from 'types/reducers';
-import type { RequestType } from './constants';
+import type { AxiosRequestConfig } from "axios";
+import type { RequestKey } from "types/reducers";
+import type { RequestType } from "./constants";
 
-export const API_REQUEST = 'API_REQUEST';
+export const API_REQUEST = "API_REQUEST";
 
 export type DispatchRequestAction<Type extends string> = {
   type: Type;
@@ -30,7 +30,10 @@ export interface RequestsDispatchExt {
  * provided.
  */
 type RequestActionCreator = {
-  <Key extends string>(key: Key, options: AxiosRequestConfig): DispatchRequestAction<Key>;
+  <Key extends string>(
+    key: Key,
+    options: AxiosRequestConfig,
+  ): DispatchRequestAction<Key>;
   <Type extends string>(
     key: RequestKey,
     type: Type,
@@ -45,7 +48,7 @@ export const requestAction: RequestActionCreator = (
 ): DispatchRequestAction<RequestKey | string> => {
   let payload: AxiosRequestConfig;
 
-  if (typeof type !== 'string') {
+  if (typeof type !== "string") {
     payload = type;
     // eslint-disable-next-line no-param-reassign
     type = key;

@@ -1,15 +1,15 @@
-import qs from 'query-string';
+import qs from "query-string";
 
-import { Semester } from 'types/modules';
-import { extractStateForExport } from 'utils/export';
-import { State } from 'types/state';
-import { SemTimetableConfig } from 'types/timetables';
+import { Semester } from "types/modules";
+import { extractStateForExport } from "utils/export";
+import { State } from "types/state";
+import { SemTimetableConfig } from "types/timetables";
 
 export type ExportOptions = {
   pixelRatio?: number;
 };
 
-const baseUrl = 'https://export.nusmods.com/api/export';
+const baseUrl = "https://export.nusmods.com/api/export";
 
 function serializeState(
   semester: Semester,
@@ -24,7 +24,12 @@ function serializeState(
 }
 
 export default {
-  image: (semester: Semester, timetable: SemTimetableConfig, state: State, pixelRatio = 1) =>
+  image: (
+    semester: Semester,
+    timetable: SemTimetableConfig,
+    state: State,
+    pixelRatio = 1,
+  ) =>
     `${baseUrl}/image?${serializeState(semester, timetable, state, { pixelRatio })}`,
   pdf: (semester: Semester, timetable: SemTimetableConfig, state: State) =>
     `${baseUrl}/pdf?${serializeState(semester, timetable, state)}`,

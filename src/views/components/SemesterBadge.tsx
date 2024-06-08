@@ -1,8 +1,8 @@
-import * as React from 'react';
-import classnames from 'classnames';
-import config from 'config';
-import { Semester } from 'types/modules';
-import styles from './SemesterBadge.scss';
+import * as React from "react";
+import classnames from "classnames";
+import config from "config";
+import { Semester } from "types/modules";
+import styles from "./SemesterBadge.scss";
 
 /* eslint-disable no-useless-computed-key */
 const BADGE_COLOR: { [semester: number]: string } = {
@@ -23,7 +23,7 @@ const SemesterBadge: React.FC<Props> = ({ className, semesters }) => (
     {semesters.map((semester) => (
       <span
         key={semester}
-        className={classnames('badge', BADGE_COLOR[semester])}
+        className={classnames("badge", BADGE_COLOR[semester])}
         title={config.semesterNames[semester]}
         aria-label={config.semesterNames[semester]}
       >

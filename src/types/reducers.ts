@@ -1,8 +1,16 @@
-import { AxiosError } from 'axios';
-import { RegPeriodType, ScheduleType } from 'config';
+import { AxiosError } from "axios";
+import { RegPeriodType, ScheduleType } from "config";
 
-import { Mode } from './settings';
-import { ColorIndex, Lesson, EditingType, SemTimetableMultiConfig, TimetableConfig, TimetableMultiConfig, MultiUserTimetableConfig } from './timetables';
+import { Mode } from "./settings";
+import {
+  ColorIndex,
+  Lesson,
+  EditingType,
+  SemTimetableMultiConfig,
+  TimetableConfig,
+  TimetableMultiConfig,
+  MultiUserTimetableConfig,
+} from "./timetables";
 import {
   Faculty,
   Module,
@@ -11,8 +19,8 @@ import {
   SearchableModule,
   Semester,
   UserID,
-} from './modules';
-import { VenueList } from './venues';
+} from "./modules";
+import { VenueList } from "./venues";
 
 /* app.js */
 export type NotificationOptions = {
@@ -47,7 +55,9 @@ export type NotificationOptions = {
   readonly willClose?: (discarded: boolean, actionClicked: boolean) => void;
 };
 
-export type NotificationData = { readonly message: string } & NotificationOptions;
+export type NotificationData = {
+  readonly message: string;
+} & NotificationOptions;
 
 export type AppState = {
   readonly activeUserID: UserID;
@@ -62,10 +72,10 @@ export type AppState = {
 /* requests.js */
 export type RequestKey = string;
 
-export type ApiStatus = '_REQUEST' | '_SUCCESS' | '_FAILURE';
-export const REQUEST = '_REQUEST' as const;
-export const SUCCESS = '_SUCCESS' as const;
-export const FAILURE = '_FAILURE' as const;
+export type ApiStatus = "_REQUEST" | "_SUCCESS" | "_FAILURE";
+export const REQUEST = "_REQUEST" as const;
+export const SUCCESS = "_SUCCESS" as const;
+export const FAILURE = "_FAILURE" as const;
 
 export type FetchRequest = {
   status: ApiStatus;
@@ -75,9 +85,9 @@ export type FetchRequest = {
 export type Requests = { [requestKey: string]: FetchRequest };
 
 /* theme.js */
-export type TimetableOrientation = 'HORIZONTAL' | 'VERTICAL';
-export const VERTICAL: TimetableOrientation = 'VERTICAL';
-export const HORIZONTAL: TimetableOrientation = 'HORIZONTAL';
+export type TimetableOrientation = "HORIZONTAL" | "VERTICAL";
+export const VERTICAL: TimetableOrientation = "VERTICAL";
+export const HORIZONTAL: TimetableOrientation = "HORIZONTAL";
 
 export type ThemeState = Readonly<{
   id: string;
@@ -95,7 +105,7 @@ export type ModRegNotificationSettings = {
   readonly scheduleType: ScheduleType;
 };
 
-export type ModuleTableOrder = 'exam' | 'mc' | 'code';
+export type ModuleTableOrder = "exam" | "mc" | "code";
 
 export type SettingsState = {
   readonly newStudent: boolean;

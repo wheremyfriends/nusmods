@@ -1,10 +1,10 @@
-import { shallow, mount } from 'enzyme';
+import { shallow, mount } from "enzyme";
 
 /* @var {Module} */
-import CS1010S from '__mocks__/modules/CS1010S.json';
+import CS1010S from "__mocks__/modules/CS1010S.json";
 
-import { Module } from 'types/modules';
-import { DisconnectedModuleTombstone, Props } from './ModuleTombstone';
+import { Module } from "types/modules";
+import { DisconnectedModuleTombstone, Props } from "./ModuleTombstone";
 
 describe(DisconnectedModuleTombstone, () => {
   let mockProps: jest.Mocked<Props>;
@@ -17,23 +17,23 @@ describe(DisconnectedModuleTombstone, () => {
     } as any;
   });
 
-  it('renders', () => {
+  it("renders", () => {
     const wrapper = shallow(<DisconnectedModuleTombstone {...mockProps} />);
     expect(wrapper.exists()).toEqual(true);
   });
 
-  it('should display the module code', () => {
+  it("should display the module code", () => {
     const wrapper = shallow(<DisconnectedModuleTombstone {...mockProps} />);
-    const tombstoneText = wrapper.find('span');
+    const tombstoneText = wrapper.find("span");
     expect(tombstoneText.text()).toEqual(`CS1010S removed`);
   });
 
-  it('should call resetTombstone when Dismiss is clicked', () => {
+  it("should call resetTombstone when Dismiss is clicked", () => {
     const wrapper = mount(<DisconnectedModuleTombstone {...mockProps} />);
     const dismissBtn = wrapper
-      .find('button')
+      .find("button")
       .filterWhere((e) => Boolean(e.text().match(/dismiss/i)));
-    dismissBtn.simulate('click');
+    dismissBtn.simulate("click");
     expect(mockProps.resetTombstone.mock.calls.length).toEqual(1);
   });
 });

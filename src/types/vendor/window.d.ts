@@ -1,6 +1,6 @@
-import { Tracker } from 'types/vendor/piwik';
+import { Tracker } from "types/vendor/piwik";
 
-export type DEBUG_HOOK_NAMES = 'SET_ERROR_REPORTING_DEBUG' | 'SET_COVID_ZONES';
+export type DEBUG_HOOK_NAMES = "SET_ERROR_REPORTING_DEBUG" | "SET_COVID_ZONES";
 
 declare global {
   interface Window {

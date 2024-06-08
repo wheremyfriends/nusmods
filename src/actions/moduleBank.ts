@@ -1,12 +1,17 @@
-import { size } from 'lodash';
+import { size } from "lodash";
 
-import type { AcadYear, Module, ModuleCode, ModuleCondensed } from 'types/modules';
-import type { RequestActions } from 'middlewares/requests-middleware';
-import type { Dispatch, GetState } from 'types/redux';
+import type {
+  AcadYear,
+  Module,
+  ModuleCode,
+  ModuleCondensed,
+} from "types/modules";
+import type { RequestActions } from "middlewares/requests-middleware";
+import type { Dispatch, GetState } from "types/redux";
 
-import { requestAction } from 'actions/requests';
-import NUSModsApi from 'apis/nusmods';
-import config from 'config';
+import { requestAction } from "actions/requests";
+import NUSModsApi from "apis/nusmods";
+import config from "config";
 import {
   FETCH_ARCHIVE_MODULE,
   FETCH_MODULE,
@@ -15,15 +20,18 @@ import {
   fetchModuleRequest,
   REMOVE_LRU_MODULE,
   UPDATE_MODULE_TIMESTAMP,
-} from './constants';
-import { getLRUModules } from './moduleBank-lru';
+} from "./constants";
+import { getLRUModules } from "./moduleBank-lru";
 
 export function fetchModuleList() {
   return requestAction(FETCH_MODULE_LIST, {
     url: NUSModsApi.moduleListUrl(),
   });
 }
-export type FetchModuleListActions = RequestActions<typeof FETCH_MODULE_LIST, ModuleCondensed[]>;
+export type FetchModuleListActions = RequestActions<
+  typeof FETCH_MODULE_LIST,
+  ModuleCondensed[]
+>;
 
 const MAX_MODULE_LIMIT = 100;
 export const Internal = {
@@ -52,7 +60,8 @@ export function fetchModule(moduleCode: ModuleCode) {
 
       // Remove the LRU module if the size exceeds the maximum and if anything
       // can be removed
-      const overLimitCount = size(getState().moduleBank.modules) - MAX_MODULE_LIMIT;
+      const overLimitCount =
+        size(getState().moduleBank.modules) - MAX_MODULE_LIMIT;
       if (overLimitCount > 0) {
         const { moduleBank, timetables } = getState();
 
@@ -87,7 +96,10 @@ export function fetchModule(moduleCode: ModuleCode) {
     );
   };
 }
-export type FetchModuleActions = RequestActions<typeof FETCH_MODULE, Omit<Module, 'timestamp'>>;
+export type FetchModuleActions = RequestActions<
+  typeof FETCH_MODULE,
+  Omit<Module, "timestamp">
+>;
 
 export function fetchModuleArchive(moduleCode: ModuleCode, year: string) {
   const key = fetchArchiveRequest(moduleCode, year);
@@ -100,7 +112,7 @@ export function fetchModuleArchive(moduleCode: ModuleCode, year: string) {
 }
 export type FetchModuleArchiveActions = RequestActions<
   typeof FETCH_ARCHIVE_MODULE,
-  Omit<Module, 'timestamp'>,
+  Omit<Module, "timestamp">,
   { academicYear: string }
 >;
 

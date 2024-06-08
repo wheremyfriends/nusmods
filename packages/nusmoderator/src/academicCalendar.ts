@@ -1,5 +1,5 @@
-import { addWeeks, startOfWeek, isBefore, getYear } from 'date-fns';
-import { WeekType, Semester, AcadYear, AcadWeek, AcadWeekInfo } from './types';
+import { addWeeks, startOfWeek, isBefore, getYear } from "date-fns";
+import { WeekType, Semester, AcadYear, AcadWeek, AcadWeekInfo } from "./types";
 
 /* eslint-disable no-fallthrough, no-console */
 
@@ -10,7 +10,7 @@ import { WeekType, Semester, AcadYear, AcadWeek, AcadWeekInfo } from './types';
  * @return {Date} Start date of the academic year
  */
 export function getAcadYearStartDate(acadYear: string): Date {
-  const shortYear = acadYear.split('/')[0];
+  const shortYear = acadYear.split("/")[0];
   const targetYear = 2000 + parseInt(shortYear, 10);
   const firstDateOfMonth = new Date(targetYear, 7, 1, 0, 0, 0);
   const nearestMonday = startOfWeek(firstDateOfMonth, { weekStartsOn: 1 });
@@ -25,10 +25,10 @@ export function getAcadYearStartDate(acadYear: string): Date {
 
 // Constant variables.
 const oneWeekDuration = 1000 * 60 * 60 * 24 * 7;
-const sem1 = 'Semester 1';
-const sem2 = 'Semester 2';
-const special1 = 'Special Term I';
-const special2 = 'Special Term II';
+const sem1 = "Semester 1";
+const sem2 = "Semester 2";
+const special1 = "Special Term I";
+const special2 = "Special Term II";
 
 /**
  * Takes in a Date and returns an object of acad year and start date for that year.
@@ -68,7 +68,9 @@ export function getAcadSem(acadWeekNumber: number): Semester | null {
   const lastWeekOfSpecialSem2 = 52;
 
   if (acadWeekNumber < earliestSupportedWeek) {
-    console.warn(`[nusmoderator] Unsupported acadWeekNumber: ${acadWeekNumber}`);
+    console.warn(
+      `[nusmoderator] Unsupported acadWeekNumber: ${acadWeekNumber}`,
+    );
     return null;
   }
 
@@ -92,18 +94,18 @@ export function getAcadWeekName(acadWeekNumber: number): AcadWeek | null {
   switch (acadWeekNumber) {
     case 7:
       return {
-        weekType: 'Recess',
+        weekType: "Recess",
         weekNumber: null,
       };
     case 15:
       return {
-        weekType: 'Reading',
+        weekType: "Reading",
         weekNumber: null,
       };
     case 16:
     case 17:
       return {
-        weekType: 'Examination',
+        weekType: "Examination",
         weekNumber: acadWeekNumber - 15,
       };
     default: {
@@ -114,12 +116,14 @@ export function getAcadWeekName(acadWeekNumber: number): AcadWeek | null {
       }
 
       if (acadWeekNumber < 1 || acadWeekNumber > 17) {
-        console.warn(`[nusmoderator] Unsupported acadWeekNumber as parameter: ${acadWeekNumber}`);
+        console.warn(
+          `[nusmoderator] Unsupported acadWeekNumber as parameter: ${acadWeekNumber}`,
+        );
         return null;
       }
 
       return {
-        weekType: 'Instructional',
+        weekType: "Instructional",
         weekNumber,
       };
     }
@@ -155,11 +159,11 @@ export function getAcadWeekInfo(date: Date): AcadWeekInfo {
       acadWeekNumber -= 22;
     case sem1:
       if (acadWeekNumber === 1) {
-        weekType = 'Orientation';
+        weekType = "Orientation";
         break;
       }
       if (acadWeekNumber > 18) {
-        weekType = 'Vacation';
+        weekType = "Vacation";
         weekNumber = acadWeekNumber - 18;
         break;
       }
@@ -173,14 +177,14 @@ export function getAcadWeekInfo(date: Date): AcadWeekInfo {
       acadWeekNumber -= 6;
     case special1: // Special Term I starts on week 41 of the AY
       acadWeekNumber -= 40;
-      weekType = 'Instructional';
+      weekType = "Instructional";
       weekNumber = acadWeekNumber;
       break;
     default:
       if (acadWeekNumber === 53) {
         // This means it is the 53th week of the AY, and this week is Vacation.
         // This happens 5 times every 28 years.
-        weekType = 'Vacation';
+        weekType = "Vacation";
         weekNumber = null;
       }
       break;

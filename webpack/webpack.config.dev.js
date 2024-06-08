@@ -1,27 +1,27 @@
-const path = require('path');
-const webpack = require('webpack');
-const { partition } = require('lodash');
+const path = require("path");
+const webpack = require("webpack");
+const { partition } = require("lodash");
 
-const { merge } = require('webpack-merge');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const { merge } = require("webpack-merge");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
-const commonConfig = require('./webpack.config.common');
-const parts = require('./webpack.parts');
-const nusmods = require('../src/apis/nusmods');
-const config = require('../src/config/app-config.json');
+const commonConfig = require("./webpack.config.common");
+const parts = require("./webpack.parts");
+const nusmods = require("../src/apis/nusmods");
+const config = require("../src/config/app-config.json");
 
 const developmentConfig = merge([
   commonConfig,
   {
-    mode: 'development',
+    mode: "development",
     // Use a fast source map for good-enough debugging usage
     // https://webpack.js.org/configuration/devtool/#devtool
-    devtool: 'eval-cheap-module-source-map',
+    devtool: "eval-cheap-module-source-map",
     plugins: [
       new HtmlWebpackPlugin({
-        template: path.join(parts.PATHS.src, 'index.ejs'),
+        template: path.join(parts.PATHS.src, "index.ejs"),
         cache: true,
 
         // Our production Webpack config manually injects CSS and JS files.
@@ -31,7 +31,7 @@ const developmentConfig = merge([
 
         templateParameters: (compilation, assets, assetTags, options) => {
           const [inlinedJsFiles, loadedJsFiles] = partition(assets.js, (file) =>
-            file.includes('runtime'),
+            file.includes("runtime"),
           );
           return {
             // Passthrough parameters
@@ -55,7 +55,7 @@ const developmentConfig = merge([
       }),
       // Copy files from static folder over (in-memory)
       new CopyWebpackPlugin({
-        patterns: [{ from: 'static/base', context: parts.PATHS.root }],
+        patterns: [{ from: "static/base", context: parts.PATHS.root }],
       }),
       // Ignore node_modules so CPU usage with poll watching drops significantly.
       new webpack.WatchIgnorePlugin({
@@ -75,7 +75,7 @@ const developmentConfig = merge([
     exclude: parts.PATHS.styles,
     options: {
       modules: {
-        localIdentName: '[name]-[local]',
+        localIdentName: "[name]-[local]",
       },
     },
   }),

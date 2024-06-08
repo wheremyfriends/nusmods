@@ -1,20 +1,20 @@
-import { ModuleCode, Semester } from 'types/modules';
-import { SemTimetableConfig, Lesson } from 'types/timetables';
+import { ModuleCode, Semester } from "types/modules";
+import { SemTimetableConfig, Lesson } from "types/timetables";
 
-import lessons from '__mocks__/lessons-array.json';
-import { CS1010S, CS3216 } from '__mocks__/modules';
+import lessons from "__mocks__/lessons-array.json";
+import { CS1010S, CS3216 } from "__mocks__/modules";
 
-import * as actions from './timetables';
+import * as actions from "./timetables";
 
-jest.mock('storage', () => ({
+jest.mock("storage", () => ({
   getItem: jest.fn(),
   setItem: jest.fn(),
 }));
 
 // see: https://github.com/reactjs/redux/blob/master/docs/recipes/WritingTests.md#example-1
 // TODO: write addModule test with nock and mockStore.
-test('addModule should create an action to add a module', () => {
-  const moduleCode = 'CS1010';
+test("addModule should create an action to add a module", () => {
+  const moduleCode = "CS1010";
   const semester = 1;
 
   const value = actions.addModule(semester, moduleCode);
@@ -22,66 +22,75 @@ test('addModule should create an action to add a module', () => {
   expect(value).toBeInstanceOf(Function);
 });
 
-test('removeLesson should return information to remove module', () => {
+test("removeLesson should return information to remove module", () => {
   const semester: Semester = 1;
-  const moduleCode: ModuleCode = 'CS1010';
+  const moduleCode: ModuleCode = "CS1010";
   expect(actions.removeModule(semester, moduleCode)).toMatchSnapshot();
 });
 
-test('modifyLesson should return lesson payload', () => {
+test("modifyLesson should return lesson payload", () => {
   const activeLesson: Lesson = lessons[0];
   expect(actions.modifyLesson(activeLesson)).toMatchSnapshot();
 });
 
-test('changeLesson should return updated information to change lesson', () => {
+test("changeLesson should return updated information to change lesson", () => {
   const semester: Semester = 1;
   const lesson: Lesson = lessons[1];
   expect(actions.changeLesson(semester, lesson)).toMatchSnapshot();
 });
 
-test('cancelModifyLesson should not have payload', () => {
+test("cancelModifyLesson should not have payload", () => {
   expect(actions.cancelModifyLesson()).toMatchSnapshot();
 });
 
-test('select module color should dispatch a select of module color', () => {
+test("select module color should dispatch a select of module color", () => {
   const semester: Semester = 1;
-  expect(actions.selectModuleColor(semester, 'CS1010S', 0)).toMatchSnapshot();
-  expect(actions.selectModuleColor(semester, 'CS3216', 1)).toMatchSnapshot();
+  expect(actions.selectModuleColor(semester, "CS1010S", 0)).toMatchSnapshot();
+  expect(actions.selectModuleColor(semester, "CS3216", 1)).toMatchSnapshot();
 });
 
-describe('fillTimetableBlanks', () => {
+describe("fillTimetableBlanks", () => {
   const moduleBank = { modules: { CS1010S, CS3216 } };
-  const timetablesState = (semester: Semester, timetable: SemTimetableConfig) => ({
+  const timetablesState = (
+    semester: Semester,
+    timetable: SemTimetableConfig,
+  ) => ({
     lessons: { [semester]: timetable },
   });
   const semester = 1;
   const action = actions.validateTimetable(semester);
 
-  test('do nothing if timetable is already full', () => {
+  test("do nothing if timetable is already full", () => {
     const timetable = {
       CS1010S: {
-        Lecture: '1',
-        Tutorial: '1',
-        Recitation: '1',
+        Lecture: "1",
+        Tutorial: "1",
+        Recitation: "1",
       },
     };
 
-    const state: any = { timetables: timetablesState(semester, timetable), moduleBank };
+    const state: any = {
+      timetables: timetablesState(semester, timetable),
+      moduleBank,
+    };
     const dispatch = jest.fn();
     action(dispatch, () => state);
 
     expect(dispatch).not.toHaveBeenCalled();
   });
 
-  test('fill missing lessons with randomly generated modules', () => {
+  test("fill missing lessons with randomly generated modules", () => {
     const timetable = {
       CS1010S: {
-        Lecture: '1',
-        Tutorial: '1',
+        Lecture: "1",
+        Tutorial: "1",
       },
       CS3216: {},
     };
-    const state: any = { timetables: timetablesState(semester, timetable), moduleBank };
+    const state: any = {
+      timetables: timetablesState(semester, timetable),
+      moduleBank,
+    };
     const dispatch = jest.fn();
 
     action(dispatch, () => state);
@@ -93,10 +102,10 @@ describe('fillTimetableBlanks', () => {
       type: actions.SET_LESSON_CONFIG,
       payload: {
         semester,
-        moduleCode: 'CS1010S',
+        moduleCode: "CS1010S",
         lessonConfig: {
-          Lecture: '1',
-          Tutorial: '1',
+          Lecture: "1",
+          Tutorial: "1",
           Recitation: expect.any(String),
         },
       },
@@ -106,26 +115,30 @@ describe('fillTimetableBlanks', () => {
       type: actions.SET_LESSON_CONFIG,
       payload: {
         semester,
-        moduleCode: 'CS3216',
+        moduleCode: "CS3216",
         lessonConfig: {
-          Lecture: '1',
+          Lecture: "1",
         },
       },
     });
   });
 });
 
-describe('hide/show timetable modules', () => {
+describe("hide/show timetable modules", () => {
   const semester: Semester = 1;
 
-  test('should dispatch a module code for hiding', () => {
-    const moduleCode: ModuleCode = 'CS1010';
-    expect(actions.hideLessonInTimetable(semester, moduleCode)).toMatchSnapshot();
+  test("should dispatch a module code for hiding", () => {
+    const moduleCode: ModuleCode = "CS1010";
+    expect(
+      actions.hideLessonInTimetable(semester, moduleCode),
+    ).toMatchSnapshot();
   });
 
-  test('should dispatch a module code for showing', () => {
-    const moduleCode: ModuleCode = 'CS1020';
-    expect(actions.showLessonInTimetable(semester, moduleCode)).toMatchSnapshot();
+  test("should dispatch a module code for showing", () => {
+    const moduleCode: ModuleCode = "CS1020";
+    expect(
+      actions.showLessonInTimetable(semester, moduleCode),
+    ).toMatchSnapshot();
   });
 });
 
@@ -148,7 +161,7 @@ describe(actions.fetchTimetableModules, () => {
     getState.mockClear();
   });
 
-  test('should fetch modules', async () => {
+  test("should fetch modules", async () => {
     const timetable = {
       CS1010S: {},
     };
@@ -162,7 +175,7 @@ describe(actions.fetchTimetableModules, () => {
     expect(dispatch.mock.calls).toMatchSnapshot();
   });
 
-  test('should not fetch invalid modules', async () => {
+  test("should not fetch invalid modules", async () => {
     const timetable = {
       invalid: {},
     };

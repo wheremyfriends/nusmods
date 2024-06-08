@@ -1,9 +1,9 @@
-import axios from 'axios';
-import venueLocationsLocal from 'data/venues';
-import { mockResponse } from 'test-utils/axios';
-import { getVenueLocations } from './github';
+import axios from "axios";
+import venueLocationsLocal from "data/venues";
+import { mockResponse } from "test-utils/axios";
+import { getVenueLocations } from "./github";
 
-jest.mock('axios');
+jest.mock("axios");
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
 afterEach(() => {
@@ -12,10 +12,10 @@ afterEach(() => {
 });
 
 describe(getVenueLocations, () => {
-  test('should load venues from proxy if possible', async () => {
+  test("should load venues from proxy if possible", async () => {
     const venueLocations = {
       LT19: {
-        roomName: 'Lecture Theatre 19',
+        roomName: "Lecture Theatre 19",
       },
     };
 
@@ -24,8 +24,8 @@ describe(getVenueLocations, () => {
     await expect(getVenueLocations()).resolves.toEqual(venueLocations);
   });
 
-  test('should fall back to import if proxy is not available', async () => {
-    mockAxios.get.mockRejectedValue(new Error('The server is on fire'));
+  test("should fall back to import if proxy is not available", async () => {
+    mockAxios.get.mockRejectedValue(new Error("The server is on fire"));
 
     await expect(getVenueLocations()).resolves.toEqual(venueLocationsLocal);
   });

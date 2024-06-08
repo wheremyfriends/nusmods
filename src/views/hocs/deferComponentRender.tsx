@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { defer, wrapComponentName } from 'utils/react';
+import * as React from "react";
+import { defer, wrapComponentName } from "utils/react";
 
 type State = {
   shouldRender: boolean;
@@ -16,7 +16,10 @@ function deferComponentRender<Props>(
   WrappedComponent: React.ComponentType<Props>,
 ): React.ComponentType<Props> {
   return class extends React.Component<Props, State> {
-    static displayName = wrapComponentName(WrappedComponent, deferComponentRender.name);
+    static displayName = wrapComponentName(
+      WrappedComponent,
+      deferComponentRender.name,
+    );
 
     override state = {
       shouldRender: false,

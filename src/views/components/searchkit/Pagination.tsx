@@ -1,6 +1,10 @@
-import * as React from 'react';
-import { PaginationAccessor, SearchkitComponent, SearchkitComponentProps } from 'searchkit';
-import { clamp, get } from 'lodash';
+import * as React from "react";
+import {
+  PaginationAccessor,
+  SearchkitComponent,
+  SearchkitComponentProps,
+} from "searchkit";
+import { clamp, get } from "lodash";
 
 export interface PagerProps {
   selectedPage: number;
@@ -20,22 +24,29 @@ export const FIRST_PAGE_INDEX = 1;
 
 // Custom equivalent of Searchkit's Pagination component
 // eslint-disable-next-line @typescript-eslint/ban-types
-export default class Pagination extends SearchkitComponent<PaginationProps, {}> {
+export default class Pagination extends SearchkitComponent<
+  PaginationProps,
+  {}
+> {
   paginationAccessor() {
     return this.accessor as PaginationAccessor;
   }
 
   // eslint-disable-next-line class-methods-use-this
   override defineAccessor() {
-    return new PaginationAccessor('p');
+    return new PaginationAccessor("p");
   }
 
   getCurrentPage() {
-    return Number(this.paginationAccessor().state.getValue()) || FIRST_PAGE_INDEX;
+    return (
+      Number(this.paginationAccessor().state.getValue()) || FIRST_PAGE_INDEX
+    );
   }
 
   getTotalPages() {
-    return Math.ceil(this.getHitsCount() / get(this.getQuery(), 'query.size', 10));
+    return Math.ceil(
+      this.getHitsCount() / get(this.getQuery(), "query.size", 10),
+    );
   }
 
   onGoToFirst = () => this.setPage(FIRST_PAGE_INDEX);
@@ -53,7 +64,8 @@ export default class Pagination extends SearchkitComponent<PaginationProps, {}> 
     if (page === this.getCurrentPage()) {
       return; // Same page, no need to rerun query
     }
-    this.paginationAccessor().state = this.paginationAccessor().state.setValue(page);
+    this.paginationAccessor().state =
+      this.paginationAccessor().state.setValue(page);
     this.searchkit.performSearch();
   }
 

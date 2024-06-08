@@ -1,11 +1,11 @@
-import * as React from 'react';
-import { connect } from 'react-redux';
-import classnames from 'classnames';
+import * as React from "react";
+import { connect } from "react-redux";
+import classnames from "classnames";
 
-import { NotificationData } from 'types/reducers';
-import { popNotification } from 'actions/app';
-import { State as StoreState } from 'types/state';
-import styles from './Notification.scss';
+import { NotificationData } from "types/reducers";
+import { popNotification } from "actions/app";
+import { State as StoreState } from "types/state";
+import styles from "./Notification.scss";
 
 type Props = {
   notifications: NotificationData[];
@@ -18,7 +18,7 @@ type State = {
   actionClicked: boolean;
 };
 
-const ACTIVE_CLASSNAME = 'mdc-snackbar--active';
+const ACTIVE_CLASSNAME = "mdc-snackbar--active";
 const DEFAULT_TIMEOUT = 2750;
 const TRANSITION_DURATION = 250;
 
@@ -79,7 +79,8 @@ export class NotificationComponent extends React.Component<Props, State> {
     if (notifications[0] !== shownNotification) {
       // Active notification has changed
       if (isOpen) {
-        const discarded = !shownNotification || !notifications.includes(shownNotification);
+        const discarded =
+          !shownNotification || !notifications.includes(shownNotification);
         if (shownNotification && shownNotification.willClose) {
           shownNotification.willClose(discarded, actionClicked);
         }
@@ -103,7 +104,10 @@ export class NotificationComponent extends React.Component<Props, State> {
       // close the notification when the timer is up
       const timeout = this.state.shownNotification.timeout || DEFAULT_TIMEOUT;
       clearTimeout(this.openTimeoutId); // Defensive
-      this.openTimeoutId = window.setTimeout(() => this.props.popNotification(), timeout);
+      this.openTimeoutId = window.setTimeout(
+        () => this.props.popNotification(),
+        timeout,
+      );
     } else if (this.props.notifications.length) {
       // End of closing transition - if there are more notifications, let's show them
       this.openSnackbar();
@@ -130,7 +134,10 @@ export class NotificationComponent extends React.Component<Props, State> {
     // turn false and notifications to stop showing up, so we set a timer
     // and turn transitioning false when the timer is up
     clearTimeout(this.closeTimeoutId); // Defensive
-    this.closeTimeoutId = window.setTimeout(() => this.clearTransition(), TRANSITION_DURATION);
+    this.closeTimeoutId = window.setTimeout(
+      () => this.clearTransition(),
+      TRANSITION_DURATION,
+    );
   };
 
   renderNotificationContent() {
@@ -167,7 +174,7 @@ export class NotificationComponent extends React.Component<Props, State> {
 
     return (
       <div
-        className={classnames('mdc-snackbar', styles.snackbar, {
+        className={classnames("mdc-snackbar", styles.snackbar, {
           [ACTIVE_CLASSNAME]: isOpen,
         })}
         aria-live="assertive"

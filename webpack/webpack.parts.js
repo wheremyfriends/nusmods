@@ -1,44 +1,44 @@
-const childProcess = require('child_process');
-const path = require('path');
+const childProcess = require("child_process");
+const path = require("path");
 
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-const { format } = require('date-fns');
+const { format } = require("date-fns");
 
-const ROOT = path.join(__dirname, '..');
-const SRC = 'src';
-const DIST = 'dist';
+const ROOT = path.join(__dirname, "..");
+const SRC = "src";
+const DIST = "dist";
 
 // Used by Webpack to resolve the path to assets on the client side
 // See: https://webpack.js.org/guides/public-path/
-exports.WEBSITE_PUBLIC_PATH = '/';
-exports.TIMETABLE_ONLY_PUBLIC_PATH = '/timetable-only/';
+exports.WEBSITE_PUBLIC_PATH = "/";
+exports.TIMETABLE_ONLY_PUBLIC_PATH = "/timetable-only/";
 
 const PATHS = {
   root: ROOT,
   // Using an absolute path will cause transient dependencies to be resolved to OUR
   // version of the same module, so this is kept relative
-  node: 'node_modules',
+  node: "node_modules",
   src: path.join(ROOT, SRC),
-  styles: [path.join(ROOT, SRC, 'styles'), path.join(ROOT, 'node_modules')],
-  images: path.join(ROOT, SRC, 'img'),
-  fixtures: path.join(ROOT, SRC, '__mocks__'),
+  styles: [path.join(ROOT, SRC, "styles"), path.join(ROOT, "node_modules")],
+  images: path.join(ROOT, SRC, "img"),
+  fixtures: path.join(ROOT, SRC, "__mocks__"),
   build: path.join(ROOT, DIST),
   buildTimetable: path.join(ROOT, DIST, exports.TIMETABLE_ONLY_PUBLIC_PATH),
 };
 
 const getCSSConfig = ({ options } = {}) => [
   {
-    loader: 'css-loader',
+    loader: "css-loader",
     // Enable 'composes' from other scss files
     options: { ...options, importLoaders: 2 },
   },
   {
-    loader: 'postcss-loader',
+    loader: "postcss-loader",
     // See .postcssrc.js for plugin and plugin config
   },
   {
-    loader: 'sass-loader',
+    loader: "sass-loader",
     options: {
       sassOptions: {
         // @material packages uses '@material' directly as part of their import paths.
@@ -62,7 +62,7 @@ exports.loadCSS = ({ include, exclude, options } = {}) => ({
         include,
         exclude,
 
-        use: ['style-loader', ...getCSSConfig({ options })],
+        use: ["style-loader", ...getCSSConfig({ options })],
       },
     ],
   },
@@ -71,8 +71,8 @@ exports.loadCSS = ({ include, exclude, options } = {}) => ({
 exports.productionCSS = ({ options } = {}) => ({
   plugins: [
     new MiniCssExtractPlugin({
-      filename: 'assets/[name].[contenthash:8].css',
-      chunkFilename: 'assets/[name].[contenthash:8].css',
+      filename: "assets/[name].[contenthash:8].css",
+      chunkFilename: "assets/[name].[contenthash:8].css",
       ignoreOrder: true,
 
       ...options,
@@ -95,7 +95,7 @@ exports.productionCSS = ({ options } = {}) => ({
           ...getCSSConfig({
             options: {
               modules: {
-                localIdentName: '[hash:base64:8]',
+                localIdentName: "[hash:base64:8]",
               },
             },
           }),
@@ -121,7 +121,7 @@ exports.loadImages = ({ include, exclude, options } = {}) => ({
           {
             test: /\.(ico|jpg|jpeg|png|gif)(\?.*)?$/,
             use: {
-              loader: 'url-loader',
+              loader: "url-loader",
               options,
             },
           },
@@ -133,7 +133,7 @@ exports.loadImages = ({ include, exclude, options } = {}) => ({
             test: /\.(svg)(\?.*)?$/,
             resourceQuery: /url/,
             use: {
-              loader: 'url-loader',
+              loader: "url-loader",
               options,
             },
           },
@@ -144,7 +144,7 @@ exports.loadImages = ({ include, exclude, options } = {}) => ({
           {
             test: /\.(svg)(\?.*)?$/,
             use: {
-              loader: '@svgr/webpack',
+              loader: "@svgr/webpack",
               options: {
                 titleProp: true,
               },
@@ -166,9 +166,9 @@ exports.devServer = () => ({
     // routing works. Good for complex setups.
     historyApiFallback: true,
     // Open browser unless told otherwise
-    open: process.env.OPEN_BROWSER !== '0',
+    open: process.env.OPEN_BROWSER !== "0",
     // Enable hot reloading server.
-    hot: 'only',
+    hot: "only",
   },
 });
 
@@ -182,7 +182,10 @@ exports.devServer = () => ({
 function singaporeTime() {
   const SGT_OFFSET = -8 * 60;
   const localDate = new Date();
-  return new Date(localDate.getTime() + (localDate.getTimezoneOffset() - SGT_OFFSET) * 60 * 1000);
+  return new Date(
+    localDate.getTime() +
+      (localDate.getTimezoneOffset() - SGT_OFFSET) * 60 * 1000,
+  );
 }
 
 /**
@@ -195,13 +198,14 @@ exports.appVersion = () => {
   try {
     commitHash =
       process.env.GIT_COMMIT_HASH ||
-      childProcess.execFileSync('git', ['rev-parse', 'HEAD']).toString().trim();
+      childProcess.execFileSync("git", ["rev-parse", "HEAD"]).toString().trim();
   } catch (e) {
-    commitHash = 'UNSET';
+    commitHash = "UNSET";
   }
   // Version format: <yyyyMMdd date>-<7-char hash substring>
   const versionStr =
-    commitHash && `${format(singaporeTime(), 'yyyyMMdd')}-${commitHash.substring(0, 7)}`;
+    commitHash &&
+    `${format(singaporeTime(), "yyyyMMdd")}-${commitHash.substring(0, 7)}`;
   return { commitHash, versionStr };
 };
 
@@ -212,20 +216,20 @@ exports.appVersion = () => {
  * see the docstring for the `NUSMODS_ENV` global variable.
  */
 exports.env = () => {
-  if (process.env.NODE_ENV === 'test') return 'test';
+  if (process.env.NODE_ENV === "test") return "test";
 
   // Vercel deployments
-  if (process.env.VERCEL_ENV === 'production') return 'production';
-  if (process.env.VERCEL_ENV === 'preview') {
-    if (process.env.VERCEL_GIT_COMMIT_REF === 'master') return 'staging';
-    return 'preview';
+  if (process.env.VERCEL_ENV === "production") return "production";
+  if (process.env.VERCEL_ENV === "preview") {
+    if (process.env.VERCEL_GIT_COMMIT_REF === "master") return "staging";
+    return "preview";
   }
 
   // CI builds, if ever ran (e.g. if build artifacts are uploaded to Netlify), are previews
-  if (process.env.NODE_ENV === 'production' && process.env.CI) return 'preview';
+  if (process.env.NODE_ENV === "production" && process.env.CI) return "preview";
 
   // Others
-  return 'development';
+  return "development";
 };
 
 exports.PATHS = PATHS;

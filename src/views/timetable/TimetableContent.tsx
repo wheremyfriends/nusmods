@@ -1,10 +1,23 @@
-import * as React from 'react';
-import classnames from 'classnames';
-import { connect, useDispatch } from 'react-redux';
-import _, { get } from 'lodash';
+import * as React from "react";
+import classnames from "classnames";
+import { connect, useDispatch } from "react-redux";
+import _, { get } from "lodash";
 
-import { ColorMapping, HORIZONTAL, ModulesMap, TimetableOrientation, NotificationOptions } from 'types/reducers';
-import { Module, ModuleCode, LessonType, Semester, ClassNo, UserID } from 'types/modules';
+import {
+  ColorMapping,
+  HORIZONTAL,
+  ModulesMap,
+  TimetableOrientation,
+  NotificationOptions,
+} from "types/reducers";
+import {
+  Module,
+  ModuleCode,
+  LessonType,
+  Semester,
+  ClassNo,
+  UserID,
+} from "types/modules";
 import {
   ColoredLesson,
   Lesson,
@@ -17,7 +30,7 @@ import {
   TimetableMultiConfig,
   LessonChange,
   MultiUserTimetableConfig,
-} from 'types/timetables';
+} from "types/timetables";
 
 import {
   cancelModifyLesson,
@@ -29,14 +42,14 @@ import {
   // toggleSelectLesson,
   resetTimetable,
   addModuleRT,
-} from 'actions/timetables';
+} from "actions/timetables";
 import {
   areLessonsSameClass,
   isLessonSelected,
   formatExamDate,
   getExamDate,
   getModuleTimetable,
-} from 'utils/modules';
+} from "utils/modules";
 import {
   areOtherClassesAvailable,
   arrangeLessonsForWeek,
@@ -48,67 +61,113 @@ import {
   lessonsForLessonType,
   randomModuleLessonConfig,
   timetableLessonsArray,
-} from 'utils/timetables';
-import { resetScrollPosition } from 'utils/react';
-import ModulesSelectContainer from 'views/timetable/ModulesSelectContainer';
-import Title from 'views/components/Title';
-import ErrorBoundary from 'views/errors/ErrorBoundary';
-import { State as StoreState } from 'types/state';
-import { TombstoneModule } from 'types/views';
-import Timetable from './Timetable';
-import TimetableActions from './TimetableActions';
-import TimetableModulesTable from './TimetableModulesTable';
-import ModulesTableFooter from './ModulesTableFooter';
-import styles from './TimetableContent.scss';
+} from "utils/timetables";
+import { resetScrollPosition } from "utils/react";
+import ModulesSelectContainer from "views/timetable/ModulesSelectContainer";
+import Title from "views/components/Title";
+import ErrorBoundary from "views/errors/ErrorBoundary";
+import { State as StoreState } from "types/state";
+import { TombstoneModule } from "types/views";
+import Timetable from "./Timetable";
+import TimetableActions from "./TimetableActions";
+import TimetableModulesTable from "./TimetableModulesTable";
+import ModulesTableFooter from "./ModulesTableFooter";
+import styles from "./TimetableContent.scss";
 
-import { ApolloClient, InMemoryCache, ApolloProvider, gql, FetchResult } from '@apollo/client';
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  gql,
+  FetchResult,
+} from "@apollo/client";
 
-import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
-import { createClient } from 'graphql-ws';
-import { openNotification } from 'actions/app';
-import { fetchModule } from 'actions/moduleBank';
-import type { Dispatch, GetState } from 'types/redux';
-import { Action } from 'actions/constants';
-import { getOptimisedTimetable } from 'solver';
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
+import { createClient } from "graphql-ws";
+import { openNotification } from "actions/app";
+import { fetchModule } from "actions/moduleBank";
+import type { Dispatch, GetState } from "types/redux";
+import { Action } from "actions/constants";
+import { getOptimisedTimetable } from "solver";
 
 export const CREATE_LESSON = gql`
-  mutation CreateLesson($roomID: String!, $userID: Int!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
-    createLesson(roomID: $roomID, userID: $userID, semester: $semester, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
+  mutation CreateLesson(
+    $roomID: String!
+    $userID: Int!
+    $semester: Int!
+    $moduleCode: String!
+    $lessonType: String!
+    $classNo: String!
+  ) {
+    createLesson(
+      roomID: $roomID
+      userID: $userID
+      semester: $semester
+      moduleCode: $moduleCode
+      lessonType: $lessonType
+      classNo: $classNo
+    )
   }
 `;
 
 export const DELETE_LESSON = gql`
-  mutation DeleteLesson($roomID: String!, $userID: Int!, $semester: Int!, $moduleCode: String!, $lessonType: String!, $classNo: String!) {
-    deleteLesson(roomID: $roomID, userID: $userID, semester: $semester, moduleCode: $moduleCode, lessonType: $lessonType, classNo: $classNo)
+  mutation DeleteLesson(
+    $roomID: String!
+    $userID: Int!
+    $semester: Int!
+    $moduleCode: String!
+    $lessonType: String!
+    $classNo: String!
+  ) {
+    deleteLesson(
+      roomID: $roomID
+      userID: $userID
+      semester: $semester
+      moduleCode: $moduleCode
+      lessonType: $lessonType
+      classNo: $classNo
+    )
   }
-  `;
+`;
 
 export const DELETE_MODULE = gql`
-  mutation DeleteModule($roomID: String!, $userID: Int!, $semester: Int!, $moduleCode: String!) {
-    deleteModule(roomID: $roomID, userID: $userID, semester: $semester, moduleCode: $moduleCode)
+  mutation DeleteModule(
+    $roomID: String!
+    $userID: Int!
+    $semester: Int!
+    $moduleCode: String!
+  ) {
+    deleteModule(
+      roomID: $roomID
+      userID: $userID
+      semester: $semester
+      moduleCode: $moduleCode
+    )
   }
-  `;
+`;
 
 export const RESET_TIMETABLE_MUTATION = gql`
   mutation ResetTimetable($roomID: String!, $userID: Int!, $semester: Int!) {
     resetTimetable(roomID: $roomID, userID: $userID, semester: $semester)
   }
-  `;
+`;
 
 let url = "";
 let wsURL = "";
 if (process.env.NODE_ENV == "production") {
-  url = `https://${window.location.hostname}/graphql`
-  wsURL = `wss://${window.location.hostname}/graphql`
+  url = `https://${window.location.hostname}/graphql`;
+  wsURL = `wss://${window.location.hostname}/graphql`;
 } else {
-  url = `http://${window.location.hostname}:4000/graphql`
-  wsURL = `ws://${window.location.hostname}:4000/graphql`
+  url = `http://${window.location.hostname}:4000/graphql`;
+  wsURL = `ws://${window.location.hostname}:4000/graphql`;
 }
 
 // TODO: Proper URL variable
-const wsLink = new GraphQLWsLink(createClient({
-  url: wsURL,
-}));
+const wsLink = new GraphQLWsLink(
+  createClient({
+    url: wsURL,
+  }),
+);
 
 export const apolloClient = new ApolloClient({
   uri: url,
@@ -144,7 +203,12 @@ type Props = OwnProps & {
   hiddenInTimetable: ModuleCode[];
 
   // Actions
-  addModuleRT: (userID: UserID, semester: Semester, moduleCode: ModuleCode, roomID: String) => void;
+  addModuleRT: (
+    userID: UserID,
+    semester: Semester,
+    moduleCode: ModuleCode,
+    roomID: String,
+  ) => void;
   resetTimetable: (userID: UserID, semester: Semester) => void;
   modifyLesson: (lesson: Lesson) => void;
   editLesson: (semester: Semester, lesson: Lesson) => void;
@@ -161,14 +225,16 @@ type State = {
   tombstone: TombstoneModule | null;
 };
 
-
 /**
  * When a module is modified, we want to ensure the selected timetable cell
  * is in approximately the same location when all of the new options are rendered.
  * This is important for modules with a lot of options which can push the selected
  * option off screen and disorientate the user.
  */
-function maintainScrollPosition(container: HTMLElement, modifiedCell: ModifiedCell) {
+function maintainScrollPosition(
+  container: HTMLElement,
+  modifiedCell: ModifiedCell,
+) {
   const newCell = container.getElementsByClassName(modifiedCell.className)[0];
   if (!newCell) return;
 
@@ -185,7 +251,6 @@ function maintainScrollPosition(container: HTMLElement, modifiedCell: ModifiedCe
   window.scroll(0, y);
   container.scrollLeft = x; // eslint-disable-line no-param-reassign
 }
-
 
 class TimetableContent extends React.Component<Props, State> {
   override state: State = {
@@ -213,7 +278,9 @@ class TimetableContent extends React.Component<Props, State> {
   onScroll: React.UIEventHandler = (e) => {
     // Only trigger when there is an active lesson
     const isScrolledHorizontally =
-      !!this.props.activeLesson && e.currentTarget && e.currentTarget.scrollLeft > 0;
+      !!this.props.activeLesson &&
+      e.currentTarget &&
+      e.currentTarget.scrollLeft > 0;
     if (this.state.isScrolledHorizontally !== isScrolledHorizontally) {
       this.setState({ isScrolledHorizontally });
     }
@@ -239,20 +306,27 @@ class TimetableContent extends React.Component<Props, State> {
     this.props.hiddenInTimetable.includes(moduleCode);
 
   modifyCell = (lesson: ModifiableLesson, position: ClientRect) => {
-
     if (lesson.isActive) {
       // this.props.toggleSelectLesson(this.props.semester, lesson);
       const { userID, semester, roomID } = this.props;
       const { moduleCode, lessonType, classNo } = lesson;
 
       // Prevent deselecting all lessons
-      if (!lesson.isAvailable && (this.props.multiUserLessons[userID]?.[semester]?.[moduleCode]?.[lessonType] || [])
-        .filter(e => e !== classNo).length === 0) {
-        this.props.openNotification(`Must select at least one ${lessonType} for ${moduleCode}`,
+      if (
+        !lesson.isAvailable &&
+        (
+          this.props.multiUserLessons[userID]?.[semester]?.[moduleCode]?.[
+            lessonType
+          ] || []
+        ).filter((e) => e !== classNo).length === 0
+      ) {
+        this.props.openNotification(
+          `Must select at least one ${lessonType} for ${moduleCode}`,
           {
             timeout: 12000,
             overwritable: true,
-          });
+          },
+        );
       } else {
         const MUTATION = lesson.isAvailable ? CREATE_LESSON : DELETE_LESSON;
         apolloClient
@@ -264,11 +338,11 @@ class TimetableContent extends React.Component<Props, State> {
               semester: semester,
               moduleCode: moduleCode,
               lessonType: lessonType,
-              classNo: classNo
-            }
+              classNo: classNo,
+            },
           })
           .catch((err) => {
-            console.error("CREATE/DELETE_LESSON error: ", err)
+            console.error("CREATE/DELETE_LESSON error: ", err);
           });
       }
     } else {
@@ -282,10 +356,14 @@ class TimetableContent extends React.Component<Props, State> {
     }
   };
 
-
   // Centralized function to send addModule mutation
   addModuleRT = (semester: Semester, moduleCode: ModuleCode) => {
-    this.props.addModuleRT(this.props.userID, semester, moduleCode, this.props.roomID);
+    this.props.addModuleRT(
+      this.props.userID,
+      semester,
+      moduleCode,
+      this.props.roomID,
+    );
   };
 
   // Centralized function to send deleteModule mutation
@@ -298,13 +376,12 @@ class TimetableContent extends React.Component<Props, State> {
           userID: this.props.userID,
           semester: this.props.semester,
           moduleCode: moduleCode,
-        }
+        },
       })
       .catch((err) => {
-        console.error("DELETE_MODULE error: ", err)
+        console.error("DELETE_MODULE error: ", err);
       });
-  }
-
+  };
 
   resetTimetable = () => {
     apolloClient
@@ -314,10 +391,10 @@ class TimetableContent extends React.Component<Props, State> {
           roomID: this.props.roomID, // TODO: Use variable roomID and name
           userID: this.props.userID,
           semester: this.props.semester,
-        }
+        },
       })
       .catch((err) => {
-        console.error("RESET_TIMETABLE error: ", err)
+        console.error("RESET_TIMETABLE error: ", err);
       });
   };
 
@@ -325,8 +402,13 @@ class TimetableContent extends React.Component<Props, State> {
 
   // Returns modules currently in the timetable
   addedModules(): Module[] {
-    const modules = getSemesterModules(this.props.timetableWithLessons, this.props.modules);
-    return _.sortBy(modules, (module: Module) => getExamDate(module, this.props.semester));
+    const modules = getSemesterModules(
+      this.props.timetableWithLessons,
+      this.props.modules,
+    );
+    return _.sortBy(modules, (module: Module) =>
+      getExamDate(module, this.props.semester),
+    );
   }
 
   toModuleWithColor = (module: Module) => ({
@@ -358,7 +440,10 @@ class TimetableContent extends React.Component<Props, State> {
 
     // Separate added modules into sections of clashing modules
     const clashes = findExamClashes(modules, this.props.semester);
-    const nonClashingMods: Module[] = _.difference(modules, _.flatten(_.values(clashes)));
+    const nonClashingMods: Module[] = _.difference(
+      modules,
+      _.flatten(_.values(clashes)),
+    );
 
     if (_.isEmpty(clashes) && _.isEmpty(nonClashingMods) && !tombstone) {
       return (
@@ -384,13 +469,20 @@ class TimetableContent extends React.Component<Props, State> {
                   <p>
                     Clash on <strong>{formatExamDate(clashDate)}</strong>
                   </p>
-                  {this.renderModuleTable(clashes[clashDate], horizontalOrientation)}
+                  {this.renderModuleTable(
+                    clashes[clashDate],
+                    horizontalOrientation,
+                  )}
                 </div>
               ))}
             <hr />
           </>
         )}
-        {this.renderModuleTable(nonClashingMods, horizontalOrientation, tombstone)}
+        {this.renderModuleTable(
+          nonClashingMods,
+          horizontalOrientation,
+          tombstone,
+        )}
       </>
     );
   }
@@ -417,20 +509,28 @@ class TimetableContent extends React.Component<Props, State> {
 
     if (editingType)
       // Remove duplicates
-      filteredTimetableWithLessons[editingType.moduleCode][editingType.lessonType].length = 0;
+      filteredTimetableWithLessons[editingType.moduleCode][
+        editingType.lessonType
+      ].length = 0;
 
-    let timetableLessons: Lesson[] = timetableLessonsArray(filteredTimetableWithLessons)
+    let timetableLessons: Lesson[] = timetableLessonsArray(
+      filteredTimetableWithLessons,
+    )
       // Do not process hidden modules
       .filter((lesson) => !this.isHiddenInTimetable(lesson.moduleCode));
 
-    console.log("timetableLessons")
-    console.log(timetableLessons)
-    console.log("Optimised timetable")
+    console.log("timetableLessons");
+    console.log(timetableLessons);
+    console.log("Optimised timetable");
     try {
-      const optimisedTimetable = getOptimisedTimetable([timetableLessons], 0, 1)
-      console.log(optimisedTimetable)
+      const optimisedTimetable = getOptimisedTimetable(
+        [timetableLessons],
+        0,
+        1,
+      );
+      console.log(optimisedTimetable);
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
 
     // TODO: Set editingType to null when abruptly exiting from edit mode
@@ -452,7 +552,10 @@ class TimetableContent extends React.Component<Props, State> {
         // Blink animation
         modifiableLesson.isActive = true;
         // Transparency
-        modifiableLesson.isAvailable = !isLessonSelected(modifiableLesson, multiUserLessons[userID]?.[semester] || {});
+        modifiableLesson.isAvailable = !isLessonSelected(
+          modifiableLesson,
+          multiUserLessons[userID]?.[semester] || {},
+        );
 
         timetableLessons.push(modifiableLesson);
       });
@@ -478,7 +581,8 @@ class TimetableContent extends React.Component<Props, State> {
             return {
               ...lesson,
               isModifiable:
-                !readOnly && areOtherClassesAvailable(moduleTimetable, lesson.lessonType),
+                !readOnly &&
+                areOtherClassesAvailable(moduleTimetable, lesson.lessonType),
             };
           }),
         ),
@@ -490,11 +594,11 @@ class TimetableContent extends React.Component<Props, State> {
 
     return (
       <div
-        className={classnames('page-container', styles.container, {
+        className={classnames("page-container", styles.container, {
           verticalMode: isVerticalOrientation,
         })}
         onClick={this.cancelEditLesson}
-        onKeyUp={(e) => e.key === 'Escape' && this.cancelEditLesson()} // Quit modifying when Esc is pressed
+        onKeyUp={(e) => e.key === "Escape" && this.cancelEditLesson()} // Quit modifying when Esc is pressed
       >
         <Title>Timetable</Title>
 
@@ -503,8 +607,8 @@ class TimetableContent extends React.Component<Props, State> {
         <div className="row">
           <div
             className={classnames({
-              'col-md-12': !isVerticalOrientation,
-              'col-md-8': isVerticalOrientation,
+              "col-md-12": !isVerticalOrientation,
+              "col-md-8": isVerticalOrientation,
             })}
           >
             <div
@@ -523,8 +627,8 @@ class TimetableContent extends React.Component<Props, State> {
           </div>
           <div
             className={classnames({
-              'col-md-12': !isVerticalOrientation,
-              'col-md-4': isVerticalOrientation,
+              "col-md-12": !isVerticalOrientation,
+              "col-md-4": isVerticalOrientation,
             })}
           >
             <div className="row">
@@ -533,10 +637,14 @@ class TimetableContent extends React.Component<Props, State> {
                   isVerticalOrientation={isVerticalOrientation}
                   showTitle={isShowingTitle}
                   semester={semester}
-                  multiTimetable={this.props.multiUserLessons[userID]?.[semester]}
+                  multiTimetable={
+                    this.props.multiUserLessons[userID]?.[semester]
+                  }
                   showExamCalendar={showExamCalendar}
                   resetTimetable={this.resetTimetable}
-                  toggleExamCalendar={() => this.setState({ showExamCalendar: !showExamCalendar })}
+                  toggleExamCalendar={() =>
+                    this.setState({ showExamCalendar: !showExamCalendar })
+                  }
                   hiddenModules={hiddenInTimetable}
                 />
               </div>
@@ -545,7 +653,9 @@ class TimetableContent extends React.Component<Props, State> {
                 {!readOnly && (
                   <ModulesSelectContainer
                     semester={semester}
-                    multiTimetable={this.props.multiUserLessons[userID]?.[semester] || {}}
+                    multiTimetable={
+                      this.props.multiUserLessons[userID]?.[semester] || {}
+                    }
                     addModule={this.addModuleRT}
                     removeModuleRT={this.removeModuleRT}
                   />
@@ -553,7 +663,10 @@ class TimetableContent extends React.Component<Props, State> {
               </div>
 
               <div className="col-12">
-                {this.renderModuleSections(addedModules, !isVerticalOrientation)}
+                {this.renderModuleSections(
+                  addedModules,
+                  !isVerticalOrientation,
+                )}
               </div>
               {/* <div className="col-12">
                 <ModulesTableFooter
@@ -576,11 +689,16 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
   const { multiUserLessons } = state.timetables;
 
   // TODO: handle possibility of non-existent SemConfig
-  const timetableWithLessons = hydrateSemTimetableWithMultiLessons(multiUserLessons[userID]?.[semester] || {}, modules, semester);
+  const timetableWithLessons = hydrateSemTimetableWithMultiLessons(
+    multiUserLessons[userID]?.[semester] || {},
+    modules,
+    semester,
+  );
 
   // Determine the key to check for hidden modules based on readOnly status
   const hiddenModulesKey = readOnly ? HIDDEN_IMPORTED_SEM : semester;
-  const hiddenInTimetable = state.timetables.multiUserHidden?.[userID]?.[hiddenModulesKey] || [];
+  const hiddenInTimetable =
+    state.timetables.multiUserHidden?.[userID]?.[hiddenModulesKey] || [];
 
   return {
     semester,
@@ -606,5 +724,5 @@ export default connect(mapStateToProps, {
   changeLesson,
   cancelModifyLesson,
   cancelEditLesson,
-  openNotification
+  openNotification,
 })(TimetableContent);

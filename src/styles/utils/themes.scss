@@ -3,7 +3,8 @@
 }
 
 .hoverable {
-  transition: background-color $desktop-entering-duration $material-deceleration-curve;
+  transition: background-color $desktop-entering-duration
+    $material-deceleration-curve;
 }
 
 @each $name, $colors in $nusmods-theme-colors {

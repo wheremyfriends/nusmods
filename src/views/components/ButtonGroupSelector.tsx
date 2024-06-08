@@ -1,5 +1,5 @@
-import * as React from 'react';
-import classnames from 'classnames';
+import * as React from "react";
+import classnames from "classnames";
 
 export type Props = {
   choices: string[];
@@ -19,7 +19,7 @@ const ButtonGroupSelector: React.FC<Props> = (props) => {
     onChoiceSelect,
     classNames = {},
     attrs = {},
-    ariaLabel = 'Choices',
+    ariaLabel = "Choices",
   } = props;
 
   const sizeClassName = size ? `btn-group-${size}` : null;
@@ -33,9 +33,9 @@ const ButtonGroupSelector: React.FC<Props> = (props) => {
         key={choice}
         onClick={() => onChoiceSelect(choice)}
         type="button"
-        className={classnames('btn', ...className, {
-          'btn-primary': selectedChoice === choice,
-          'btn-outline-primary': selectedChoice !== choice,
+        className={classnames("btn", ...className, {
+          "btn-primary": selectedChoice === choice,
+          "btn-outline-primary": selectedChoice !== choice,
         })}
         {...attr}
       >
@@ -45,7 +45,11 @@ const ButtonGroupSelector: React.FC<Props> = (props) => {
   });
 
   return (
-    <div className={classnames('btn-group', sizeClassName)} role="group" aria-label={ariaLabel}>
+    <div
+      className={classnames("btn-group", sizeClassName)}
+      role="group"
+      aria-label={ariaLabel}
+    >
       {buttons}
     </div>
   );

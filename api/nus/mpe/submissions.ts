@@ -1,27 +1,29 @@
-import { User, verifyLogin } from '../../../src/serverless/nus-auth';
+import { User, verifyLogin } from "../../../src/serverless/nus-auth";
 import {
   createSubmission,
   featureFlagEnablerMiddleware,
   getSubmissionById,
-} from '../../../src/serverless/mpe';
-import type { MpeSubmission } from '../../../src/types/mpe';
+} from "../../../src/serverless/mpe";
+import type { MpeSubmission } from "../../../src/types/mpe";
 import {
   createRouteHandler,
   defaultFallback,
   defaultRescue,
   Handler,
   MethodHandlers,
-} from '../../../src/serverless/handler';
+} from "../../../src/serverless/handler";
 
 const handleGet: Handler = async (req, res) => {
   try {
     const user = (req as any).user as User;
     const existingSubmission = await getSubmissionById(user.accountName);
     delete existingSubmission.nusExchangeId;
-    existingSubmission.preferences = existingSubmission.preferences.map((p) => ({
-      moduleCode: p.moduleCode,
-      moduleType: p.moduleType,
-    }));
+    existingSubmission.preferences = existingSubmission.preferences.map(
+      (p) => ({
+        moduleCode: p.moduleCode,
+        moduleType: p.moduleType,
+      }),
+    );
     res.json(existingSubmission);
   } catch (err) {
     if (err.response.status === 404) {
@@ -42,7 +44,7 @@ const handlePost: Handler = async (req, res) => {
     const user = (req as any).user as User;
     await createSubmission(user.accountName, req.body);
     res.json({
-      message: 'Your MPE preferences are successfully recorded',
+      message: "Your MPE preferences are successfully recorded",
     });
   } catch (err) {
     throw err;
@@ -55,4 +57,8 @@ const methodHandlers: MethodHandlers = {
   PUT: featureFlagEnablerMiddleware(verifyLogin(handlePost)),
 };
 
-export default createRouteHandler(methodHandlers, defaultFallback, defaultRescue(true));
+export default createRouteHandler(
+  methodHandlers,
+  defaultFallback,
+  defaultRescue(true),
+);

@@ -1,5 +1,5 @@
-import qs from 'query-string';
-import { setTime } from 'utils/timify';
+import qs from "query-string";
+import { setTime } from "utils/timify";
 
 // Debug helper - allows developers to force some hard to reproduce
 // conditions to trigger via query params
@@ -10,7 +10,7 @@ function getParams() {
 
 // Force the 'new version available' refresh prompt to appear
 export function forceRefreshPrompt() {
-  return getParams().refresh === '1';
+  return getParams().refresh === "1";
 }
 
 // Overriding the Elasticsearch host URL from config, used for testing with a local ES server
@@ -29,7 +29,11 @@ export function forceTimer() {
   if (Number.isNaN(date.getTime())) return null;
 
   // Add current time if not specified
-  if (date.getUTCHours() === 0 && date.getMinutes() === 0 && date.getSeconds() === 0) {
+  if (
+    date.getUTCHours() === 0 &&
+    date.getMinutes() === 0 &&
+    date.getSeconds() === 0
+  ) {
     return setTime(date, new Date());
   }
 
@@ -37,9 +41,9 @@ export function forceTimer() {
 }
 
 export function allowBusStopEditing() {
-  return getParams().edit === '1';
+  return getParams().edit === "1";
 }
 
 export function preferRepoVenues() {
-  return getParams().localVenue === '1';
+  return getParams().localVenue === "1";
 }

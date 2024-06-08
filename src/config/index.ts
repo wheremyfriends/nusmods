@@ -1,22 +1,22 @@
-import { mapValues } from 'lodash';
-import { format } from 'date-fns';
+import { mapValues } from "lodash";
+import { format } from "date-fns";
 
-import { AcadYear, Semester } from 'types/modules';
+import { AcadYear, Semester } from "types/modules";
 
-import holidays from 'data/holidays.json';
-import modRegData from 'data/modreg-schedule.json';
-import appConfig from './app-config.json';
+import holidays from "data/holidays.json";
+import modRegData from "data/modreg-schedule.json";
+import appConfig from "./app-config.json";
 
 export const regPeriods = [
-  'Select Courses',
-  'Select Tutorials / Labs',
-  'Add / Swap Tutorials',
-  'Submit Course Requests',
-  'Course Planning Exercise (CPEx)',
+  "Select Courses",
+  "Select Tutorials / Labs",
+  "Add / Swap Tutorials",
+  "Submit Course Requests",
+  "Course Planning Exercise (CPEx)",
 ] as const;
 export type RegPeriodType = (typeof regPeriods)[number];
 
-export const SCHEDULE_TYPES = ['Undergraduate', 'Graduate'] as const;
+export const SCHEDULE_TYPES = ["Undergraduate", "Graduate"] as const;
 export type ScheduleType = (typeof SCHEDULE_TYPES)[number];
 
 export type RegPeriod = {
@@ -72,12 +72,14 @@ export type Config = {
   modRegSchedule: { [type in ScheduleType]: RegPeriod[] };
 };
 
-export function convertModRegDates(roundData: (typeof modRegData)[ScheduleType]): RegPeriod[] {
+export function convertModRegDates(
+  roundData: (typeof modRegData)[ScheduleType],
+): RegPeriod[] {
   return roundData.map((data) => ({
     ...data,
     type: data.type as RegPeriodType,
-    start: format(new Date(data.start), 'EEEE do LLLL, h:mm aaaa'),
-    end: format(new Date(data.end), 'EEEE do LLLL, h:mm aaaa'),
+    start: format(new Date(data.start), "EEEE do LLLL, h:mm aaaa"),
+    end: format(new Date(data.end), "EEEE do LLLL, h:mm aaaa"),
     startDate: new Date(data.start),
     endDate: new Date(data.end),
   }));

@@ -1,4 +1,4 @@
-import { REDO, UNDO } from './constants';
+import { REDO, UNDO } from "./constants";
 
 export function undo() {
   return { type: UNDO, payload: null };

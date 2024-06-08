@@ -1,12 +1,12 @@
-import { each } from 'lodash';
+import { each } from "lodash";
 
-import { PlannerPlaceholder } from 'types/planner';
+import { PlannerPlaceholder } from "types/planner";
 
-import general from './general';
-import cs from './cs';
+import general from "./general";
+import cs from "./cs";
 
-describe('Placeholders', () => {
-  test('should have same ID as object key', () => {
+describe("Placeholders", () => {
+  test("should have same ID as object key", () => {
     const expectKeyMatchId = (placeholder: PlannerPlaceholder, key: string) => {
       expect(key).toEqual(placeholder.id);
     };
@@ -15,7 +15,7 @@ describe('Placeholders', () => {
     each(cs, expectKeyMatchId);
   });
 
-  test('should have unique ID', () => {
+  test("should have unique ID", () => {
     const idMap = new Map<string, PlannerPlaceholder>();
 
     const expectUniqueId = (placeholder: PlannerPlaceholder, key: string) => {

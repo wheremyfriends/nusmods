@@ -1,9 +1,9 @@
-import { each, kebabCase } from 'lodash';
-import { ModuleTitle, Semester, ModuleCode } from 'types/modules';
-import { Venue } from 'types/venues';
-import { SemTimetableConfig } from 'types/timetables';
-import { serializeTimetable } from 'utils/timetables';
-import config from 'config';
+import { each, kebabCase } from "lodash";
+import { ModuleTitle, Semester, ModuleCode } from "types/modules";
+import { Venue } from "types/venues";
+import { SemTimetableConfig } from "types/timetables";
+import { serializeTimetable } from "utils/timetables";
+import config from "config";
 
 // IMPORTANT: Remember to update any route changes on the sitemap
 
@@ -29,14 +29,15 @@ export function timetablePage(semester: Semester): string {
   return `/`;
 }
 
-export const TIMETABLE_SHARE = 'share';
+export const TIMETABLE_SHARE = "share";
 export function timetableShare(
   semester: Semester,
   timetable: SemTimetableConfig,
   hiddenModules: ModuleCode[],
 ): string {
   // Convert the list of hidden modules to a comma-separated string, if there are any
-  const serializedHidden = hiddenModules.length === 0 ? '' : `&hidden=${hiddenModules.join(',')}`;
+  const serializedHidden =
+    hiddenModules.length === 0 ? "" : `&hidden=${hiddenModules.join(",")}`;
 
   return (
     `${timetablePage(semester)}/${TIMETABLE_SHARE}` +
@@ -46,27 +47,32 @@ export function timetableShare(
 }
 
 // Timetable path -> Semester
-export function semesterForTimetablePage(semStr: string | null | undefined): Semester | null {
+export function semesterForTimetablePage(
+  semStr: string | null | undefined,
+): Semester | null {
   if (!semStr) return null;
   return toSemester[semStr] || null;
 }
 
 // Module Code, Module Title -> Module page path
-export function modulePage(moduleCode: ModuleCode, moduleTitle?: ModuleTitle | null): string {
-  return `/courses/${moduleCode}/${kebabCase(moduleTitle || '')}`;
+export function modulePage(
+  moduleCode: ModuleCode,
+  moduleTitle?: ModuleTitle | null,
+): string {
+  return `/courses/${moduleCode}/${kebabCase(moduleTitle || "")}`;
 }
 
 export function moduleArchive(
   moduleCode: ModuleCode,
   year: string,
-  moduleTitle: ModuleTitle = '',
+  moduleTitle: ModuleTitle = "",
 ): string {
-  return `/archive/${moduleCode}/${year.replace('/', '-')}/${kebabCase(moduleTitle)}`;
+  return `/archive/${moduleCode}/${year.replace("/", "-")}/${kebabCase(moduleTitle)}`;
 }
 
 // Venue -> Venue page path
 export function venuePage(venue?: Venue | null | undefined): string {
-  if (!venue) return '/venues';
+  if (!venue) return "/venues";
   return `/venues/${encodeURIComponent(venue)}`;
 }
 

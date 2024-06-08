@@ -1,15 +1,15 @@
-import * as React from 'react';
-import classnames from 'classnames';
+import * as React from "react";
+import classnames from "classnames";
 
-import { HoverLesson, TimetableDayArrangement } from 'types/timetables';
-import { OnHoverCell, OnModifyCell } from 'types/views';
-import { convertTimeToIndex } from 'utils/timify';
+import { HoverLesson, TimetableDayArrangement } from "types/timetables";
+import { OnHoverCell, OnModifyCell } from "types/views";
+import { convertTimeToIndex } from "utils/timify";
 
-import { TimePeriod } from 'types/venues';
-import styles from './TimetableDay.scss';
-import TimetableRow from './TimetableRow';
-import CurrentTimeIndicator from './CurrentTimeIndicator';
-import TimetableHighlight from './TimetableHighlight';
+import { TimePeriod } from "types/venues";
+import styles from "./TimetableDay.scss";
+import TimetableRow from "./TimetableRow";
+import CurrentTimeIndicator from "./CurrentTimeIndicator";
+import TimetableHighlight from "./TimetableHighlight";
 
 type Props = {
   day: string;
@@ -42,8 +42,8 @@ function calculateLessonStyle(
   const endIndex = convertTimeToIndex(period.endTime);
   const size = endIndex - startIndex;
 
-  const dirStyle = verticalMode ? 'top' : 'left';
-  const sizeStyle = verticalMode ? 'height' : 'width';
+  const dirStyle = verticalMode ? "top" : "left";
+  const sizeStyle = verticalMode ? "height" : "width";
 
   return {
     [dirStyle]: `calc(${((startIndex - startingIndex) / totalCols) * 100}% + 1px)`,
@@ -92,12 +92,19 @@ const TimetableDay: React.FC<Props> = (props) => {
 
         {highlightPeriod && (
           <TimetableHighlight
-            style={calculateLessonStyle(highlightPeriod, startingIndex, endingIndex, verticalMode)}
+            style={calculateLessonStyle(
+              highlightPeriod,
+              startingIndex,
+              endingIndex,
+              verticalMode,
+            )}
           />
         )}
       </div>
 
-      {props.isCurrentDay && <div className={classnames('no-export', styles.currentDay)} />}
+      {props.isCurrentDay && (
+        <div className={classnames("no-export", styles.currentDay)} />
+      )}
     </li>
   );
 };
