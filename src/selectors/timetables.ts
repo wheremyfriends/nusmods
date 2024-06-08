@@ -27,7 +27,7 @@ const EMPTY_OBJECT = {};
 export const getSemesterTimetableMultiLessons = createSelector(
   ({ timetables }: State) => timetables.multiUserLessons,
   (multiUserLessons) => (userID: UserID, semester: Semester | null) =>
-    semester === null ? EMPTY_OBJECT : multiUserLessons[userID]?.[semester] ?? EMPTY_OBJECT,
+    semester === null ? EMPTY_OBJECT : multiUserLessons?.[userID]?.[semester] ?? EMPTY_OBJECT,
 );
 
 /**
