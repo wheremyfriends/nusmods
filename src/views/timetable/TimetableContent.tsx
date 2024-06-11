@@ -685,6 +685,9 @@ class TimetableContent extends React.Component<Props, State> {
                   }
                   hiddenModules={hiddenInTimetable}
                 />
+                <button className="TimetableActions-titleBtn btn-outline-primary btn btn-svg" onClick={() => {
+                  navigator.clipboard.writeText(JSON.stringify(multiTimetableLessons, null, 4));
+                }}>Copy as JSON</button>
               </div>
 
               <div className={styles.modulesSelect}>
