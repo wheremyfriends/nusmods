@@ -1,7 +1,7 @@
 import * as React from "react";
 import classnames from "classnames";
 import { connect, useDispatch } from "react-redux";
-import _, { get } from "lodash";
+import _, { get, keys } from "lodash";
 
 import {
   ColorMapping,
@@ -30,6 +30,7 @@ import {
   TimetableMultiConfig,
   LessonChange,
   MultiUserTimetableConfig,
+  MultiUserSemTimetableConfigWithLessons,
 } from "types/timetables";
 
 import {
@@ -56,7 +57,6 @@ import {
   findExamClashes,
   getLessonIdentifier,
   getSemesterModules,
-  hydrateSemTimetableWithLessons,
   hydrateSemTimetableWithMultiLessons,
   lessonsForLessonType,
   randomModuleLessonConfig,
@@ -193,7 +193,7 @@ type OwnProps = {
 
 type Props = OwnProps & {
   // From Redux
-  timetableWithLessons: SemTimetableConfigWithLessons;
+  multiUserTimetableWithLessons: MultiUserSemTimetableConfigWithLessons;
   multiUserLessons: MultiUserTimetableConfig;
   modules: ModulesMap;
   activeLesson: Lesson | null;
@@ -403,7 +403,7 @@ class TimetableContent extends React.Component<Props, State> {
   // Returns modules currently in the timetable
   addedModules(): Module[] {
     const modules = getSemesterModules(
-      this.props.timetableWithLessons,
+      this.props.multiUserTimetableWithLessons?.[this.props.userID] || {},
       this.props.modules,
     );
     return _.sortBy(modules, (module: Module) =>
@@ -416,6 +416,21 @@ class TimetableContent extends React.Component<Props, State> {
     colorIndex: this.props.colors[module.moduleCode],
     hiddenInTimetable: this.isHiddenInTimetable(module.moduleCode),
   });
+
+  colorLessons = (timetableLessons: Lesson[], colors: ColorMapping) => {
+    // Inject color into module
+    return (
+      timetableLessons
+        // Only populate lessons with colors that have been set
+        .filter((lesson: Lesson) => lesson.moduleCode in colors)
+        .map(
+          (lesson: Lesson): ColoredLesson => ({
+            ...lesson,
+            colorIndex: colors[lesson.moduleCode],
+          }),
+        )
+    );
+  };
 
   renderModuleTable = (
     modules: Module[],
@@ -499,13 +514,14 @@ class TimetableContent extends React.Component<Props, State> {
       showTitle,
       readOnly,
       hiddenInTimetable,
+      multiUserTimetableWithLessons,
     } = this.props;
 
     const { showExamCalendar } = this.state;
 
-    const filteredTimetableWithLessons = {
-      ...this.props.timetableWithLessons,
-    };
+    const filteredTimetableWithLessons = structuredClone(
+      multiUserTimetableWithLessons?.[userID],
+    );
 
     if (editingType)
       // Remove duplicates
@@ -519,18 +535,32 @@ class TimetableContent extends React.Component<Props, State> {
       // Do not process hidden modules
       .filter((lesson) => !this.isHiddenInTimetable(lesson.moduleCode));
 
-    console.log("timetableLessons");
-    console.log(timetableLessons);
-    console.log("Optimised timetable");
-    try {
-      const optimisedTimetable = getOptimisedTimetable(
-        [timetableLessons],
-        0,
-        1,
-      );
-      console.log(optimisedTimetable);
-    } catch (e) {
-      console.error(e);
+    const multiTimetableLessons = _.values(multiUserTimetableWithLessons).map(
+      (timetableWithLessons) => {
+        return timetableLessonsArray(timetableWithLessons).filter(
+          (lesson) => !this.isHiddenInTimetable(lesson.moduleCode),
+        );
+      },
+    );
+
+    const targetTimetableIdx = _.keys(multiUserTimetableWithLessons).indexOf(
+      userID.toString(),
+    );
+
+    let optimisedTimetables: Lesson[][] = [];
+
+    const maxsols = 1;
+
+    if (multiTimetableLessons[targetTimetableIdx]) {
+      try {
+        optimisedTimetables = getOptimisedTimetable(
+          multiTimetableLessons,
+          targetTimetableIdx,
+          maxsols,
+        );
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     // TODO: Set editingType to null when abruptly exiting from edit mode
@@ -561,17 +591,15 @@ class TimetableContent extends React.Component<Props, State> {
       });
     }
 
-    // Inject color into module
-    const coloredTimetableLessons = timetableLessons
-      // Only populate lessons with colors that have been set
-      .filter((lesson: Lesson) => lesson.moduleCode in colors)
-      .map(
-        (lesson: Lesson): ColoredLesson => ({
-          ...lesson,
-          colorIndex: colors[lesson.moduleCode],
-        }),
-      );
+    const coloredOptimisedTimetableLessons = this.colorLessons(
+      optimisedTimetables[maxsols - 1] || [],
+      colors,
+    );
+    const arrangedOptimisedLessons = arrangeLessonsForWeek(
+      coloredOptimisedTimetableLessons,
+    );
 
+    const coloredTimetableLessons = this.colorLessons(timetableLessons, colors);
     const arrangedLessons = arrangeLessonsForWeek(coloredTimetableLessons);
     const arrangedLessonsWithModifiableFlag: TimetableArrangement = _.mapValues(
       arrangedLessons,
@@ -619,6 +647,13 @@ class TimetableContent extends React.Component<Props, State> {
               onScroll={this.onScroll}
               ref={this.timetableRef}
             >
+              <Timetable
+                lessons={arrangedOptimisedLessons}
+                isVerticalOrientation={isVerticalOrientation}
+                isScrolledHorizontally={this.state.isScrolledHorizontally}
+                showTitle={isShowingTitle}
+                onModifyCell={() => {}}
+              />
               <Timetable
                 lessons={arrangedLessonsWithModifiableFlag}
                 isVerticalOrientation={isVerticalOrientation}
@@ -691,12 +726,18 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
   const { modules } = state.moduleBank;
   const { multiUserLessons } = state.timetables;
 
-  // TODO: handle possibility of non-existent SemConfig
-  const timetableWithLessons = hydrateSemTimetableWithMultiLessons(
-    multiUserLessons[userID]?.[semester] || {},
-    modules,
-    semester,
-  );
+  const multiUserTimetableWithLessons: MultiUserSemTimetableConfigWithLessons =
+    _.mapValues(
+      multiUserLessons,
+      (timetableMultiConfig: TimetableMultiConfig) => {
+        // TODO: handle possibility of non-existent SemConfig
+        return hydrateSemTimetableWithMultiLessons(
+          timetableMultiConfig?.[semester] || {},
+          modules,
+          semester,
+        );
+      },
+    );
 
   // Determine the key to check for hidden modules based on readOnly status
   const hiddenModulesKey = readOnly ? HIDDEN_IMPORTED_SEM : semester;
@@ -705,7 +746,7 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
 
   return {
     semester,
-    timetableWithLessons,
+    multiUserTimetableWithLessons,
     modules,
     roomID,
     userID,
