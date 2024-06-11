@@ -245,10 +245,10 @@ var Solver = class _Solver {
 
 // src/index.ts
 function getOptimisedTimetable(timetables, index, maxsols = -1) {
-  timetables = timetables.map((e) => {
+  const processedTimetable = timetables.map((e) => {
     return preprocess(e);
   });
-  const solver = new Solver(timetables, index);
+  const solver = new Solver(processedTimetable, index);
   const solvedTimetable = solver.solve(maxsols);
   const ret = [];
   solvedTimetable.forEach((timetable) => {
