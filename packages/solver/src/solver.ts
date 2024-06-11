@@ -28,15 +28,27 @@ type Cls = {
   lessonType: string;
   classNo: string;
   priority: number;
-  timeslots: TimeSlot[];
+  timeslots: TS[];
 };
-export type TimeSlot = {
+
+// TS for TimeSlot
+export type TS = {
   moduleCode: string;
   lessonType: string;
   classNo: string;
   startTime: number;
   endTime: number;
   day: Day;
+  [key: string]: any;
+};
+
+export type TimeSlot = {
+  moduleCode: string;
+  lessonType: string;
+  classNo: string;
+  startTime: string;
+  endTime: string;
+  day: string;
   [key: string]: any;
 };
 
@@ -67,7 +79,7 @@ export class Solver {
 
     const allClasses = Solver.assignPriority(
       allUsersClasses[index],
-      coursePriority,
+      coursePriority
     );
 
     this.numsols = 0;
@@ -129,7 +141,7 @@ export class Solver {
 
   static groupIntoClases(lessons: any[]) {
     const classToTimeSlot: { [key: string]: Cls } = {};
-    lessons.forEach((l: TimeSlot) => {
+    lessons.forEach((l: TS) => {
       const key = Solver.getClassKey(l);
 
       if (key in classToTimeSlot) {
@@ -190,7 +202,7 @@ export class Solver {
     numClassPerLesson = Object.fromEntries(
       Object.entries(numClassPerLesson).filter(([_, value]) => {
         return value > 1;
-      }),
+      })
     );
 
     return {
@@ -200,24 +212,24 @@ export class Solver {
   }
 
   resetTimetable(cls: Cls) {
-    cls.timeslots.forEach((ts: TimeSlot) => {
+    cls.timeslots.forEach((ts: TS) => {
       Solver.setTimetableVal(this.isFree, ts, Status.FREE);
     });
   }
 
   setTimetable(cls: Cls) {
-    cls.timeslots.forEach((ts: TimeSlot) => {
+    cls.timeslots.forEach((ts: TS) => {
       Solver.setTimetableVal(this.isFree, ts, Status.ALLOCATED);
     });
   }
 
-  static setTimetableVal(bitmap: Status[][], timeslot: TimeSlot, val: Status) {
+  static setTimetableVal(bitmap: Status[][], timeslot: TS, val: Status) {
     for (let i = timeslot.startTime; i < timeslot.endTime; i++) {
       bitmap[timeslot.day][i] = val;
     }
   }
 
-  static checkAvail(bitmap: Status[][], timeslots: TimeSlot[]) {
+  static checkAvail(bitmap: Status[][], timeslots: TS[]) {
     for (let ts of timeslots) {
       for (let i = ts.startTime; i < ts.endTime; i++) {
         if (bitmap[ts.day][i] == Status.ALLOCATED) return false;
