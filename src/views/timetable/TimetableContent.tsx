@@ -316,7 +316,7 @@ class TimetableContent extends React.Component<Props, State> {
         !lesson.isAvailable &&
         (
           this.props.multiUserLessons[userID]?.[semester]?.[moduleCode]?.[
-          lessonType
+            lessonType
           ] || []
         ).filter((e) => e !== classNo).length === 0
       ) {
