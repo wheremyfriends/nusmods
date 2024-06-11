@@ -316,7 +316,7 @@ class TimetableContent extends React.Component<Props, State> {
         !lesson.isAvailable &&
         (
           this.props.multiUserLessons[userID]?.[semester]?.[moduleCode]?.[
-          lessonType
+            lessonType
           ] || []
         ).filter((e) => e !== classNo).length === 0
       ) {
@@ -419,16 +419,18 @@ class TimetableContent extends React.Component<Props, State> {
 
   colorLessons = (timetableLessons: Lesson[], colors: ColorMapping) => {
     // Inject color into module
-    return timetableLessons
-      // Only populate lessons with colors that have been set
-      .filter((lesson: Lesson) => lesson.moduleCode in colors)
-      .map(
-        (lesson: Lesson): ColoredLesson => ({
-          ...lesson,
-          colorIndex: colors[lesson.moduleCode],
-        }),
-      );
-  }
+    return (
+      timetableLessons
+        // Only populate lessons with colors that have been set
+        .filter((lesson: Lesson) => lesson.moduleCode in colors)
+        .map(
+          (lesson: Lesson): ColoredLesson => ({
+            ...lesson,
+            colorIndex: colors[lesson.moduleCode],
+          }),
+        )
+    );
+  };
 
   renderModuleTable = (
     modules: Module[],
@@ -512,12 +514,14 @@ class TimetableContent extends React.Component<Props, State> {
       showTitle,
       readOnly,
       hiddenInTimetable,
-      multiUserTimetableWithLessons
+      multiUserTimetableWithLessons,
     } = this.props;
 
     const { showExamCalendar } = this.state;
 
-    const filteredTimetableWithLessons = structuredClone(multiUserTimetableWithLessons?.[userID]);
+    const filteredTimetableWithLessons = structuredClone(
+      multiUserTimetableWithLessons?.[userID],
+    );
 
     if (editingType)
       // Remove duplicates
@@ -531,14 +535,17 @@ class TimetableContent extends React.Component<Props, State> {
       // Do not process hidden modules
       .filter((lesson) => !this.isHiddenInTimetable(lesson.moduleCode));
 
-    const multiTimetableLessons = _.values(multiUserTimetableWithLessons)
-      .map((timetableWithLessons) => {
-        return timetableLessonsArray(timetableWithLessons)
-        .filter((lesson) => !this.isHiddenInTimetable(lesson.moduleCode));
-      });
+    const multiTimetableLessons = _.values(multiUserTimetableWithLessons).map(
+      (timetableWithLessons) => {
+        return timetableLessonsArray(timetableWithLessons).filter(
+          (lesson) => !this.isHiddenInTimetable(lesson.moduleCode),
+        );
+      },
+    );
 
-
-    const targetTimetableIdx = _.keys(multiUserTimetableWithLessons).indexOf(userID.toString());
+    const targetTimetableIdx = _.keys(multiUserTimetableWithLessons).indexOf(
+      userID.toString(),
+    );
 
     let optimisedTimetables: Lesson[][] = [];
 
@@ -584,8 +591,13 @@ class TimetableContent extends React.Component<Props, State> {
       });
     }
 
-    const coloredOptimisedTimetableLessons = this.colorLessons(optimisedTimetables[maxsols-1] || [], colors);
-    const arrangedOptimisedLessons = arrangeLessonsForWeek(coloredOptimisedTimetableLessons);
+    const coloredOptimisedTimetableLessons = this.colorLessons(
+      optimisedTimetables[maxsols - 1] || [],
+      colors,
+    );
+    const arrangedOptimisedLessons = arrangeLessonsForWeek(
+      coloredOptimisedTimetableLessons,
+    );
 
     const coloredTimetableLessons = this.colorLessons(timetableLessons, colors);
     const arrangedLessons = arrangeLessonsForWeek(coloredTimetableLessons);
@@ -640,7 +652,7 @@ class TimetableContent extends React.Component<Props, State> {
                 isVerticalOrientation={isVerticalOrientation}
                 isScrolledHorizontally={this.state.isScrolledHorizontally}
                 showTitle={isShowingTitle}
-                onModifyCell={() => { }}
+                onModifyCell={() => {}}
               />
               <Timetable
                 lessons={arrangedLessonsWithModifiableFlag}
@@ -715,15 +727,17 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
   const { multiUserLessons } = state.timetables;
 
   const multiUserTimetableWithLessons: MultiUserSemTimetableConfigWithLessons =
-    _.mapValues(multiUserLessons, (timetableMultiConfig: TimetableMultiConfig) => {
-      // TODO: handle possibility of non-existent SemConfig
-      return hydrateSemTimetableWithMultiLessons(
-        timetableMultiConfig?.[semester] || {},
-        modules,
-        semester,
-      );
-    })
-
+    _.mapValues(
+      multiUserLessons,
+      (timetableMultiConfig: TimetableMultiConfig) => {
+        // TODO: handle possibility of non-existent SemConfig
+        return hydrateSemTimetableWithMultiLessons(
+          timetableMultiConfig?.[semester] || {},
+          modules,
+          semester,
+        );
+      },
+    );
 
   // Determine the key to check for hidden modules based on readOnly status
   const hiddenModulesKey = readOnly ? HIDDEN_IMPORTED_SEM : semester;
