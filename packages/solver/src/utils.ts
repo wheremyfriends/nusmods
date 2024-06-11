@@ -1,3 +1,5 @@
+import { TimeSlot, TS } from "./solver";
+
 /**
  * Converts day (e.g Monday/Tuesday/Wednesday) to its corresponding number.
  * 0 - Sunday
@@ -43,7 +45,7 @@ export function init2DArr<T>(row: number, col: number, initval: T): T[][] {
   return output;
 }
 
-export function preprocess(timeslots: any[]) {
+export function preprocess(timeslots: TimeSlot[]) {
   return timeslots.map((ts) => {
     return {
       ...ts,
@@ -54,7 +56,7 @@ export function preprocess(timeslots: any[]) {
   });
 }
 
-export function postprocess(timeslots: any[]) {
+export function postprocess(timeslots: TS[]) {
   return timeslots.map((ts) => {
     return {
       ...ts,

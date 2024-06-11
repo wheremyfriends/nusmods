@@ -5,7 +5,6 @@ import { timetable as user3 } from "../timetables/user3";
 import { getOptimisedTimetable } from "../src/index";
 import { Solver, TimeSlot } from "../src/solver";
 import { init2DArr, preprocess } from "../src/utils";
-import { Roarr as log } from "roarr";
 
 describe("Timetable Generation", () => {
   let ans: TimeSlot[][];
@@ -50,8 +49,8 @@ describe("Timetable Generation", () => {
     ans.forEach((timetable) => {
       const bitmap = init2DArr<number>(7, 24, 0);
 
-      timetable = preprocess(timetable);
-      timetable.forEach((timeslot: any) => {
+      const processedTimetable = preprocess(timetable);
+      processedTimetable.forEach((timeslot: any) => {
         expect(Solver.checkAvail(bitmap, [timeslot])).toBeTruthy();
         Solver.setTimetableVal(bitmap, timeslot, 1);
       });
