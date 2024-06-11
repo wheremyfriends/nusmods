@@ -4,7 +4,7 @@ import { preprocess, postprocess } from "./utils";
 export function getOptimisedTimetable(
   timetables: TimeSlot[][],
   index: number,
-  maxsols: number = -1
+  maxsols: number = -1,
 ) {
   const processedTimetable: TS[][] = timetables.map((e) => {
     return preprocess(e);
