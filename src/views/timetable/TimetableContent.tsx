@@ -562,12 +562,15 @@ class TimetableContent extends React.Component<Props, State> {
     }
 
     // Inject color into module
-    const coloredTimetableLessons = timetableLessons.map(
-      (lesson: Lesson): ColoredLesson => ({
-        ...lesson,
-        colorIndex: colors[lesson.moduleCode],
-      }),
-    );
+    const coloredTimetableLessons = timetableLessons
+      // Only populate lessons with colors that have been set
+      .filter((lesson: Lesson) => lesson.moduleCode in colors)
+      .map(
+        (lesson: Lesson): ColoredLesson => ({
+          ...lesson,
+          colorIndex: colors[lesson.moduleCode],
+        }),
+      );
 
     const arrangedLessons = arrangeLessonsForWeek(coloredTimetableLessons);
     const arrangedLessonsWithModifiableFlag: TimetableArrangement = _.mapValues(
