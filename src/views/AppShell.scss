@@ -21,9 +21,6 @@ $logo-vert-padding: 0.875rem;
 
 .brand {
   display: flex;
-  // Explicit width so the logo will not expand
-  // to occupy the entire navbar
-  width: 12rem;
   padding: $logo-vert-padding $grid-gutter-width;
 }
 

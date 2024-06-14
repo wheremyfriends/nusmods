@@ -6,21 +6,28 @@
 */
 .nav {
   position: fixed;
-  top: $navbar-height;
+  top: $navbar-height + 1rem;
   right: 0;
   left: 0;
   z-index: $navtabs-z-index;
   // See site.scss for width on md and lg sizes
-  display: flex;
+  display: none;
   justify-content: space-around;
   align-items: stretch;
-  height: $navtab-height;
+  max-height: $navtab-height;
   overflow-y: auto;
+
+  & > div:first-child {
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+  }
 
   @include media-breakpoint-up(md) {
     flex-direction: column;
     justify-content: flex-start;
     box-shadow: none;
+    display: flex;
   }
 
   @include media-breakpoint-up(xl) {
@@ -58,6 +65,7 @@
   text-align: center;
   color: var(--gray-mid);
   transition: color 0.15s;
+  justify-content: start;
 
   &.linkActive {
     color: theme-color(primary);
