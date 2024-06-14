@@ -138,16 +138,12 @@ const AppShell: FC = ({ children }) => {
         />
       </Helmet>
 
-      {/* <nav className={styles.navbar}>
+      <nav className={styles.navbar}>
         <NavLink className={styles.brand} to="/" title="Home">
-          <Logo className={styles.brandLogo} title="NUSMods" />
+          Where are my friends?
         </NavLink>
 
-        <div className={styles.navRight}>
-
-          <div className={styles.weekText}>{weekText}</div>
-        </div>
-      </nav> */}
+      </nav>
 
       <div className="main-container">
         {/* <Navtabs /> */}
