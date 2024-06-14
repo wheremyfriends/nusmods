@@ -137,6 +137,7 @@ const Navtabs: FC<{
       </a>
       {/* <div className={styles.divider} /> */}
     </nav>
+        <div>{navUsers}</div>
   );
 };
 

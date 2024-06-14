@@ -17,6 +17,12 @@
   max-height: $navtab-height;
   overflow-y: auto;
 
+  & > div:first-child {
+     overflow: auto;
+     display: flex;
+     flex-direction: column;
+  }
+
   @include media-breakpoint-up(md) {
     flex-direction: column;
     justify-content: flex-start;
