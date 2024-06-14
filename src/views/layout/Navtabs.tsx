@@ -95,7 +95,7 @@ const Navtabs: FC<{
     useState<boolean>(false);
   const [isDelUserModalOpen, setIsDelUserModalOpen] = useState<boolean>(false);
   const [curEditUser, setCurEditUser] = useState<RoomUser | undefined>(
-    undefined
+    undefined,
   );
 
   useEffect(() => {
@@ -125,13 +125,13 @@ const Navtabs: FC<{
                   users.map((user) => {
                     if (user.userID === userID) return { ...user, name: name };
                     return user;
-                  })
+                  }),
                 );
                 return;
               }
               case Action.DELETE_USER: {
                 setUsers((users) =>
-                  users.filter((user) => user.userID !== userID)
+                  users.filter((user) => user.userID !== userID),
                 );
                 return;
               }

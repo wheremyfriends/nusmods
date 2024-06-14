@@ -18,9 +18,9 @@
   overflow-y: auto;
 
   & > div:first-child {
-     overflow: auto;
-     display: flex;
-     flex-direction: column;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
   }
 
   @include media-breakpoint-up(md) {

@@ -142,7 +142,6 @@ const AppShell: FC = ({ children }) => {
         <NavLink className={styles.brand} to="/" title="Home">
           Where are my friends?
         </NavLink>
-
       </nav>
 
       <div className="main-container">
