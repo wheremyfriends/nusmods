@@ -127,8 +127,11 @@
   "dependencies": {
     "@apollo/client": "^3.10.4",
     "@authenio/samlify-node-xmllint": "2.0.0",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@material/fab": "0.40.1",
     "@material/snackbar": "0.40.1",
+    "@mui/material": "^5.15.20",
     "@sentry/browser": "6.19.7",
     "@sentry/node": "6.19.7",
     "@sentry/tracing": "6.19.7",
