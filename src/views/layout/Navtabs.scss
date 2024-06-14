@@ -11,7 +11,7 @@
   left: 0;
   z-index: $navtabs-z-index;
   // See site.scss for width on md and lg sizes
-  display: flex;
+  display: none;
   justify-content: space-around;
   align-items: stretch;
   height: $navtab-height;
@@ -21,6 +21,7 @@
     flex-direction: column;
     justify-content: flex-start;
     box-shadow: none;
+    display: flex;
   }
 
   @include media-breakpoint-up(xl) {
