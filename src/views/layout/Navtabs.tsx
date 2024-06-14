@@ -65,20 +65,17 @@ const Navtabs: FC<{
                 return;
               }
               case Action.UPDATE_USER: {
-                setUsers((users) => {
-                  const index = users.findIndex(
-                    (user) => user.userID === userID,
-                  );
-                  if (index !== -1) {
-                    users[index].name = name;
-                  }
-                  return users;
-                });
+                setUsers((users) =>
+                  users.map((user) => {
+                    if (user.userID === userID) return { ...user, name: name };
+                    return user;
+                  })
+                );
                 return;
               }
               case Action.DELETE_USER: {
                 setUsers((users) =>
-                  users.filter((user) => user.userID == userID),
+                  users.filter((user) => user.userID !== userID)
                 );
                 return;
               }
