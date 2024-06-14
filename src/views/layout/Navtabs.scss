@@ -14,7 +14,7 @@
   display: none;
   justify-content: space-around;
   align-items: stretch;
-  height: $navtab-height;
+  max-height: $navtab-height;
   overflow-y: auto;
 
   @include media-breakpoint-up(md) {
@@ -59,6 +59,7 @@
   text-align: center;
   color: var(--gray-mid);
   transition: color 0.15s;
+  justify-content: start;
 
   &.linkActive {
     color: theme-color(primary);
