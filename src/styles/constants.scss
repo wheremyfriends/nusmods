@@ -2,7 +2,7 @@
 
 // Also update the NAVTAB_HEIGHT constant in Navtabs.jsx if these are changed
 $navbar-height: 3rem;
-$navtab-height: calc(100vh - $navbar-height);
+$navtab-height: calc(100vh - $navbar-height - 1rem);
 
 $side-nav-width-md: 4rem;
 $side-nav-width-lg: 10rem;

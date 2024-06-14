@@ -11,7 +11,7 @@ body,
 }
 
 body {
-  padding-top: 4rem;
+  padding-top: $navbar-height + 1rem;
 
   @include media-breakpoint-down(sm) {
     padding-top: $navbar-height;
