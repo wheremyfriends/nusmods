@@ -642,18 +642,18 @@ class TimetableContent extends React.Component<Props, State> {
               "col-md-8": isVerticalOrientation,
             })}
           >
+            <Timetable
+              lessons={arrangedOptimisedLessons}
+              isVerticalOrientation={isVerticalOrientation}
+              isScrolledHorizontally={this.state.isScrolledHorizontally}
+              showTitle={isShowingTitle}
+              onModifyCell={() => {}}
+            />
             <div
               className={styles.timetableWrapper}
               onScroll={this.onScroll}
               ref={this.timetableRef}
             >
-              <Timetable
-                lessons={arrangedOptimisedLessons}
-                isVerticalOrientation={isVerticalOrientation}
-                isScrolledHorizontally={this.state.isScrolledHorizontally}
-                showTitle={isShowingTitle}
-                onModifyCell={() => {}}
-              />
               <Timetable
                 lessons={arrangedLessonsWithModifiableFlag}
                 isVerticalOrientation={isVerticalOrientation}
