@@ -166,7 +166,7 @@ if (process.env.NODE_ENV == "production") {
 const wsLink = new GraphQLWsLink(
   createClient({
     url: wsURL,
-  }),
+  })
 );
 
 export const apolloClient = new ApolloClient({
@@ -207,7 +207,7 @@ type Props = OwnProps & {
     userID: UserID,
     semester: Semester,
     moduleCode: ModuleCode,
-    roomID: String,
+    roomID: String
   ) => void;
   resetTimetable: (userID: UserID, semester: Semester) => void;
   modifyLesson: (lesson: Lesson) => void;
@@ -233,7 +233,7 @@ type State = {
  */
 function maintainScrollPosition(
   container: HTMLElement,
-  modifiedCell: ModifiedCell,
+  modifiedCell: ModifiedCell
 ) {
   const newCell = container.getElementsByClassName(modifiedCell.className)[0];
   if (!newCell) return;
@@ -325,7 +325,7 @@ class TimetableContent extends React.Component<Props, State> {
           {
             timeout: 12000,
             overwritable: true,
-          },
+          }
         );
       } else {
         const MUTATION = lesson.isAvailable ? CREATE_LESSON : DELETE_LESSON;
@@ -362,7 +362,7 @@ class TimetableContent extends React.Component<Props, State> {
       this.props.userID,
       semester,
       moduleCode,
-      this.props.roomID,
+      this.props.roomID
     );
   };
 
@@ -404,10 +404,10 @@ class TimetableContent extends React.Component<Props, State> {
   addedModules(): Module[] {
     const modules = getSemesterModules(
       this.props.multiUserTimetableWithLessons?.[this.props.userID] || {},
-      this.props.modules,
+      this.props.modules
     );
     return _.sortBy(modules, (module: Module) =>
-      getExamDate(module, this.props.semester),
+      getExamDate(module, this.props.semester)
     );
   }
 
@@ -427,7 +427,7 @@ class TimetableContent extends React.Component<Props, State> {
           (lesson: Lesson): ColoredLesson => ({
             ...lesson,
             colorIndex: colors[lesson.moduleCode],
-          }),
+          })
         )
     );
   };
@@ -435,7 +435,7 @@ class TimetableContent extends React.Component<Props, State> {
   renderModuleTable = (
     modules: Module[],
     horizontalOrientation: boolean,
-    tombstone: TombstoneModule | null = null,
+    tombstone: TombstoneModule | null = null
   ) => (
     <TimetableModulesTable
       userID={this.props.userID}
@@ -457,7 +457,7 @@ class TimetableContent extends React.Component<Props, State> {
     const clashes = findExamClashes(modules, this.props.semester);
     const nonClashingMods: Module[] = _.difference(
       modules,
-      _.flatten(_.values(clashes)),
+      _.flatten(_.values(clashes))
     );
 
     if (_.isEmpty(clashes) && _.isEmpty(nonClashingMods) && !tombstone) {
@@ -486,7 +486,7 @@ class TimetableContent extends React.Component<Props, State> {
                   </p>
                   {this.renderModuleTable(
                     clashes[clashDate],
-                    horizontalOrientation,
+                    horizontalOrientation
                   )}
                 </div>
               ))}
@@ -496,7 +496,7 @@ class TimetableContent extends React.Component<Props, State> {
         {this.renderModuleTable(
           nonClashingMods,
           horizontalOrientation,
-          tombstone,
+          tombstone
         )}
       </>
     );
@@ -520,7 +520,7 @@ class TimetableContent extends React.Component<Props, State> {
     const { showExamCalendar } = this.state;
 
     const filteredTimetableWithLessons = structuredClone(
-      multiUserTimetableWithLessons?.[userID],
+      multiUserTimetableWithLessons?.[userID]
     );
 
     if (editingType)
@@ -530,7 +530,7 @@ class TimetableContent extends React.Component<Props, State> {
       ].length = 0;
 
     let timetableLessons: Lesson[] = timetableLessonsArray(
-      filteredTimetableWithLessons,
+      filteredTimetableWithLessons
     )
       // Do not process hidden modules
       .filter((lesson) => !this.isHiddenInTimetable(lesson.moduleCode));
@@ -538,13 +538,13 @@ class TimetableContent extends React.Component<Props, State> {
     const multiTimetableLessons = _.values(multiUserTimetableWithLessons).map(
       (timetableWithLessons) => {
         return timetableLessonsArray(timetableWithLessons).filter(
-          (lesson) => !this.isHiddenInTimetable(lesson.moduleCode),
+          (lesson) => !this.isHiddenInTimetable(lesson.moduleCode)
         );
-      },
+      }
     );
 
     const targetTimetableIdx = _.keys(multiUserTimetableWithLessons).indexOf(
-      userID.toString(),
+      userID.toString()
     );
 
     let optimisedTimetables: Lesson[][] = [];
@@ -556,7 +556,7 @@ class TimetableContent extends React.Component<Props, State> {
         optimisedTimetables = getOptimisedTimetable(
           multiTimetableLessons,
           targetTimetableIdx,
-          maxsols,
+          maxsols
         );
       } catch (e) {
         console.error(e);
@@ -584,7 +584,7 @@ class TimetableContent extends React.Component<Props, State> {
         // Transparency
         modifiableLesson.isAvailable = !isLessonSelected(
           modifiableLesson,
-          multiUserLessons[userID]?.[semester] || {},
+          multiUserLessons[userID]?.[semester] || {}
         );
 
         timetableLessons.push(modifiableLesson);
@@ -593,10 +593,10 @@ class TimetableContent extends React.Component<Props, State> {
 
     const coloredOptimisedTimetableLessons = this.colorLessons(
       optimisedTimetables[maxsols - 1] || [],
-      colors,
+      colors
     );
     const arrangedOptimisedLessons = arrangeLessonsForWeek(
-      coloredOptimisedTimetableLessons,
+      coloredOptimisedTimetableLessons
     );
 
     const coloredTimetableLessons = this.colorLessons(timetableLessons, colors);
@@ -615,8 +615,8 @@ class TimetableContent extends React.Component<Props, State> {
                 !readOnly &&
                 areOtherClassesAvailable(moduleTimetable, lesson.lessonType),
             };
-          }),
-        ),
+          })
+        )
     );
 
     const isVerticalOrientation = timetableOrientation !== HORIZONTAL;
@@ -642,18 +642,18 @@ class TimetableContent extends React.Component<Props, State> {
               "col-md-8": isVerticalOrientation,
             })}
           >
+            <Timetable
+              lessons={arrangedOptimisedLessons}
+              isVerticalOrientation={isVerticalOrientation}
+              isScrolledHorizontally={this.state.isScrolledHorizontally}
+              showTitle={isShowingTitle}
+              onModifyCell={() => {}}
+            />
             <div
               className={styles.timetableWrapper}
               onScroll={this.onScroll}
               ref={this.timetableRef}
             >
-              <Timetable
-                lessons={arrangedOptimisedLessons}
-                isVerticalOrientation={isVerticalOrientation}
-                isScrolledHorizontally={this.state.isScrolledHorizontally}
-                showTitle={isShowingTitle}
-                onModifyCell={() => {}}
-              />
               <Timetable
                 lessons={arrangedLessonsWithModifiableFlag}
                 isVerticalOrientation={isVerticalOrientation}
@@ -689,7 +689,7 @@ class TimetableContent extends React.Component<Props, State> {
                   className="TimetableActions-titleBtn btn-outline-primary btn btn-svg"
                   onClick={() => {
                     navigator.clipboard.writeText(
-                      JSON.stringify(multiTimetableLessons, null, 4),
+                      JSON.stringify(multiTimetableLessons, null, 4)
                     );
                   }}
                 >
@@ -713,7 +713,7 @@ class TimetableContent extends React.Component<Props, State> {
               <div className="col-12">
                 {this.renderModuleSections(
                   addedModules,
-                  !isVerticalOrientation,
+                  !isVerticalOrientation
                 )}
               </div>
               {/* <div className="col-12">
@@ -744,9 +744,9 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
         return hydrateSemTimetableWithMultiLessons(
           timetableMultiConfig?.[semester] || {},
           modules,
-          semester,
+          semester
         );
-      },
+      }
     );
 
   // Determine the key to check for hidden modules based on readOnly status
