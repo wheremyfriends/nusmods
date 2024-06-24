@@ -12922,7 +12922,7 @@ socks@~1.1.5:
 
 "solver@https://github.com/wheremyfriends/solver":
   version "1.0.0"
-  resolved "https://github.com/wheremyfriends/solver#14ee491ad3c878979b7913f0fac7cd3d23887e89"
+  resolved "https://github.com/wheremyfriends/solver#834a5511bd8e331368c4a8fdee317dccfedf60a4"
   dependencies:
     roarr "^7.21.1"
 
