@@ -95,6 +95,7 @@ const productionConfig = ({ browserWarningPath }) =>
               compress: {
                 // Two passes yield the most optimal results
                 passes: 2,
+                drop_console: true,
               },
             },
           }),
