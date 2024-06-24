@@ -673,7 +673,7 @@ class TimetableContent extends React.Component<Props, State> {
               "col-md-8": isVerticalOrientation,
             })}
           >
-            {missingLessons.length > 0 && missingLessons[0].length > 0 && (
+            {(missingLessons[0] || []).length > 0 && (
               <div className="alert alert-danger">
                 Warning! These lessons are unallocated
                 <ul style={{ marginBottom: 0 }}>
