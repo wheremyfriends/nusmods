@@ -252,6 +252,27 @@ function maintainScrollPosition(
   container.scrollLeft = x; // eslint-disable-line no-param-reassign
 }
 
+// Groups the timetable into lessons (CS2040C Lab, CS2100 Tut etc)
+function groupIntoLessons(lessons: Lesson[]) {
+  return lessons.reduce((acc, cur) => {
+    const lesson = `${cur.moduleCode} ${cur.lessonType}`;
+    acc.add(lesson);
+    return acc;
+  }, new Set<string>());
+}
+
+function findMissingLessons(
+  inputTimetable: Lesson[],
+  optimisedTimetables: Lesson[][],
+) {
+  const allLessons = groupIntoLessons(inputTimetable);
+
+  return optimisedTimetables.map((timetable) => {
+    const allocatedLessons = groupIntoLessons(timetable);
+    return [...allLessons].filter((l) => !allocatedLessons.has(l));
+  });
+}
+
 class TimetableContent extends React.Component<Props, State> {
   override state: State = {
     isScrolledHorizontally: false,
@@ -548,8 +569,9 @@ class TimetableContent extends React.Component<Props, State> {
     );
 
     let optimisedTimetables: Lesson[][] = [];
+    let missingLessons: string[][] = [];
 
-    const maxsols = 1;
+    const maxsols = 5;
 
     if (multiTimetableLessons[targetTimetableIdx]) {
       try {
@@ -561,6 +583,15 @@ class TimetableContent extends React.Component<Props, State> {
       } catch (e) {
         console.error(e);
       }
+
+      console.log({ optimisedTimetables });
+
+      missingLessons = findMissingLessons(
+        multiTimetableLessons[targetTimetableIdx],
+        optimisedTimetables,
+      );
+
+      console.log({ missingLessons });
     }
 
     // TODO: Set editingType to null when abruptly exiting from edit mode
@@ -592,7 +623,7 @@ class TimetableContent extends React.Component<Props, State> {
     }
 
     const coloredOptimisedTimetableLessons = this.colorLessons(
-      optimisedTimetables[maxsols - 1] || [],
+      optimisedTimetables[0] || [],
       colors,
     );
     const arrangedOptimisedLessons = arrangeLessonsForWeek(
@@ -642,6 +673,16 @@ class TimetableContent extends React.Component<Props, State> {
               "col-md-8": isVerticalOrientation,
             })}
           >
+            {missingLessons.length > 0 && missingLessons[0].length > 0 && (
+              <div className="alert alert-danger">
+                Warning! These lessons are unallocated
+                <ul style={{ marginBottom: 0 }}>
+                  {missingLessons[0].map((lesson) => (
+                    <li>{lesson}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <Timetable
               lessons={arrangedOptimisedLessons}
               isVerticalOrientation={isVerticalOrientation}
