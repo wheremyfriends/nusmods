@@ -17,6 +17,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup credential
+        run: |
+          git config --global credential.helper store
+          echo "https://${{ secrets.PAT }}:@github.com" > ~/.git-credentials
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
