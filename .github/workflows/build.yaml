@@ -4,6 +4,8 @@ on:
   push:
     branches: ["main"]
   pull_request:
+    branches: ["main"]
+  workflow_dispatch:
 
 jobs:
   build-static-site:
@@ -16,6 +18,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT }}
 
       - name: Setup credential
         run: |
