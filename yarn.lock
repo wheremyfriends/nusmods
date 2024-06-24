@@ -12920,8 +12920,9 @@ socks@~1.1.5:
     ip "^1.1.4"
     smart-buffer "^1.0.13"
 
-"solver@file:./packages/solver":
+"solver@https://github.com/wheremyfriends/solver":
   version "1.0.0"
+  resolved "https://github.com/wheremyfriends/solver#14ee491ad3c878979b7913f0fac7cd3d23887e89"
   dependencies:
     roarr "^7.21.1"
 
