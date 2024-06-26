@@ -6,10 +6,13 @@ import { Actions } from "types/actions";
 
 // Non-persisted reducers
 import requests from "./requests";
-import app from "./app";
 import createUndoReducer from "./undoHistory";
 
+
 // Persisted reducers
+import appReducer, {
+  persistConfig as appPersistConfig,
+} from "./app";
 import moduleBankReducer, {
   persistConfig as moduleBankPersistConfig,
 } from "./moduleBank";
@@ -27,7 +30,13 @@ import plannerReducer, {
   persistConfig as plannerPersistConfig,
 } from "./planner";
 
+
 // Persist reducers
+const app = persistReducer(
+  "app",
+  appReducer,
+  appPersistConfig,
+);
 const moduleBank = persistReducer(
   "moduleBank",
   moduleBankReducer,
