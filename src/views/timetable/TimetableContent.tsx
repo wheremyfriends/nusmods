@@ -9,6 +9,7 @@ import {
   ModulesMap,
   TimetableOrientation,
   NotificationOptions,
+  MultiUserFocusModulesMap,
 } from "types/reducers";
 import {
   Module,
@@ -194,6 +195,7 @@ type OwnProps = {
 type Props = OwnProps & {
   // From Redux
   multiUserTimetableWithLessons: MultiUserSemTimetableConfigWithLessons;
+  multiUserFocus: MultiUserFocusModulesMap;
   multiUserLessons: MultiUserTimetableConfig;
   modules: ModulesMap;
   activeLesson: Lesson | null;
@@ -436,6 +438,9 @@ class TimetableContent extends React.Component<Props, State> {
     ...module,
     colorIndex: this.props.colors[module.moduleCode],
     hiddenInTimetable: this.isHiddenInTimetable(module.moduleCode),
+    focused:
+      module.moduleCode ===
+      this.props.multiUserFocus[this.props.userID]?.[this.props.semester],
   });
 
   colorLessons = (timetableLessons: Lesson[], colors: ColorMapping) => {
@@ -536,6 +541,7 @@ class TimetableContent extends React.Component<Props, State> {
       readOnly,
       hiddenInTimetable,
       multiUserTimetableWithLessons,
+      multiUserFocus,
     } = this.props;
 
     const { showExamCalendar } = this.state;
@@ -552,15 +558,22 @@ class TimetableContent extends React.Component<Props, State> {
 
     let timetableLessons: Lesson[] = timetableLessonsArray(
       filteredTimetableWithLessons,
-    )
-      // Do not process hidden modules
-      .filter((lesson) => !this.isHiddenInTimetable(lesson.moduleCode));
+    );
 
-    const multiTimetableLessons = _.values(multiUserTimetableWithLessons).map(
+    const focusedMod = multiUserFocus?.[userID]?.[semester];
+    if (focusedMod === undefined) {
+      timetableLessons = timetableLessons.filter(
+        (lesson) => !this.isHiddenInTimetable(lesson.moduleCode),
+      );
+    } else {
+      timetableLessons = timetableLessons.filter(
+        (lesson) => lesson.moduleCode === focusedMod,
+      );
+    }
+
+    let multiTimetableLessons = _.values(multiUserTimetableWithLessons).map(
       (timetableWithLessons) => {
-        return timetableLessonsArray(timetableWithLessons).filter(
-          (lesson) => !this.isHiddenInTimetable(lesson.moduleCode),
-        );
+        return timetableLessonsArray(timetableWithLessons);
       },
     );
 
@@ -808,6 +821,7 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
     timetableOrientation: state.theme.timetableOrientation,
     showTitle: state.theme.showTitle,
     hiddenInTimetable,
+    multiUserFocus: state.timetables.multiUserFocus,
   };
 }
 

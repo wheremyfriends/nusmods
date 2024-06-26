@@ -428,3 +428,23 @@ export function showLessonInTimetable(
     payload: { userID, moduleCode, semester },
   };
 }
+export const FOCUS_LESSON_IN_TIMETABLE = "FOCUS_LESSON_IN_TIMETABLE" as const;
+export function focusLessonInTimetable(
+  userID: UserID,
+  semester: Semester,
+  moduleCode: ModuleCode,
+) {
+  return {
+    type: FOCUS_LESSON_IN_TIMETABLE,
+    payload: { userID, moduleCode, semester },
+  };
+}
+
+export const UNFOCUS_LESSON_IN_TIMETABLE =
+  "UNFOCUS_LESSON_IN_TIMETABLE" as const;
+export function unfocusLessonInTimetable(userID: UserID, semester: Semester) {
+  return {
+    type: UNFOCUS_LESSON_IN_TIMETABLE,
+    payload: { userID, semester },
+  };
+}

@@ -125,10 +125,13 @@ export type SettingsState = {
 export type ColorMapping = { [moduleCode: string]: ColorIndex };
 export type SemesterColorMap = { [semester: string]: ColorMapping };
 export type HiddenModulesMap = { [semester: string]: ModuleCode[] };
+export type FocusModulesMap = { [semester: string]: ModuleCode | undefined };
 export type MultiUserHiddenModulesMap = { [userID: UserID]: HiddenModulesMap };
+export type MultiUserFocusModulesMap = { [userID: UserID]: FocusModulesMap };
 
 export type TimetablesState = {
   readonly multiUserLessons: MultiUserTimetableConfig;
+  readonly multiUserFocus: MultiUserFocusModulesMap;
   readonly editingType: EditingType | null;
   readonly colors: SemesterColorMap;
   readonly multiUserHidden: MultiUserHiddenModulesMap;
