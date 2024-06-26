@@ -20,7 +20,7 @@ import {
 const defaultAppState = (): AppState => ({
   // Default to the current semester from config.
   activeSemester: config.semester,
-  activeUserID: -1,
+  activeUserMapping: {},
   // The lesson being modified on the timetable.
   activeLesson: null,
   isOnline: navigator.onLine,
@@ -33,9 +33,13 @@ const defaultAppState = (): AppState => ({
 function app(state: AppState = defaultAppState(), action: Actions): AppState {
   switch (action.type) {
     case SWITCH_USER:
+      const { userID, roomID } = action.payload;
       return {
         ...state,
-        activeUserID: action.payload,
+        activeUserMapping: {
+          ...state.activeUserMapping,
+          [roomID]: userID,
+        }
       };
     case SELECT_SEMESTER:
       return {

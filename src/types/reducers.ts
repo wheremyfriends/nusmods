@@ -12,6 +12,7 @@ import {
   MultiUserTimetableConfig,
 } from "./timetables";
 import {
+  ActiveUserMapping,
   Faculty,
   Module,
   ModuleCode,
@@ -60,7 +61,7 @@ export type NotificationData = {
 } & NotificationOptions;
 
 export type AppState = {
-  readonly activeUserID: UserID;
+  readonly activeUserMapping: ActiveUserMapping;
   readonly activeSemester: Semester;
   readonly activeLesson: Lesson | null;
   readonly isOnline: boolean;

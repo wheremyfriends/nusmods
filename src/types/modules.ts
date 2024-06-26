@@ -228,3 +228,7 @@ export type Module = {
   // Meta
   timestamp: number;
 };
+
+export type ActiveUserMapping = {
+  [roomID: string]: UserID;
+};
