@@ -4,6 +4,7 @@ import { Venue } from "types/venues";
 import { SemTimetableConfig } from "types/timetables";
 import { serializeTimetable } from "utils/timetables";
 import config from "config";
+import { nanoid } from "nanoid";
 
 // IMPORTANT: Remember to update any route changes on the sitemap
 
@@ -17,7 +18,7 @@ each(config.shortSemesterNames, (name, semester) => {
 });
 
 export function generateRoomID() {
-  return "room1"; // TODO: Implement generator
+  return nanoid();
 }
 
 export function pageWithRoomID(roomID: String): string {
