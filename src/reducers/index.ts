@@ -10,6 +10,7 @@ import createUndoReducer from "./undoHistory";
 import timetables from "./timetables";
 import moduleBank from "./moduleBank";
 import venueBank from "./venueBank";
+import planner from "./planner";
 
 
 // Persisted reducers
@@ -29,9 +30,9 @@ import themeReducer from "./theme";
 import settingsReducer, {
   persistConfig as settingsPersistConfig,
 } from "./settings";
-import plannerReducer, {
-  persistConfig as plannerPersistConfig,
-} from "./planner";
+// import plannerReducer, {
+//   persistConfig as plannerPersistConfig,
+// } from "./planner";
 
 
 // Persist reducers
@@ -61,7 +62,7 @@ const settings = persistReducer(
   settingsReducer,
   settingsPersistConfig,
 );
-const planner = persistReducer("planner", plannerReducer, plannerPersistConfig);
+// const planner = persistReducer("planner", plannerReducer, plannerPersistConfig);
 
 // State default is delegated to its child reducers.
 const defaultState = {} as unknown as State;
