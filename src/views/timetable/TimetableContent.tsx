@@ -757,13 +757,13 @@ class TimetableContent extends React.Component<Props, State> {
                   !isVerticalOrientation,
                 )}
               </div>
-              {/* <div className="col-12">
+              <div className="col-12">
                 <ModulesTableFooter
                   modules={addedModules}
                   semester={semester}
                   hiddenInTimetable={hiddenInTimetable}
                 />
-              </div> */}
+              </div>
             </div>
           </div>
         </div>
