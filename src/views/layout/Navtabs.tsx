@@ -79,12 +79,14 @@ function deleteUser(roomID: string, userID: number) {
     });
 }
 
+// TODO: move to a more appropriate location
+function getActiveUserID(roomID: string) {
+  return store.getState().app.activeUserMapping[roomID] ?? -1;
+}
+
 const Navtabs: FC<{
-  roomID: String;
+  roomID: string;
 }> = ({ roomID }) => {
-  const activeSemester = useSelector(({ app }: State) => app.activeSemester);
-  const activeUserID = useSelector(({ app }: State) => app.activeUserID);
-  const beta = useSelector(({ settings }: State) => settings.beta);
   const dispatch = useDispatch();
 
   const [users, setUsers] = useState<RoomUser[]>([]);
@@ -115,8 +117,8 @@ const Navtabs: FC<{
             switch (action) {
               case Action.CREATE_USER: {
                 setUsers((users) => [...users, { userID, name }]);
-                if (store.getState().app.activeUserID == -1) {
-                  dispatch(switchUser(userID));
+                if (getActiveUserID(roomID) === -1) {
+                  dispatch(switchUser(userID, roomID));
                 }
                 return;
               }
@@ -170,7 +172,7 @@ const Navtabs: FC<{
       <a
         key={user.userID}
         className={
-          activeUserID === user.userID
+          getActiveUserID(roomID) === user.userID
             ? classnames(styles.link, styles.linkActive)
             : styles.link
         }
@@ -179,7 +181,7 @@ const Navtabs: FC<{
           const userIDString = e.currentTarget.getAttribute("data-userid");
           if (userIDString) {
             const userID: UserID = +userIDString;
-            dispatch(switchUser(userID));
+            dispatch(switchUser(userID, roomID));
           }
         }}
         data-userid={user.userID}

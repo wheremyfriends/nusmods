@@ -146,8 +146,11 @@ export const TimetableContainerComponent: FC = () => {
   const params = useParams<Params>();
 
   const semester = useSelector(({ app }: State) => app.activeSemester);
-  const userID = useSelector(({ app }: State) => app.activeUserID);
+  const activeUserMapping = useSelector(
+    ({ app }: State) => app.activeUserMapping,
+  );
   const roomID = params.roomID;
+  const userID = activeUserMapping[roomID] ?? -1;
 
   const multiTimetable = useSelector(getSemesterTimetableMultiLessons)(
     userID,
@@ -164,10 +167,6 @@ export const TimetableContainerComponent: FC = () => {
   // Resubscribe if roomID changes
   // TODO: Unsubscribe
   useEffect(() => {
-    // TODO: states should not even be saved in the first place
-    dispatch(cancelEditLesson());
-    dispatch(resetAllTimetables());
-
     apolloClient
       .subscribe({
         query: LESSON_CHANGE_SUBSCRIPTION,

@@ -6,50 +6,27 @@ import { Actions } from "types/actions";
 
 // Non-persisted reducers
 import requests from "./requests";
-import app from "./app";
 import createUndoReducer from "./undoHistory";
+import timetables from "./timetables";
+import moduleBank from "./moduleBank";
+import venueBank from "./venueBank";
+import planner from "./planner";
 
 // Persisted reducers
-import moduleBankReducer, {
-  persistConfig as moduleBankPersistConfig,
-} from "./moduleBank";
-import venueBankReducer, {
-  persistConfig as venueBankPersistConfig,
-} from "./venueBank";
-import timetablesReducer, {
-  persistConfig as timetablesPersistConfig,
-} from "./timetables";
+import appReducer, { persistConfig as appPersistConfig } from "./app";
 import themeReducer from "./theme";
 import settingsReducer, {
   persistConfig as settingsPersistConfig,
 } from "./settings";
-import plannerReducer, {
-  persistConfig as plannerPersistConfig,
-} from "./planner";
 
 // Persist reducers
-const moduleBank = persistReducer(
-  "moduleBank",
-  moduleBankReducer,
-  moduleBankPersistConfig,
-);
-const venueBank = persistReducer(
-  "venueBank",
-  venueBankReducer,
-  venueBankPersistConfig,
-);
-const timetables = persistReducer(
-  "timetables",
-  timetablesReducer,
-  timetablesPersistConfig,
-);
+const app = persistReducer("app", appReducer, appPersistConfig);
 const theme = persistReducer("theme", themeReducer);
 const settings = persistReducer(
   "settings",
   settingsReducer,
   settingsPersistConfig,
 );
-const planner = persistReducer("planner", plannerReducer, plannerPersistConfig);
 
 // State default is delegated to its child reducers.
 const defaultState = {} as unknown as State;
