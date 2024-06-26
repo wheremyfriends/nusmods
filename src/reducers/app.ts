@@ -117,5 +117,4 @@ function app(state: AppState = defaultAppState(), action: Actions): AppState {
 
 export default app;
 
-export const persistConfig = {
-};
+export const persistConfig = {};

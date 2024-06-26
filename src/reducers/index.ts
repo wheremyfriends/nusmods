@@ -12,11 +12,8 @@ import moduleBank from "./moduleBank";
 import venueBank from "./venueBank";
 import planner from "./planner";
 
-
 // Persisted reducers
-import appReducer, {
-  persistConfig as appPersistConfig,
-} from "./app";
+import appReducer, { persistConfig as appPersistConfig } from "./app";
 // import moduleBankReducer, {
 //   persistConfig as moduleBankPersistConfig,
 // } from "./moduleBank";
@@ -34,13 +31,8 @@ import settingsReducer, {
 //   persistConfig as plannerPersistConfig,
 // } from "./planner";
 
-
 // Persist reducers
-const app = persistReducer(
-  "app",
-  appReducer,
-  appPersistConfig,
-);
+const app = persistReducer("app", appReducer, appPersistConfig);
 // const moduleBank = persistReducer(
 //   "moduleBank",
 //   moduleBankReducer,
