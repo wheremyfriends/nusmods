@@ -85,6 +85,23 @@ function formatWeekRange(weekRange: WeekRange) {
     </Tooltip>
   );
 }
+function isSameLessonType(
+  a: HoverLesson | null | undefined,
+  b: HoverLesson | null | undefined,
+) {
+  if (a === null || b === null || a === undefined || b === undefined)
+    return false;
+
+  const preprocess = (inp: HoverLesson) => {
+    const { moduleCode, lessonType, ...rest } = inp;
+    return {
+      moduleCode,
+      lessonType,
+    };
+  };
+
+  return isEqual(preprocess(a), preprocess(b));
+}
 
 /**
  * Smallest unit in timetable.
@@ -99,7 +116,11 @@ const TimetableCell: React.FC<Props> = (props) => {
     ? `${lesson.moduleCode} ${lesson.title}`
     : lesson.moduleCode;
   const Cell = props.onClick ? "button" : "div";
-  const isHoveredOver = isEqual(getHoverLesson(lesson), hoverLesson);
+  const isHoveredOver = !lesson.isActive
+    ? isSameLessonType(lesson, hoverLesson)
+    : lesson.isAvailable
+      ? isEqual(getHoverLesson(lesson), hoverLesson)
+      : true;
 
   const conditionalProps = onClick
     ? {

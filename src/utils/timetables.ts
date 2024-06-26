@@ -234,6 +234,67 @@ export function doLessonsOverlap(lesson1: Lesson, lesson2: Lesson): boolean {
     lesson2.startTime < lesson1.endTime
   );
 }
+function getModKey(lesson: Lesson) {
+  return lesson.moduleCode;
+}
+
+function getLessonKey(lesson: Lesson) {
+  return `${getModKey(lesson)} ${lesson.lessonType}`;
+}
+function duration(a: string, b: string) {
+  function convertToInt(inp: string) {
+    return parseInt(inp) / 100;
+  }
+
+  return convertToInt(a) - convertToInt(b);
+}
+
+function compare(
+  mapping: { [key: string]: number },
+  keyFunc: (a: Lesson) => string,
+  a: Lesson,
+  b: Lesson,
+) {
+  return mapping[keyFunc(b)] - mapping[keyFunc(a)];
+}
+
+function getRange(keyFunc: (a: Lesson) => string, lessons: Lesson[]) {
+  function convertToInt(inp: string) {
+    return parseInt(inp) / 100;
+  }
+
+  const startTimes = lessons.reduce(
+    (acc, cur) => {
+      const key = keyFunc(cur);
+      if (!(key in acc)) acc[key] = [];
+
+      acc[key].push(convertToInt(cur.startTime));
+      return acc;
+    },
+    {} as { [key: string]: number[] },
+  );
+
+  const endTimes = lessons.reduce(
+    (acc, cur) => {
+      const key = keyFunc(cur);
+      if (!(key in acc)) acc[key] = [];
+
+      acc[key].push(convertToInt(cur.endTime));
+      return acc;
+    },
+    {} as { [key: string]: number[] },
+  );
+
+  return Object.keys(startTimes).reduce(
+    (acc, key) => {
+      const start = Math.min(...startTimes[key]);
+      const end = Math.max(...endTimes[key]);
+      acc[key] = end - start;
+      return acc;
+    },
+    {} as { [key: string]: number },
+  );
+}
 
 //  Converts a flat array of lessons *for ONE day* into rows of lessons within that day row.
 //  Result invariants:
@@ -249,9 +310,41 @@ export function arrangeLessonsWithinDay(
   if (isEmpty(lessons)) {
     return rows;
   }
+
+  const totalDurationByLesson = lessons.reduce(
+    (acc, cur) => {
+      const lessonKey = getLessonKey(cur);
+      acc[lessonKey] =
+        (acc[lessonKey] || 0) + duration(cur.endTime, cur.startTime);
+      return acc;
+    },
+    {} as { [key: string]: number },
+  );
+
+  const totalDurationByMod = lessons.reduce(
+    (acc, cur) => {
+      const lessonKey = getModKey(cur);
+      acc[lessonKey] =
+        (acc[lessonKey] || 0) + duration(cur.endTime, cur.startTime);
+      return acc;
+    },
+    {} as { [key: string]: number },
+  );
+
+  const rangeByMod = getRange(getModKey, lessons);
+  const rangeByLesson = getRange(getLessonKey, lessons);
+
   const sortedLessons = lessons.sort((a, b) => {
-    const timeDiff = a.startTime.localeCompare(b.startTime);
-    return timeDiff !== 0 ? timeDiff : a.classNo.localeCompare(b.classNo);
+    return (
+      a.startTime.localeCompare(b.startTime) ||
+      compare(rangeByMod, getModKey, a, b) ||
+      compare(totalDurationByMod, getModKey, a, b) ||
+      compare(rangeByLesson, getLessonKey, a, b) ||
+      compare(totalDurationByLesson, getLessonKey, a, b) ||
+      a.moduleCode.localeCompare(b.moduleCode) ||
+      a.lessonType.localeCompare(b.lessonType) ||
+      a.classNo.localeCompare(b.classNo)
+    );
   });
   sortedLessons.forEach((lesson: ColoredLesson) => {
     for (let i = 0; i < rows.length; i++) {
