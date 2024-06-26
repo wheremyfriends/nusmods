@@ -727,6 +727,7 @@ class TimetableContent extends React.Component<Props, State> {
                   hiddenModules={hiddenInTimetable}
                 />
                 <button
+                  hidden
                   className="TimetableActions-titleBtn btn-outline-primary btn btn-svg"
                   onClick={() => {
                     navigator.clipboard.writeText(
@@ -757,13 +758,13 @@ class TimetableContent extends React.Component<Props, State> {
                   !isVerticalOrientation,
                 )}
               </div>
-              {/* <div className="col-12">
+              <div className="col-12">
                 <ModulesTableFooter
                   modules={addedModules}
                   semester={semester}
                   hiddenInTimetable={hiddenInTimetable}
                 />
-              </div> */}
+              </div>
             </div>
           </div>
         </div>
