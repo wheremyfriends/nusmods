@@ -28,22 +28,6 @@ export default function configureStore(defaultState?: State) {
 
   const middlewares = [ravenMiddleware, thunk, requestsMiddleware];
 
-  if (NUSMODS_ENV === "development") {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require, import/no-extraneous-dependencies
-    const { createLogger } = require("redux-logger");
-    const logger = createLogger({
-      level: "info",
-      collapsed: true,
-      duration: true,
-      diff: true,
-      // Avoid diffing actions that insert a lot of stuff into the state to prevent console from lagging
-      diffPredicate: (_getState: GetState, action: Actions) =>
-        !action.type.startsWith("FETCH_MODULE_LIST") &&
-        !action.type.startsWith("persist/"),
-    });
-    middlewares.push(logger);
-  }
-
   const storeEnhancer = applyMiddleware(...middlewares);
 
   const store = createStore(
