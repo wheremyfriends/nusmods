@@ -7,21 +7,24 @@ import { Actions } from "types/actions";
 // Non-persisted reducers
 import requests from "./requests";
 import createUndoReducer from "./undoHistory";
+import timetables from "./timetables";
+import moduleBank from "./moduleBank";
+import venueBank from "./venueBank";
 
 
 // Persisted reducers
 import appReducer, {
   persistConfig as appPersistConfig,
 } from "./app";
-import moduleBankReducer, {
-  persistConfig as moduleBankPersistConfig,
-} from "./moduleBank";
-import venueBankReducer, {
-  persistConfig as venueBankPersistConfig,
-} from "./venueBank";
-import timetablesReducer, {
-  persistConfig as timetablesPersistConfig,
-} from "./timetables";
+// import moduleBankReducer, {
+//   persistConfig as moduleBankPersistConfig,
+// } from "./moduleBank";
+// import venueBankReducer, {
+//   persistConfig as venueBankPersistConfig,
+// } from "./venueBank";
+// import timetablesReducer, {
+//   persistConfig as timetablesPersistConfig,
+// } from "./timetables";
 import themeReducer from "./theme";
 import settingsReducer, {
   persistConfig as settingsPersistConfig,
@@ -37,21 +40,21 @@ const app = persistReducer(
   appReducer,
   appPersistConfig,
 );
-const moduleBank = persistReducer(
-  "moduleBank",
-  moduleBankReducer,
-  moduleBankPersistConfig,
-);
-const venueBank = persistReducer(
-  "venueBank",
-  venueBankReducer,
-  venueBankPersistConfig,
-);
-const timetables = persistReducer(
-  "timetables",
-  timetablesReducer,
-  timetablesPersistConfig,
-);
+// const moduleBank = persistReducer(
+//   "moduleBank",
+//   moduleBankReducer,
+//   moduleBankPersistConfig,
+// );
+// const venueBank = persistReducer(
+//   "venueBank",
+//   venueBankReducer,
+//   venueBankPersistConfig,
+// );
+// const timetables = persistReducer(
+//   "timetables",
+//   timetablesReducer,
+//   timetablesPersistConfig,
+// );
 const theme = persistReducer("theme", themeReducer);
 const settings = persistReducer(
   "settings",
