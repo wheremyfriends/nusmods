@@ -4,7 +4,11 @@ import { Venue } from "types/venues";
 import { SemTimetableConfig } from "types/timetables";
 import { serializeTimetable } from "utils/timetables";
 import config from "config";
-import { nanoid } from "nanoid";
+import { customAlphabet } from "nanoid";
+
+const alphabet =
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+const nanoid = customAlphabet(alphabet, 10);
 
 // IMPORTANT: Remember to update any route changes on the sitemap
 
