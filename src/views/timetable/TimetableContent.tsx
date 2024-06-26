@@ -726,7 +726,8 @@ class TimetableContent extends React.Component<Props, State> {
                   }
                   hiddenModules={hiddenInTimetable}
                 />
-                <button hidden
+                <button
+                  hidden
                   className="TimetableActions-titleBtn btn-outline-primary btn btn-svg"
                   onClick={() => {
                     navigator.clipboard.writeText(
