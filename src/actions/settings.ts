@@ -11,7 +11,7 @@ export function switchUser(userID: UserID, roomID: string) {
     type: SWITCH_USER,
     payload: {
       userID: userID,
-      roomID: roomID
+      roomID: roomID,
     },
   };
 }

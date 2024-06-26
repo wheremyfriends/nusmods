@@ -146,7 +146,9 @@ export const TimetableContainerComponent: FC = () => {
   const params = useParams<Params>();
 
   const semester = useSelector(({ app }: State) => app.activeSemester);
-  const activeUserMapping = useSelector(({ app }: State) => app.activeUserMapping);
+  const activeUserMapping = useSelector(
+    ({ app }: State) => app.activeUserMapping,
+  );
   const roomID = params.roomID;
   const userID = activeUserMapping[roomID] ?? -1;
 

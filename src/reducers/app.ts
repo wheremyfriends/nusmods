@@ -39,7 +39,7 @@ function app(state: AppState = defaultAppState(), action: Actions): AppState {
         activeUserMapping: {
           ...state.activeUserMapping,
           [roomID]: userID,
-        }
+        },
       };
     case SELECT_SEMESTER:
       return {
