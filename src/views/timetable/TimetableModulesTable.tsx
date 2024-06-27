@@ -5,7 +5,7 @@ import classnames from "classnames";
 import { sortBy } from "lodash";
 import produce from "immer";
 
-import { Eye, EyeOff, Trash } from "react-feather";
+import { Crosshair, Eye, EyeOff, Trash } from "react-feather";
 import { ModuleWithColor, TombstoneModule } from "types/views";
 import { ColorIndex } from "types/timetables";
 import { ModuleCode, Semester, UserID } from "types/modules";
@@ -14,14 +14,16 @@ import { ModuleTableOrder } from "types/reducers";
 
 import ColorPicker from "views/components/ColorPicker";
 import {
+  focusLessonInTimetable,
   hideLessonInTimetable,
   selectModuleColor,
   showLessonInTimetable,
+  unfocusLessonInTimetable,
 } from "actions/timetables";
 import { getExamDate, getFormattedExamDate, renderMCs } from "utils/modules";
 import { intersperse } from "utils/array";
 import { BULLET_NBSP } from "utils/react";
-import { modulePage } from "views/routes/paths";
+import { modulePage, semesterForTimetablePage } from "views/routes/paths";
 import elements from "views/elements";
 import Tooltip from "views/components/Tooltip";
 import config from "config";
@@ -55,6 +57,12 @@ export type Props = {
     semester: Semester,
     moduleCode: ModuleCode,
   ) => void;
+  focusLessonInTimetable: (
+    userID: UserID,
+    semester: Semester,
+    moduleCode: ModuleCode,
+  ) => void;
+  unfocusLessonInTimetable: (userID: UserID, semester: Semester) => void;
   onRemoveModule: (moduleCode: ModuleCode) => void;
   resetTombstone: () => void;
 };
@@ -63,6 +71,7 @@ export const TimetableModulesTableComponent: React.FC<Props> = (props) => {
   const renderModuleActions = (module: ModuleWithColor) => {
     const hideBtnLabel = `${module.hiddenInTimetable ? "Show" : "Hide"} ${module.moduleCode}`;
     const removeBtnLabel = `Remove ${module.moduleCode} from timetable`;
+    const focusBtnLabel = `${module.focused ? "Unfocus" : "Focus"} ${module.moduleCode}`;
     const { userID, semester } = props;
 
     return (
@@ -110,6 +119,29 @@ export const TimetableModulesTableComponent: React.FC<Props> = (props) => {
               ) : (
                 <EyeOff className={styles.actionIcon} />
               )}
+            </button>
+          </Tooltip>
+          <Tooltip content={focusBtnLabel} touch="hold">
+            <button
+              type="button"
+              className={classnames(
+                "btn btn-svg",
+                styles.moduleAction,
+                module.focused ? "btn-secondary" : "btn-outline-secondary",
+              )}
+              aria-label={focusBtnLabel}
+              onClick={() => {
+                if (module.focused)
+                  props.unfocusLessonInTimetable(userID, semester);
+                else
+                  props.focusLessonInTimetable(
+                    userID,
+                    semester,
+                    module.moduleCode,
+                  );
+              }}
+            >
+              <Crosshair className={styles.actionIcon} />
             </button>
           </Tooltip>
         </div>
@@ -214,5 +246,7 @@ export default connect(
     selectModuleColor,
     hideLessonInTimetable,
     showLessonInTimetable,
+    focusLessonInTimetable,
+    unfocusLessonInTimetable,
   },
 )(React.memo(TimetableModulesTableComponent));

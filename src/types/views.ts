@@ -70,6 +70,7 @@ export const TIME_SEGMENTS = ["Morning", "Afternoon", "Evening"];
 export type ModuleWithColor = Module & {
   colorIndex: ColorIndex;
   hiddenInTimetable: boolean;
+  focused: boolean;
 };
 
 export type TombstoneModule = ModuleWithColor & {
