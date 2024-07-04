@@ -65,6 +65,7 @@ export type Props = {
   unfocusLessonInTimetable: (userID: UserID, semester: Semester) => void;
   onRemoveModule: (moduleCode: ModuleCode) => void;
   resetTombstone: () => void;
+  undoTombstone: () => void;
 };
 
 export const TimetableModulesTableComponent: React.FC<Props> = (props) => {
@@ -150,11 +151,16 @@ export const TimetableModulesTableComponent: React.FC<Props> = (props) => {
   };
 
   const renderModule = (module: ModuleWithColor) => {
-    const { semester, readOnly, tombstone, resetTombstone } = props;
+    const { semester, readOnly, tombstone, resetTombstone, undoTombstone } =
+      props;
 
     if (tombstone && tombstone.moduleCode === module.moduleCode) {
       return (
-        <ModuleTombstone module={module} resetTombstone={resetTombstone} />
+        <ModuleTombstone
+          module={module}
+          undoTombstone={undoTombstone}
+          resetTombstone={resetTombstone}
+        />
       );
     }
 

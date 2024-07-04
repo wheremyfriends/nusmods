@@ -391,27 +391,48 @@ class TimetableContent extends React.Component<Props, State> {
 
   // Centralized function to send deleteModule mutation
   removeModuleRT = (moduleCode: ModuleCode) => {
-    apolloClient
-      .mutate({
+    // Save state so there is something to undo
+    const index = this.addedModules().findIndex(
+      ({ moduleCode: modCode }) => modCode === moduleCode,
+    );
+    const moduleWithColor = this.toModuleWithColor(this.addedModules()[index]);
+
+    // Save all lessons of the user
+    const selectedLessons =
+      this.props.multiUserLessons[this.props.userID][this.props.semester][
+        moduleCode
+      ];
+
+    try {
+      apolloClient.mutate({
         mutation: DELETE_MODULE,
         variables: {
-          roomID: this.props.roomID, // TODO: Use variable roomID and name
+          roomID: this.props.roomID,
           userID: this.props.userID,
           semester: this.props.semester,
           moduleCode: moduleCode,
         },
-      })
-      .catch((err) => {
-        console.error("DELETE_MODULE error: ", err);
       });
-  };
+    } catch (err) {
+      console.error("DELETE_MODULE error: ", err);
+      return;
+    }
 
+    this.setState({
+      tombstone: {
+        ...moduleWithColor,
+        index,
+        selectedLessons,
+        userID: this.props.userID,
+      },
+    });
+  };
   resetTimetable = () => {
     apolloClient
       .mutate({
         mutation: RESET_TIMETABLE_MUTATION,
         variables: {
-          roomID: this.props.roomID, // TODO: Use variable roomID and name
+          roomID: this.props.roomID,
           userID: this.props.userID,
           semester: this.props.semester,
         },
@@ -422,6 +443,33 @@ class TimetableContent extends React.Component<Props, State> {
   };
 
   resetTombstone = () => this.setState({ tombstone: null });
+  undoTombstone = () => {
+    if (this.state.tombstone === null) return;
+
+    const moduleCode = this.state.tombstone.moduleCode;
+    const lessons = this.state.tombstone.selectedLessons;
+
+    Object.entries(lessons).forEach(([lessonType, classes]) => {
+      classes.forEach((classNo) => {
+        // Restore the shit
+        apolloClient
+          .mutate({
+            mutation: CREATE_LESSON,
+            variables: {
+              roomID: this.props.roomID,
+              userID: this.props.userID,
+              semester: this.props.semester,
+              moduleCode,
+              lessonType,
+              classNo,
+            },
+          })
+          .catch((err) => {
+            console.error("CREATE_LESSON error: ", err);
+          });
+      });
+    });
+  };
 
   // Returns modules currently in the timetable
   addedModules(): Module[] {
@@ -471,6 +519,7 @@ class TimetableContent extends React.Component<Props, State> {
       onRemoveModule={this.removeModuleRT}
       readOnly={this.props.readOnly}
       tombstone={tombstone}
+      undoTombstone={this.undoTombstone}
       resetTombstone={this.resetTombstone}
     />
   );
@@ -752,6 +801,7 @@ class TimetableContent extends React.Component<Props, State> {
                 </button>
               </div>
 
+              {/* Searchbox */}
               <div className={styles.modulesSelect}>
                 {!readOnly && (
                   <ModulesSelectContainer
