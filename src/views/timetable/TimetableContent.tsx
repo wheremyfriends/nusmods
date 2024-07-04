@@ -292,6 +292,13 @@ class TimetableContent extends React.Component<Props, State> {
 
       this.modifiedCell = null;
     }
+
+    if (
+      this.state.tombstone !== null &&
+      this.state.tombstone.userID !== this.props.userID
+    ) {
+      this.resetTombstone();
+    }
   }
 
   override componentWillUnmount() {
