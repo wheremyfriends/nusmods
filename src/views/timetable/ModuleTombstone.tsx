@@ -9,6 +9,7 @@ export type Props = {
   module: Module;
   undo: () => void;
   resetTombstone: () => void;
+  undoTombstone: () => void;
 };
 
 const ModuleTombstone: React.FC<Props> = (props) => (
@@ -27,7 +28,7 @@ const ModuleTombstone: React.FC<Props> = (props) => (
         type="button"
         className={classnames("btn btn-sm btn-link", styles.moduleAction)}
         onClick={() => {
-          props.undo();
+          props.undoTombstone();
           props.resetTombstone();
         }}
       >

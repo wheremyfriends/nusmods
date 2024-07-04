@@ -6,6 +6,7 @@ import {
   HoverLesson,
   Lesson,
   ModifiableLesson,
+  ModuleLessonMultiConfig,
 } from "./timetables";
 import { Venue, VenueList } from "./venues";
 import { RegPeriod } from "../config";
@@ -75,6 +76,8 @@ export type ModuleWithColor = Module & {
 
 export type TombstoneModule = ModuleWithColor & {
   index: number;
+  userID: number;
+  selectedLessons: ModuleLessonMultiConfig;
 };
 
 export type ModuleWithExamTime = {
