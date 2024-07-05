@@ -305,9 +305,10 @@ function timetables(
 
       return produce(state, (draft) => {
         draft.editingType = null;
-        draft.multiUserLessons[userID][semester] = {};
+        draft.multiUserLessons[userID] = { [semester]: {} };
         // draft.colors[semester] = DEFAULT_SEM_COLOR_MAP; // TODO: Reference count
-        draft.multiUserHidden[userID][semester] = DEFAULT_HIDDEN_STATE;
+        draft.multiUserHidden[userID] = { [semester]: DEFAULT_HIDDEN_STATE };
+        draft.multiUserFocus[userID] = { [semester]: undefined };
       });
     }
 
@@ -318,6 +319,7 @@ function timetables(
         draft.multiUserHidden[userID] = { [semester]: [] };
       });
     }
+
     case REMOVE_MODULE: {
       const { userID, semester, moduleCode } = action.payload;
       return produce(state, (draft) => {
