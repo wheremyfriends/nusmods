@@ -297,6 +297,7 @@ function timetables(
         draft.multiUserLessons = {};
         draft.colors = {};
         draft.multiUserHidden = {};
+        draft.multiUserFocus = {};
       });
     }
 
