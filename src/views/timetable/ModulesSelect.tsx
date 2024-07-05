@@ -180,7 +180,7 @@ const ModulesSelect: FC<Props> = ({
                   </div>
                 )}
 
-                {module.isAdding && (
+                {module.isAdding && !module.isAdded && (
                   <div>
                     <span className="badge badge-warning">Adding...</span>
                   </div>
