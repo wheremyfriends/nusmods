@@ -91,6 +91,28 @@ const TimetableActions: React.FC<Props> = (props) => {
             {props.showTitle ? "Hide Titles" : "Show Titles"}
           </button>
         )}
+
+        {config.examAvailabilitySet.has(props.semester) && (
+          <button
+            type="button"
+            className={classnames(
+              styles.calendarBtn,
+              elements.examCalendarBtn,
+              "btn-outline-primary btn btn-svg",
+            )}
+            onClick={props.toggleExamCalendar}
+          >
+            {props.showExamCalendar ? (
+              <>
+                <Grid className="svg svg-small" /> Timetable
+              </>
+            ) : (
+              <>
+                <Calendar className="svg svg-small" /> Exam Calendar
+              </>
+            )}
+          </button>
+        )}
       </div>
 
       <div

@@ -92,6 +92,7 @@ import type { Dispatch, GetState } from "types/redux";
 import { Action } from "actions/constants";
 import { getOptimisedTimetable } from "solver";
 import venues from "data/venues";
+import ExamCalendar from "./ExamCalendar";
 
 export const CREATE_LESSON = gql`
   mutation CreateLesson(
@@ -787,26 +788,42 @@ class TimetableContent extends React.Component<Props, State> {
                 </ul>
               </div>
             )}
-            <Timetable
-              lessons={arrangedOptimisedLessons}
-              isVerticalOrientation={isVerticalOrientation}
-              isScrolledHorizontally={this.state.isScrolledHorizontally}
-              showTitle={isShowingTitle}
-              onModifyCell={() => {}}
-            />
-            <div
-              className={styles.timetableWrapper}
-              onScroll={this.onScroll}
-              ref={this.timetableRef}
-            >
-              <Timetable
-                lessons={arrangedLessonsWithModifiableFlag}
-                isVerticalOrientation={isVerticalOrientation}
-                isScrolledHorizontally={this.state.isScrolledHorizontally}
-                showTitle={isShowingTitle}
-                onModifyCell={this.modifyCell}
+
+            {showExamCalendar ? (
+              <ExamCalendar
+                semester={semester}
+                modules={addedModules.map((module) => ({
+                  ...module,
+                  colorIndex: this.props.colors[module.moduleCode],
+                  hiddenInTimetable: this.isHiddenInTimetable(
+                    module.moduleCode,
+                  ),
+                }))}
               />
-            </div>
+            ) : (
+              <>
+                <Timetable
+                  lessons={arrangedOptimisedLessons}
+                  isVerticalOrientation={isVerticalOrientation}
+                  isScrolledHorizontally={this.state.isScrolledHorizontally}
+                  showTitle={isShowingTitle}
+                  onModifyCell={() => {}}
+                />
+                <div
+                  className={styles.timetableWrapper}
+                  onScroll={this.onScroll}
+                  ref={this.timetableRef}
+                >
+                  <Timetable
+                    lessons={arrangedLessonsWithModifiableFlag}
+                    isVerticalOrientation={isVerticalOrientation}
+                    isScrolledHorizontally={this.state.isScrolledHorizontally}
+                    showTitle={isShowingTitle}
+                    onModifyCell={this.modifyCell}
+                  />
+                </div>
+              </>
+            )}
           </div>
           <div
             className={classnames({
