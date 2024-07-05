@@ -155,7 +155,7 @@ export const RESET_TIMETABLE_MUTATION = gql`
 
 let url = "";
 let wsURL = "";
-if (process.env.NODE_ENV == "production") {
+if (process.env.NODE_ENV === "production") {
   url = `https://${window.location.hostname}/graphql`;
   wsURL = `wss://${window.location.hostname}/graphql`;
 } else {
@@ -747,7 +747,7 @@ class TimetableContent extends React.Component<Props, State> {
                 Warning! These lessons are unallocated
                 <ul style={{ marginBottom: 0 }}>
                   {missingLessons[0].map((lesson) => (
-                    <li>{lesson}</li>
+                    <li key={lesson}>{lesson}</li>
                   ))}
                 </ul>
               </div>
@@ -796,7 +796,7 @@ class TimetableContent extends React.Component<Props, State> {
                   hiddenModules={hiddenInTimetable}
                 />
                 <button
-                  hidden
+                  hidden={process.env.NODE_ENV !== "development"}
                   className="TimetableActions-titleBtn btn-outline-primary btn btn-svg"
                   onClick={() => {
                     navigator.clipboard.writeText(
