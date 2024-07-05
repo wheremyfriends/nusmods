@@ -317,7 +317,6 @@ function timetables(
       const { userID, semester, moduleCode } = action.payload;
       return produce(state, (draft) => {
         draft.colors[semester] = semColors(state.colors[semester], action);
-        draft.multiUserHidden[userID] = { [semester]: [] };
       });
     }
 
