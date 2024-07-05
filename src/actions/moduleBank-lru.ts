@@ -28,7 +28,6 @@ export function getLRUModules(
       )
       .flat(),
   );
-  console.log({ timetableModules });
   // const timetableModules = new Set(
   //   flatMap(multiUserLessons, (semester) => Object.keys(semester)),
   // );
