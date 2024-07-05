@@ -142,9 +142,9 @@ const ModulesSelect: FC<Props> = ({
           <ol className={styles.selectList} {...getMenuProps()}>
             {results.map((module, index) => (
               <li
+                key={module.moduleCode}
                 {...getItemProps({
                   index,
-                  key: module.moduleCode,
                   item: module.moduleCode,
                   disabled: module.isAdded || module.isAdding,
                 })}
