@@ -50,7 +50,7 @@ export type EditingType = {
 //  ModuleLessonConfigWithLessons is a mapping of lessonType to an array of Lessons for a module.
 export type Lesson = RawLesson & {
   moduleCode: ModuleCode;
-  title?: ModuleTitle;
+  title: ModuleTitle;
 };
 
 export type ColoredLesson = Lesson & {
@@ -120,4 +120,17 @@ export type LessonChange = {
 export type RoomUser = {
   readonly userID: UserID;
   name: String;
+};
+
+// Format for the timetable generator config
+export type TimetableGeneratorConfig = {
+  prefDays: number[];
+  maxDist: number;
+  breaks: {
+    minDuration: number;
+    timeslots: {
+      start: number;
+      end: number;
+    }[];
+  }[];
 };

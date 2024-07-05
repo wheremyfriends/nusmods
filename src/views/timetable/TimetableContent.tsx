@@ -32,6 +32,7 @@ import {
   LessonChange,
   MultiUserTimetableConfig,
   MultiUserSemTimetableConfigWithLessons,
+  TimetableGeneratorConfig,
 } from "types/timetables";
 
 import {
@@ -90,6 +91,7 @@ import { fetchModule } from "actions/moduleBank";
 import type { Dispatch, GetState } from "types/redux";
 import { Action } from "actions/constants";
 import { getOptimisedTimetable } from "solver";
+import venues from "data/venues";
 
 export const CREATE_LESSON = gql`
   mutation CreateLesson(
@@ -225,6 +227,7 @@ type State = {
   isScrolledHorizontally: boolean;
   showExamCalendar: boolean;
   tombstone: TombstoneModule | null;
+  timetableGeneratorConfig: TimetableGeneratorConfig;
 };
 
 /**
@@ -254,6 +257,29 @@ function maintainScrollPosition(
   container.scrollLeft = x; // eslint-disable-line no-param-reassign
 }
 
+function transformVenues(venueInfo: {
+  [key: string]: {
+    location?: {
+      x: number;
+      y: number;
+    };
+  };
+}) {
+  return Object.keys(venueInfo)
+    .filter((key) => "location" in venueInfo[key])
+    .reduce(
+      (acc, key) => {
+        acc[key] = {
+          lat: venueInfo[key].location!.y,
+          lon: venueInfo[key].location!.x,
+        };
+        return acc;
+      },
+      {} as {
+        [key: string]: { lat: number; lon: number };
+      },
+    );
+}
 // Groups the timetable into lessons (CS2040C Lab, CS2100 Tut etc)
 function groupIntoLessons(lessons: Lesson[]) {
   return lessons.reduce((acc, cur) => {
@@ -280,6 +306,11 @@ class TimetableContent extends React.Component<Props, State> {
     isScrolledHorizontally: false,
     showExamCalendar: false,
     tombstone: null,
+    timetableGeneratorConfig: {
+      prefDays: [],
+      maxDist: -1,
+      breaks: [],
+    },
   };
 
   timetableRef = React.createRef<HTMLDivElement>();
@@ -584,6 +615,11 @@ class TimetableContent extends React.Component<Props, State> {
     );
   }
 
+  onConfigChange = (config: TimetableGeneratorConfig) => {
+    this.setState({ timetableGeneratorConfig: config });
+    console.log({ config });
+  };
+
   override render() {
     const {
       userID,
@@ -640,27 +676,26 @@ class TimetableContent extends React.Component<Props, State> {
     let optimisedTimetables: Lesson[][] = [];
     let missingLessons: string[][] = [];
 
-    const maxsols = 5;
-
     if (multiTimetableLessons[targetTimetableIdx]) {
-      try {
-        optimisedTimetables = getOptimisedTimetable(
-          multiTimetableLessons,
-          targetTimetableIdx,
-          maxsols,
-        );
-      } catch (e) {
-        console.error(e);
-      }
+      // if (false) {
+      optimisedTimetables = getOptimisedTimetable(
+        multiTimetableLessons,
+        targetTimetableIdx,
+        {
+          maxSols: 1,
+          venueInfo: transformVenues(venues),
+          ...this.state.timetableGeneratorConfig,
+        },
+      ) as Lesson[][];
 
-      console.log({ optimisedTimetables });
+      // console.log({ optimisedTimetables });
 
       missingLessons = findMissingLessons(
         multiTimetableLessons[targetTimetableIdx],
         optimisedTimetables,
       );
 
-      console.log({ missingLessons });
+      // console.log({ missingLessons });
     }
 
     // TODO: Set editingType to null when abruptly exiting from edit mode
@@ -789,6 +824,7 @@ class TimetableContent extends React.Component<Props, State> {
                     this.props.multiUserLessons[userID]?.[semester]
                   }
                   showExamCalendar={showExamCalendar}
+                  onConfigChange={this.onConfigChange}
                   resetTimetable={this.resetTimetable}
                   toggleExamCalendar={() =>
                     this.setState({ showExamCalendar: !showExamCalendar })

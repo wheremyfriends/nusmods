@@ -2,10 +2,22 @@ import * as React from "react";
 import classnames from "classnames";
 import { connect } from "react-redux";
 
-import { Calendar, Grid, Sidebar, Type } from "react-feather";
+import {
+  Calendar,
+  Grid,
+  Settings,
+  Sidebar,
+  Sliders,
+  Tool,
+  Type,
+} from "react-feather";
 import { toggleTimetableOrientation, toggleTitleDisplay } from "actions/theme";
 import { ModuleCode, Semester } from "types/modules";
-import { SemTimetableConfig, SemTimetableMultiConfig } from "types/timetables";
+import {
+  SemTimetableConfig,
+  SemTimetableMultiConfig,
+  TimetableGeneratorConfig,
+} from "types/timetables";
 
 import elements from "views/elements";
 import config from "config";
@@ -13,6 +25,7 @@ import ResetTimetable from "./ResetTimetable";
 import ShareTimetable from "./ShareTimetable";
 
 import styles from "./TimetableActions.scss";
+import TimetableGeneratorConfigModal from "views/components/TimetableGenConfModal";
 
 type Props = {
   semester: Semester;
@@ -29,55 +42,80 @@ type Props = {
 
   hiddenModules: ModuleCode[];
 
+  onConfigChange: (config: TimetableGeneratorConfig) => void;
   resetTimetable: () => void;
 };
 
-const TimetableActions: React.FC<Props> = (props) => (
-  <div
-    className="btn-toolbar justify-content-between"
-    role="toolbar"
-    aria-label="Timetable utilities"
-  >
-    <div
-      className={styles.buttonGroup}
-      role="group"
-      aria-label="Timetable manipulation"
-    >
-      <button
-        type="button"
-        className={classnames("btn btn-outline-primary btn-svg")}
-        onClick={props.toggleTimetableOrientation}
-        disabled={props.showExamCalendar}
-      >
-        <Sidebar className={styles.sidebarIcon} />
-        {props.isVerticalOrientation ? "Horizontal Mode" : "Vertical Mode"}
-      </button>
+const TimetableActions: React.FC<Props> = (props) => {
+  const [isConfigOpen, setIsConfigOpen] = React.useState(false);
 
-      {!props.isVerticalOrientation && (
+  return (
+    <div
+      className="btn-toolbar justify-content-between"
+      role="toolbar"
+      aria-label="Timetable utilities"
+    >
+      <TimetableGeneratorConfigModal
+        isOpen={isConfigOpen}
+        onChange={props.onConfigChange}
+        onClose={() => {
+          setIsConfigOpen(false);
+        }}
+      />
+      <div
+        className={styles.buttonGroup}
+        role="group"
+        aria-label="Timetable manipulation"
+      >
+        <button
+          type="button"
+          className={classnames("btn btn-outline-primary btn-svg")}
+          onClick={props.toggleTimetableOrientation}
+          disabled={props.showExamCalendar}
+        >
+          <Sidebar className={styles.sidebarIcon} />
+          {props.isVerticalOrientation ? "Horizontal Mode" : "Vertical Mode"}
+        </button>
+
+        {!props.isVerticalOrientation && (
+          <button
+            type="button"
+            className={classnames(
+              styles.titleBtn,
+              "btn-outline-primary btn btn-svg",
+            )}
+            onClick={props.toggleTitleDisplay}
+            disabled={props.showExamCalendar}
+          >
+            <Type className={styles.titleIcon} />
+            {props.showTitle ? "Hide Titles" : "Show Titles"}
+          </button>
+        )}
+      </div>
+
+      <div
+        className={styles.buttonGroup}
+        role="group"
+        aria-label="Timetable exporting"
+      >
+        <ResetTimetable resetTimetable={props.resetTimetable} />
         <button
           type="button"
           className={classnames(
             styles.titleBtn,
             "btn-outline-primary btn btn-svg",
           )}
-          onClick={props.toggleTitleDisplay}
-          disabled={props.showExamCalendar}
+          onClick={() => {
+            setIsConfigOpen(true);
+          }}
         >
-          <Type className={styles.titleIcon} />
-          {props.showTitle ? "Hide Titles" : "Show Titles"}
+          <Tool className={styles.titleIcon} />
+          Configuration
         </button>
-      )}
+      </div>
     </div>
-
-    <div
-      className={styles.buttonGroup}
-      role="group"
-      aria-label="Timetable exporting"
-    >
-      <ResetTimetable resetTimetable={props.resetTimetable} />
-    </div>
-  </div>
-);
+  );
+};
 
 export default connect(null, {
   toggleTimetableOrientation,
