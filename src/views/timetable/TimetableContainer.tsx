@@ -167,6 +167,9 @@ export const TimetableContainerComponent: FC = () => {
   // Resubscribe if roomID changes
   // TODO: Unsubscribe
   useEffect(() => {
+    // Clear the state first
+    dispatch(resetAllTimetables());
+
     apolloClient
       .subscribe({
         query: LESSON_CHANGE_SUBSCRIPTION,
