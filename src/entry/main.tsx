@@ -6,11 +6,13 @@ import "core-js/es/promise/finally";
 
 import ReactDOM from "react-dom";
 import ReactModal from "react-modal";
+import { createRoot } from "react-dom/client";
 
 import configureStore from "bootstrapping/configure-store";
 import subscribeOnlineEvents from "bootstrapping/subscribeOnlineEvents";
 import registerServiceWorker from "bootstrapping/service-worker-manager";
 
+import "styles/globals.scss";
 import "styles/main.scss";
 
 import App from "./App";
@@ -22,10 +24,9 @@ subscribeOnlineEvents(store);
 // Initialize ReactModal
 ReactModal.setAppElement("#app");
 
-ReactDOM.render(
-  <App store={store} persistor={persistor} />,
-  document.getElementById("app"),
-);
+const root = createRoot(document.getElementById("app")!);
+root.render;
+root.render(<App store={store} persistor={persistor} />);
 
 if (
   ((NUSMODS_ENV === "preview" ||
