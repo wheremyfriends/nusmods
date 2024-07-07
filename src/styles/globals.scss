@@ -4,8 +4,15 @@
 
 @layer base {
   // Just so that it doesn't override NUSMods default styles
-  img, svg, video, canvas, audio, iframe, embed, object {
-      display: inline;
+  img,
+  svg,
+  video,
+  canvas,
+  audio,
+  iframe,
+  embed,
+  object {
+    display: inline;
   }
 
   :root {

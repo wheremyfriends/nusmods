@@ -1,17 +1,17 @@
-import { PureComponent } from 'react';
-import NUSModerator from 'nusmoderator';
-import { groupBy, range } from 'lodash';
-import classnames from 'classnames';
-import { addDays } from 'date-fns';
+import { PureComponent } from "react";
+import NUSModerator from "nusmoderator";
+import { groupBy, range } from "lodash";
+import classnames from "classnames";
+import { addDays } from "date-fns";
 
-import { Semester, WorkingDays } from 'types/modules';
-import { ModuleWithColor, ModuleWithExamTime, TimeSegment } from 'types/views';
-import config from 'config';
-import { formatExamDate, getExamDate } from 'utils/modules';
-import { toSingaporeTime } from 'utils/timify';
-import elements from 'views/elements';
-import ExamWeek from './ExamWeek';
-import styles from './ExamCalendar.scss';
+import { Semester, WorkingDays } from "types/modules";
+import { ModuleWithColor, ModuleWithExamTime, TimeSegment } from "types/views";
+import config from "config";
+import { formatExamDate, getExamDate } from "utils/modules";
+import { toSingaporeTime } from "utils/timify";
+import elements from "views/elements";
+import ExamWeek from "./ExamWeek";
+import styles from "./ExamCalendar.scss";
 
 type Props = {
   readonly semester: Semester;
@@ -22,12 +22,12 @@ type Props = {
 // on Fridays only. We don't want to create two different groups for 1pm and 2.30pm exams, so we
 // create another mapping here
 export function getTimeSegment(time: string): TimeSegment {
-  if (time.toUpperCase().includes('AM')) {
-    return 'Morning';
+  if (time.toUpperCase().includes("AM")) {
+    return "Morning";
   }
 
   const hour = parseInt(time, 10);
-  return hour === 12 || hour < 5 ? 'Afternoon' : 'Evening';
+  return hour === 12 || hour < 5 ? "Afternoon" : "Evening";
 }
 
 export default class ExamCalendar extends PureComponent<Props> {
@@ -39,9 +39,13 @@ export default class ExamCalendar extends PureComponent<Props> {
   getExamCalendar(): [Date, number] {
     const { semester } = this.props;
     const year = `${config.academicYear.slice(2, 4)}/${config.academicYear.slice(-2)}`;
-    let firstDayOfExams = NUSModerator.academicCalendar.getExamWeek(year, semester);
+    let firstDayOfExams = NUSModerator.academicCalendar.getExamWeek(
+      year,
+      semester,
+    );
     firstDayOfExams = new Date(
-      firstDayOfExams.getTime() - firstDayOfExams.getTimezoneOffset() * 60 * 1000,
+      firstDayOfExams.getTime() -
+        firstDayOfExams.getTimezoneOffset() * 60 * 1000,
     );
 
     let weekCount = 0;
@@ -78,8 +82,8 @@ export default class ExamCalendar extends PureComponent<Props> {
       const dateTime = getExamDate(module, semester);
       if (!dateTime) return;
 
-      const [date, ...timeParts] = formatExamDate(dateTime).split(' ');
-      const time = timeParts.join(' ');
+      const [date, ...timeParts] = formatExamDate(dateTime).split(" ");
+      const time = timeParts.join(" ");
 
       modulesWithExams.push({
         module,
@@ -99,7 +103,7 @@ export default class ExamCalendar extends PureComponent<Props> {
     if (!weekCount) {
       return (
         <p className={styles.noExams}>
-          You don&apos;t have any final exams this semester{' '}
+          You don&apos;t have any final exams this semester{" "}
           <span className="h3" role="img" aria-label="Tada!">
             🎉
           </span>
@@ -113,10 +117,15 @@ export default class ExamCalendar extends PureComponent<Props> {
     // (5 days), and expand as necessary
     const daysWithExams = Math.max(
       5,
-      ...modulesWithExams.map((module) => toSingaporeTime(module.dateTime).getDay()),
+      ...modulesWithExams.map((module) =>
+        toSingaporeTime(module.dateTime).getDay(),
+      ),
     );
 
-    const modulesByExamDate = groupBy(modulesWithExams, (module) => module.date);
+    const modulesByExamDate = groupBy(
+      modulesWithExams,
+      (module) => module.date,
+    );
 
     // The table consists of the following <tr>s
     // - Day of the week (Mon - Sat)
@@ -126,7 +135,9 @@ export default class ExamCalendar extends PureComponent<Props> {
     //   - Afternoon exams
     //   - Evening exams
     return (
-      <div className={classnames(styles.calendarWrapper, elements.examCalendar)}>
+      <div
+        className={classnames(styles.calendarWrapper, elements.examCalendar)}
+      >
         <table>
           <thead>
             <tr>
