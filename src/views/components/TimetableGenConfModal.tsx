@@ -4,6 +4,10 @@ import { X } from "react-feather";
 import Input from "./Input";
 import SwitchWithText from "./SwitchWithText";
 import { TimetableGeneratorConfig } from "types/timetables";
+import { useSelect } from "downshift";
+import { useDispatch, useSelector } from "react-redux";
+import { AppState } from "types/reducers";
+import { updateTimetableGenConf } from "actions/app";
 
 type Break = {
   start: string;
@@ -16,6 +20,17 @@ function isTimeInvalid(value: Date) {
   return !(value.getMinutes() % 30 === 0 && value.getSeconds() === 0);
 }
 
+// Converts a number to string, returning defVal if input is negative
+function positiveNumberToStr(value: number, defVal: string = ""): string {
+  if (value < 0) return defVal;
+  return value.toString();
+}
+
+// If value if negative, return default, else return value
+function nonEmptyStrToNumber(value: string, defVal: number = -1): number {
+  if (value === "") return defVal;
+  return parseFloat(value);
+}
 type Props = {
   isOpen: boolean;
   onClose: () => void;
@@ -26,14 +41,39 @@ export default function TimetableGeneratorConfigModal({
   onClose,
   onChange,
 }: Props) {
-  const [breaks, setBreaks] = React.useState<Break[]>([{ start: "", end: "" }]);
-  const [prefDays, setPrefDays] = React.useState<string>("");
-  const [maxDist, setMaxDist] = React.useState<string>("");
-  const [minBreakDuration, setMinBreakDuration] = React.useState<string>("");
+  const config = useSelector((state: any) => {
+    return (state.app as AppState).timetableGeneratorConfig;
+  });
+  const dispatch = useDispatch();
 
-  const [prefDaysEnabled, setPrefDaysEnabled] = React.useState<boolean>(false);
-  const [maxDistEnabled, setMaxDistEnabled] = React.useState<boolean>(false);
-  const [breakEnabled, setBreakEnabled] = React.useState<boolean>(false);
+  const [breaks, setBreaks] = React.useState<Break[]>(
+    config.breaks?.length >= 1
+      ? config.breaks[0].timeslots.map(({ start, end }) => ({
+          start: positiveNumberToStr(start),
+          end: positiveNumberToStr(end),
+        }))
+      : [{ start: "", end: "" }],
+  );
+  const [prefDays, setPrefDays] = React.useState<string>(
+    config.prefDays.join(", "),
+  );
+  const [maxDist, setMaxDist] = React.useState<string>(
+    positiveNumberToStr(config.maxDist),
+  );
+
+  const [minBreakDuration, setMinBreakDuration] = React.useState<string>(
+    positiveNumberToStr(config.breaks?.[0]?.minDuration),
+  );
+
+  const [prefDaysEnabled, setPrefDaysEnabled] = React.useState<boolean>(
+    config.prefDaysEnabled,
+  );
+  const [maxDistEnabled, setMaxDistEnabled] = React.useState<boolean>(
+    config.maxDistEnabled,
+  );
+  const [breaksEnabled, setBreaksEnabled] = React.useState<boolean>(
+    config.breaksEnabled,
+  );
 
   function editBreak(property: string, newVal: string, index: number) {
     const newBreaks = breaks.map((b, i) => {
@@ -50,27 +90,24 @@ export default function TimetableGeneratorConfigModal({
 
   function handleClose() {
     const config: TimetableGeneratorConfig = {
-      prefDays: prefDaysEnabled
-        ? prefDays.split(",").map((d) => {
-            d = d.trim();
-            return parseInt(d);
-          })
-        : [],
-      maxDist: maxDistEnabled ? parseFloat(maxDist) : -1,
-      breaks: breakEnabled
-        ? [
-            {
-              minDuration: parseInt(minBreakDuration!),
-              timeslots: breaks.map(({ start, end }) => {
-                return {
-                  start: parseInt(start.replace(":", "")),
-                  end: parseInt(end.replace(":", "")),
-                };
-              }),
-            },
-          ]
-        : [],
+      prefDaysEnabled,
+      maxDistEnabled,
+      breaksEnabled,
+      prefDays: prefDays.split(",").map((d) => nonEmptyStrToNumber(d.trim())),
+      maxDist: nonEmptyStrToNumber(maxDist),
+      breaks: [
+        {
+          minDuration: nonEmptyStrToNumber(minBreakDuration!),
+          timeslots: breaks.map(({ start, end }) => {
+            return {
+              start: nonEmptyStrToNumber(start.replace(":", "")),
+              end: nonEmptyStrToNumber(end.replace(":", "")),
+            };
+          }),
+        },
+      ],
     };
+    dispatch(updateTimetableGenConf(config));
     onChange(config);
     onClose();
   }
@@ -112,14 +149,14 @@ export default function TimetableGeneratorConfigModal({
       <hr className="mt-5" />
       <fieldset>
         <SwitchWithText
-          checked={breakEnabled}
-          onCheckedChange={setBreakEnabled}
+          checked={breaksEnabled}
+          onCheckedChange={setBreaksEnabled}
         />
         <Input
           type="number"
           label="Minimum Break Duration (mins)"
           placeholder="60"
-          disabled={!breakEnabled}
+          disabled={!breaksEnabled}
           value={minBreakDuration}
           onChange={(e) => setMinBreakDuration(e.target.value)}
         />
@@ -132,7 +169,7 @@ export default function TimetableGeneratorConfigModal({
               <Input
                 label={ind === 0 ? "Start" : undefined}
                 type="time"
-                disabled={!breakEnabled}
+                disabled={!breaksEnabled}
                 value={b.start}
                 onChange={(event) => {
                   editBreak("start", event.target.value, ind);
@@ -141,7 +178,7 @@ export default function TimetableGeneratorConfigModal({
               <Input
                 label={ind === 0 ? "End" : undefined}
                 type="time"
-                disabled={!breakEnabled}
+                disabled={!breaksEnabled}
                 value={b.end}
                 onChange={(event) => {
                   editBreak("end", event.target.value, ind);
@@ -162,7 +199,7 @@ export default function TimetableGeneratorConfigModal({
           style={{ margin: "1.5rem 0" }}
           className="btn btn-outline-primary"
           onClick={() => {
-            setBreaks([...breaks, {}]);
+            setBreaks([...breaks, { start: "", end: "" }]);
           }}
         >
           Add time range

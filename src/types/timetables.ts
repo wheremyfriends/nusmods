@@ -124,6 +124,9 @@ export type RoomUser = {
 
 // Format for the timetable generator config
 export type TimetableGeneratorConfig = {
+  prefDaysEnabled: boolean;
+  maxDistEnabled: boolean;
+  breaksEnabled: boolean;
   prefDays: number[];
   maxDist: number;
   breaks: {

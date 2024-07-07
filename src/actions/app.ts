@@ -1,4 +1,5 @@
 import { NotificationOptions } from "types/reducers";
+import { TimetableGeneratorConfig } from "types/timetables";
 
 export const SET_ONLINE_STATUS = "SET_ONLINE_STATUS" as const;
 export function setOnlineStatus(isOnline: boolean) {
@@ -43,5 +44,15 @@ export function promptRefresh() {
   return {
     type: PROMPT_REFRESH,
     payload: null,
+  };
+}
+
+export const UPDATE_TIMETABLE_GEN_CONF = "UPDATE_TIMETABLE_GEN_CONF" as const;
+export function updateTimetableGenConf(config: TimetableGeneratorConfig) {
+  return {
+    type: UPDATE_TIMETABLE_GEN_CONF,
+    payload: {
+      config,
+    },
   };
 }
