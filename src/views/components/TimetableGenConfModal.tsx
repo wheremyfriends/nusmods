@@ -55,7 +55,7 @@ export default function TimetableGeneratorConfigModal({
       : [{ start: "", end: "" }],
   );
   const [prefDays, setPrefDays] = React.useState<string>(
-    config.prefDays.join(", "),
+    config.prefDays.filter((d) => d >= 0).join(", "),
   );
   const [maxDist, setMaxDist] = React.useState<string>(
     positiveNumberToStr(config.maxDist),
@@ -93,7 +93,10 @@ export default function TimetableGeneratorConfigModal({
       prefDaysEnabled,
       maxDistEnabled,
       breaksEnabled,
-      prefDays: prefDays.split(",").map((d) => nonEmptyStrToNumber(d.trim())),
+      prefDays: prefDays
+        .split(",")
+        .filter((d) => d.trim() !== "")
+        .map((d) => nonEmptyStrToNumber(d.trim())),
       maxDist: nonEmptyStrToNumber(maxDist),
       breaks: [
         {
