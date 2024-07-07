@@ -125,7 +125,7 @@ export default function TimetableGeneratorConfigModal({
         <Input
           label="Preferred Days"
           placeholder="5, 3, 4"
-          helperText="describe help text"
+          helperText="Ranking of days separated by comma. 0 = Sunday, 1 = Monday etc"
           disabled={!prefDaysEnabled}
           value={prefDays}
           onChange={(e) => setPrefDays(e.target.value)}
@@ -140,6 +140,7 @@ export default function TimetableGeneratorConfigModal({
         <Input
           type="number"
           label="Maximum Distance (km)"
+          helperText="Maximum allowable travel distance for back to back classes"
           placeholder="0.8"
           disabled={!maxDistEnabled}
           value={maxDist}
@@ -155,6 +156,7 @@ export default function TimetableGeneratorConfigModal({
         <Input
           type="number"
           label="Minimum Break Duration (mins)"
+          helperText="Minimum consecutive minutes to be free from classes"
           placeholder="60"
           disabled={!breaksEnabled}
           value={minBreakDuration}
@@ -196,14 +198,17 @@ export default function TimetableGeneratorConfigModal({
           ))}
         </div>
         <button
-          style={{ margin: "1.5rem 0" }}
-          className="btn btn-outline-primary"
+          className="btn btn-outline-primary mt-5"
           onClick={() => {
             setBreaks([...breaks, { start: "", end: "" }]);
           }}
         >
           Add time range
         </button>
+        <div className="text-sm text-grey-900">
+          The reason for multiple time ranges is to allow for you to have
+          disjointed break (e.g 11am-12pm and 1pm-2pm)
+        </div>
       </fieldset>
     </Modal>
   );
