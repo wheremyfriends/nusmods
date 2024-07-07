@@ -317,6 +317,12 @@ function timetables(
       const { userID, semester, moduleCode } = action.payload;
       return produce(state, (draft) => {
         draft.colors[semester] = semColors(state.colors[semester], action);
+
+        if (draft.multiUserHidden[userID]?.[semester] === undefined)
+          draft.multiUserHidden[userID] = { [semester]: [] };
+
+        if (draft.multiUserFocus[userID]?.[semester] === undefined)
+          draft.multiUserFocus[userID] = { [semester]: undefined };
       });
     }
 
