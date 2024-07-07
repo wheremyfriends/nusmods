@@ -15,6 +15,7 @@ import {
   PROMPT_REFRESH,
   SET_ONLINE_STATUS,
   TOGGLE_FEEDBACK_MODAL,
+  UPDATE_TIMETABLE_GEN_CONF,
 } from "actions/app";
 
 const defaultAppState = (): AppState => ({
@@ -27,6 +28,14 @@ const defaultAppState = (): AppState => ({
   isFeedbackModalOpen: false,
   promptRefresh: forceRefreshPrompt(),
   notifications: [],
+  timetableGeneratorConfig: {
+    prefDaysEnabled: false,
+    maxDistEnabled: false,
+    breaksEnabled: false,
+    prefDays: [],
+    maxDist: -1,
+    breaks: [{ minDuration: -1, timeslots: [{ start: -1, end: -1 }] }],
+  },
 });
 
 // This reducer is for storing state pertaining to the UI.
@@ -114,6 +123,14 @@ function app(state: AppState = defaultAppState(), action: Actions): AppState {
         ...state,
         notifications: state.notifications.slice(1),
       };
+
+    case UPDATE_TIMETABLE_GEN_CONF:
+      const { config } = action.payload;
+      return {
+        ...state,
+        timetableGeneratorConfig: config,
+      };
+
     default:
       return state;
   }

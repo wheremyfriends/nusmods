@@ -10,6 +10,7 @@ import {
   TimetableConfig,
   TimetableMultiConfig,
   MultiUserTimetableConfig,
+  TimetableGeneratorConfig,
 } from "./timetables";
 import {
   ActiveUserMapping,
@@ -68,6 +69,7 @@ export type AppState = {
   readonly isFeedbackModalOpen: boolean;
   readonly notifications: NotificationData[];
   readonly promptRefresh: boolean;
+  readonly timetableGeneratorConfig: TimetableGeneratorConfig;
 };
 
 /* requests.js */

@@ -101,6 +101,8 @@ const Navtabs: FC<{
   );
 
   useEffect(() => {
+    setUsers([]);
+
     apolloClient
       .subscribe({
         query: USER_CHANGE_SUBSCRIPTION,

@@ -1,7 +1,11 @@
 import { flatMap, sortBy, get } from "lodash";
 
 import { ModulesMap } from "types/reducers";
-import { TimetableConfig, TimetableMultiConfig } from "types/timetables";
+import {
+  MultiUserTimetableConfig,
+  TimetableConfig,
+  TimetableMultiConfig,
+} from "types/timetables";
 import { ModuleCode } from "types/modules";
 
 // Module bank utils - exported separately so this does not become exported as an action creator
@@ -10,14 +14,23 @@ import { ModuleCode } from "types/modules";
 // eslint-disable-next-line import/prefer-default-export
 export function getLRUModules(
   modules: ModulesMap,
-  multiLessons: TimetableMultiConfig,
+  multiUserLessons: MultiUserTimetableConfig,
   currentModule: string,
   toRemove = 1,
 ): ModuleCode[] {
   // Pull all the modules in all the timetables
   const timetableModules = new Set(
-    flatMap(multiLessons, (semester) => Object.keys(semester)),
+    Object.values(multiUserLessons)
+      .map((userTimetables) =>
+        Object.values(userTimetables)
+          .map((semTimetables) => Object.keys(semTimetables))
+          .flat(),
+      )
+      .flat(),
   );
+  // const timetableModules = new Set(
+  //   flatMap(multiUserLessons, (semester) => Object.keys(semester)),
+  // );
 
   // Remove the module which is least recently used and which is not in timetable
   // and not the currently loaded one

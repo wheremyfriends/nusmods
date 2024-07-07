@@ -83,8 +83,8 @@ const ModulesSelect: FC<Props> = ({
 
         case Downshift.stateChangeTypes.keyDownEnter:
         case Downshift.stateChangeTypes.clickItem:
-          // Don't reset isOpen, inputValue and highlightedIndex when item is selected
-          return omit(changes, ["isOpen", "inputValue", "highlightedIndex"]);
+          setInputValue("");
+          return changes;
 
         case Downshift.stateChangeTypes.mouseUp:
           // TODO: Uncomment when we upgrade to Downshift v3
@@ -142,9 +142,9 @@ const ModulesSelect: FC<Props> = ({
           <ol className={styles.selectList} {...getMenuProps()}>
             {results.map((module, index) => (
               <li
+                key={module.moduleCode}
                 {...getItemProps({
                   index,
-                  key: module.moduleCode,
                   item: module.moduleCode,
                   disabled: module.isAdded || module.isAdding,
                 })}
@@ -180,7 +180,7 @@ const ModulesSelect: FC<Props> = ({
                   </div>
                 )}
 
-                {module.isAdding && (
+                {module.isAdding && !module.isAdded && (
                   <div>
                     <span className="badge badge-warning">Adding...</span>
                   </div>
