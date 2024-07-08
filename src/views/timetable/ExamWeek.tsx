@@ -13,6 +13,7 @@ import { modulePage } from "views/routes/paths";
 import useCurrentTime from "views/hooks/useCurrentTime";
 
 import styles from "views/timetable/ExamCalendar.scss";
+import config from "config";
 
 const MONTHS = [
   "Jan",
@@ -43,8 +44,11 @@ function getExamDate(date: Date): string {
 
 const ExamModule: React.FC<{ module: ModuleWithColor }> = ({ module }) => (
   <Link
-    to={modulePage(module.moduleCode, module.title)}
+    to={{
+      pathname: config.baseUrl + modulePage(module.moduleCode, module.title),
+    }}
     className={`hoverable color-${module.colorIndex}`}
+    target="_blank"
   >
     <div className={styles.moduleCode}>{module.moduleCode}</div>
     <div className={styles.moduleTitle}>{module.title}</div>

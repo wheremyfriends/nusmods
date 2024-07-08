@@ -189,10 +189,7 @@ export const TimetableModulesTableComponent: React.FC<Props> = (props) => {
         <div className={styles.moduleInfo}>
           {!readOnly && renderModuleActions(module)}
           <a
-            href={
-              `https://nusmods.com` +
-              modulePage(module.moduleCode, module.title)
-            }
+            href={config.baseUrl + modulePage(module.moduleCode, module.title)}
             target="_blank"
           >
             {module.moduleCode} {module.title}
