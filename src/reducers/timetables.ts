@@ -33,6 +33,7 @@ import {
   RESET_ALL_TIMETABLES,
   UNFOCUS_LESSON_IN_TIMETABLE,
   FOCUS_LESSON_IN_TIMETABLE,
+  DELETE_TIMETABLE_USER,
 } from "actions/timetables";
 import { getNewColor } from "utils/colors";
 import { SET_EXPORTED_DATA } from "actions/constants";
@@ -323,6 +324,14 @@ function timetables(
 
         if (draft.multiUserFocus[userID]?.[semester] === undefined)
           draft.multiUserFocus[userID] = { [semester]: undefined };
+      });
+    }
+
+    case DELETE_TIMETABLE_USER: {
+      const { userID } = action.payload;
+
+      return produce(state, (draft) => {
+        draft.multiUserLessons = omit(draft.multiUserLessons, userID);
       });
     }
 

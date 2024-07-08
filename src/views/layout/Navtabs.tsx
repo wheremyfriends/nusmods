@@ -17,6 +17,7 @@ import { UserID } from "types/modules";
 import { ListItemIcon, ListItemText, MenuItem } from "@mui/material";
 import RenameUserModal from "views/components/RenameUserModal";
 import DeleteUserModal from "views/components/DeleteUserModal";
+import { deleteTimetableUser } from "actions/timetables";
 
 export const NAVTAB_HEIGHT = 48;
 
@@ -137,6 +138,7 @@ const Navtabs: FC<{
                 setUsers((users) =>
                   users.filter((user) => user.userID !== userID),
                 );
+                dispatch(deleteTimetableUser(userID));
                 return;
               }
             }

@@ -152,6 +152,18 @@ export function addModule(
     });
 }
 
+export const DELETE_TIMETABLE_USER = "DELETE_TIMETABLE_USER " as const;
+export function deleteTimetableUser(
+  userID: UserID,
+) {
+  return {
+    type: DELETE_TIMETABLE_USER,
+    payload: {
+      userID,
+    },
+  };
+}
+
 export const REMOVE_MODULE = "REMOVE_MODULE" as const;
 export function removeModule(
   userID: UserID,
