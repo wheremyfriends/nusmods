@@ -1,7 +1,7 @@
 {
   "brandName": "Where are my friends?",
   "defaultDescription": "Where are my friends?",
-  "academicYear": "2023/2024",
+  "academicYear": "2024/2025",
   "apiBaseUrl": "https://api.nusmods.com",
   "elasticsearchBaseUrl": "https://nusmods-search.es.ap-southeast-1.aws.found.io:9243",
   "semester": 1,
