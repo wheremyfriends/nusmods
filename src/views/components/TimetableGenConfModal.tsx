@@ -25,7 +25,9 @@ function positiveNumberToStr(value: number, defVal: string = ""): string {
   if (value < 0) return defVal;
   return value.toString();
 }
-
+function addColon(str: string, position: number): string {
+  return str.slice(0, position) + ":" + str.slice(position);
+}
 // If value if negative, return default, else return value
 function nonEmptyStrToNumber(value: string, defVal: number = -1): number {
   if (value === "") return defVal;
@@ -34,12 +36,10 @@ function nonEmptyStrToNumber(value: string, defVal: number = -1): number {
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  onChange: (config: TimetableGeneratorConfig) => void;
 };
 export default function TimetableGeneratorConfigModal({
   isOpen,
   onClose,
-  onChange,
 }: Props) {
   const config = useSelector((state: any) => {
     return (state.app as AppState).timetableGeneratorConfig;
@@ -49,8 +49,8 @@ export default function TimetableGeneratorConfigModal({
   const [breaks, setBreaks] = React.useState<Break[]>(
     config.breaks?.length >= 1
       ? config.breaks[0].timeslots.map(({ start, end }) => ({
-          start: positiveNumberToStr(start),
-          end: positiveNumberToStr(end),
+          start: addColon(positiveNumberToStr(start).padStart(4, "0"), 2),
+          end: addColon(positiveNumberToStr(end).padStart(4, "0"), 2),
         }))
       : [{ start: "", end: "" }],
   );
@@ -111,7 +111,6 @@ export default function TimetableGeneratorConfigModal({
       ],
     };
     dispatch(updateTimetableGenConf(config));
-    onChange(config);
     onClose();
   }
 

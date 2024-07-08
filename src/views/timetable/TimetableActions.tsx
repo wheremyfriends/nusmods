@@ -42,7 +42,6 @@ type Props = {
 
   hiddenModules: ModuleCode[];
 
-  onConfigChange: (config: TimetableGeneratorConfig) => void;
   resetTimetable: () => void;
 };
 
@@ -57,7 +56,6 @@ const TimetableActions: React.FC<Props> = (props) => {
     >
       <TimetableGeneratorConfigModal
         isOpen={isConfigOpen}
-        onChange={props.onConfigChange}
         onClose={() => {
           setIsConfigOpen(false);
         }}
@@ -122,7 +120,6 @@ const TimetableActions: React.FC<Props> = (props) => {
       >
         <ResetTimetable resetTimetable={props.resetTimetable} />
         <button
-          hidden
           type="button"
           className={classnames(
             styles.titleBtn,
