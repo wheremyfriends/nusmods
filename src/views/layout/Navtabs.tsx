@@ -136,9 +136,14 @@ const Navtabs: FC<{
               }
               case Action.DELETE_USER: {
                 setUsers((users) => {
-                  const filteredUsers = users.filter((user) => user.userID !== userID);
+                  const filteredUsers = users.filter(
+                    (user) => user.userID !== userID,
+                  );
                   // Switch to first user if current active user is deleted
-                  if (filteredUsers.length > 0 && getActiveUserID(roomID) === userID)
+                  if (
+                    filteredUsers.length > 0 &&
+                    getActiveUserID(roomID) === userID
+                  )
                     dispatch(switchUser(filteredUsers[0].userID, roomID));
                   return filteredUsers;
                 });
