@@ -206,6 +206,7 @@ type Props = OwnProps & {
   timetableOrientation: TimetableOrientation;
   showTitle: boolean;
   hiddenInTimetable: ModuleCode[];
+  timetableGeneratorConfig: TimetableGeneratorConfig;
 
   // Actions
   addModuleRT: (
@@ -228,7 +229,6 @@ type State = {
   isScrolledHorizontally: boolean;
   showExamCalendar: boolean;
   tombstone: TombstoneModule | null;
-  timetableGeneratorConfig: TimetableGeneratorConfig;
 };
 
 /**
@@ -307,11 +307,6 @@ class TimetableContent extends React.Component<Props, State> {
     isScrolledHorizontally: false,
     showExamCalendar: false,
     tombstone: null,
-    timetableGeneratorConfig: {
-      prefDays: [],
-      maxDist: -1,
-      breaks: [],
-    },
   };
 
   timetableRef = React.createRef<HTMLDivElement>();
@@ -616,11 +611,6 @@ class TimetableContent extends React.Component<Props, State> {
     );
   }
 
-  onConfigChange = (config: TimetableGeneratorConfig) => {
-    this.setState({ timetableGeneratorConfig: config });
-    console.log({ config });
-  };
-
   override render() {
     const {
       userID,
@@ -635,6 +625,7 @@ class TimetableContent extends React.Component<Props, State> {
       hiddenInTimetable,
       multiUserTimetableWithLessons,
       multiUserFocus,
+      timetableGeneratorConfig,
     } = this.props;
 
     const { showExamCalendar } = this.state;
@@ -685,7 +676,7 @@ class TimetableContent extends React.Component<Props, State> {
         {
           maxSols: 1,
           venueInfo: transformVenues(venues),
-          ...this.state.timetableGeneratorConfig,
+          ...timetableGeneratorConfig,
         },
       ) as Lesson[][];
 
@@ -841,7 +832,6 @@ class TimetableContent extends React.Component<Props, State> {
                     this.props.multiUserLessons[userID]?.[semester]
                   }
                   showExamCalendar={showExamCalendar}
-                  onConfigChange={this.onConfigChange}
                   resetTimetable={this.resetTimetable}
                   toggleExamCalendar={() =>
                     this.setState({ showExamCalendar: !showExamCalendar })
@@ -919,6 +909,20 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
   const hiddenInTimetable =
     state.timetables.multiUserHidden?.[userID]?.[hiddenModulesKey] || [];
 
+  const timetableGeneratorConfig: TimetableGeneratorConfig = {
+    prefDaysEnabled: state.app.timetableGeneratorConfig.prefDaysEnabled,
+    maxDistEnabled: state.app.timetableGeneratorConfig.maxDistEnabled,
+    breaksEnabled: state.app.timetableGeneratorConfig.breaksEnabled,
+    prefDays: state.app.timetableGeneratorConfig.prefDaysEnabled
+      ? state.app.timetableGeneratorConfig.prefDays
+      : [],
+    maxDist: state.app.timetableGeneratorConfig.maxDistEnabled
+      ? state.app.timetableGeneratorConfig.maxDist
+      : -1,
+    breaks: state.app.timetableGeneratorConfig.breaksEnabled
+      ? state.app.timetableGeneratorConfig.breaks
+      : [],
+  };
   return {
     semester,
     multiUserTimetableWithLessons,
@@ -932,6 +936,7 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
     showTitle: state.theme.showTitle,
     hiddenInTimetable,
     multiUserFocus: state.timetables.multiUserFocus,
+    timetableGeneratorConfig,
   };
 }
 
