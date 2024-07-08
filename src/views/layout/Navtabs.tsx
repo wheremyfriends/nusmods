@@ -236,6 +236,7 @@ const Navtabs: FC<{
             <ListItemText>Rename</ListItemText>
           </MenuItem>,
           <MenuItem
+            disabled={users.length <= 1}
             key="delete"
             onClick={() => {
               setContextMenuAnchor(undefined);
