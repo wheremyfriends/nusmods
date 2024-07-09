@@ -35,6 +35,7 @@ export type Config = {
   getSemesterKey: () => string;
 
   apiBaseUrl: string;
+  baseUrl: string;
   elasticsearchBaseUrl: string;
 
   disqusShortname: string;

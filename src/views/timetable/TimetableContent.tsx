@@ -785,6 +785,7 @@ class TimetableContent extends React.Component<Props, State> {
                 semester={semester}
                 modules={addedModules.map((module) => ({
                   ...module,
+                  focused: false,
                   colorIndex: this.props.colors[module.moduleCode],
                   hiddenInTimetable: this.isHiddenInTimetable(
                     module.moduleCode,
@@ -793,18 +794,25 @@ class TimetableContent extends React.Component<Props, State> {
               />
             ) : (
               <>
-                <Timetable
-                  lessons={arrangedOptimisedLessons}
-                  isVerticalOrientation={isVerticalOrientation}
-                  isScrolledHorizontally={this.state.isScrolledHorizontally}
-                  showTitle={isShowingTitle}
-                  onModifyCell={() => {}}
-                />
+                <div className={styles.timetableWrapper}>
+                  <h1 className="header">Generated Timetable</h1>
+                  <Timetable
+                    lessons={arrangedOptimisedLessons}
+                    isVerticalOrientation={isVerticalOrientation}
+                    isScrolledHorizontally={this.state.isScrolledHorizontally}
+                    showTitle={isShowingTitle}
+                    onModifyCell={() => {}}
+                  />
+                </div>
                 <div
                   className={styles.timetableWrapper}
                   onScroll={this.onScroll}
                   ref={this.timetableRef}
                 >
+                  <h1 className="header">
+                    Input your constraints here (Note: You can select multiple
+                    timeslots)
+                  </h1>
                   <Timetable
                     lessons={arrangedLessonsWithModifiableFlag}
                     isVerticalOrientation={isVerticalOrientation}

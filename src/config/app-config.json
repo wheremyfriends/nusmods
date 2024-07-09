@@ -3,6 +3,7 @@
   "defaultDescription": "Where are my friends?",
   "academicYear": "2024/2025",
   "apiBaseUrl": "https://api.nusmods.com",
+  "baseUrl": "https://nusmods.com",
   "elasticsearchBaseUrl": "https://nusmods-search.es.ap-southeast-1.aws.found.io:9243",
   "semester": 1,
   "disqusShortname": "nusmods-prod",
@@ -15,7 +16,8 @@
     "2019/2020",
     "2020/2021",
     "2021/2022",
-    "2022/2023"
+    "2022/2023",
+    "2023/2024"
   ],
   "examAvailability": [1, 2, 3, 4],
   "semesterNames": {
