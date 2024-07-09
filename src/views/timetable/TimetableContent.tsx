@@ -795,7 +795,7 @@ class TimetableContent extends React.Component<Props, State> {
             ) : (
               <>
                 <div className={styles.timetableWrapper}>
-                  <h1 className="text-lg">Generated Timetable</h1>
+                  <h1 className="header">Generated Timetable</h1>
                   <Timetable
                     lessons={arrangedOptimisedLessons}
                     isVerticalOrientation={isVerticalOrientation}
@@ -809,7 +809,7 @@ class TimetableContent extends React.Component<Props, State> {
                   onScroll={this.onScroll}
                   ref={this.timetableRef}
                 >
-                  <h1 className="text-lg m-0">
+                  <h1 className="header">
                     Input your constraints here (Note: You can select multiple
                     timeslots)
                   </h1>
