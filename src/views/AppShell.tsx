@@ -139,7 +139,7 @@ const AppShell: FC = ({ children }) => {
       </Helmet>
 
       <nav className={styles.navbar}>
-        <NavLink className={styles.brand} to="/" title="Home">
+        <NavLink className={styles.brand} to="#" title="Home">
           Where are my friends?
         </NavLink>
       </nav>
