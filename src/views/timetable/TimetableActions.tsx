@@ -118,13 +118,9 @@ const TimetableActions: React.FC<Props> = (props) => {
         role="group"
         aria-label="Timetable exporting"
       >
-        <ResetTimetable resetTimetable={props.resetTimetable} />
         <button
           type="button"
-          className={classnames(
-            styles.titleBtn,
-            "btn-outline-primary btn btn-svg",
-          )}
+          className={classnames("btn-outline-primary btn btn-svg")}
           onClick={() => {
             setIsConfigOpen(true);
           }}
@@ -132,6 +128,7 @@ const TimetableActions: React.FC<Props> = (props) => {
           <Tool className={styles.titleIcon} />
           Configuration
         </button>
+        <ResetTimetable resetTimetable={props.resetTimetable} />
       </div>
     </div>
   );
