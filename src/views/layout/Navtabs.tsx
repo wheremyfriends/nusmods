@@ -82,7 +82,7 @@ function deleteUser(roomID: string, userID: number) {
 
 // TODO: move to a more appropriate location
 function getActiveUserID(roomID: string) {
-  return store.getState().app.activeUserMapping[roomID] ?? -1;
+  return store.getState().app.activeUserMapping[roomID]?.userID ?? -1;
 }
 
 const Navtabs: FC<{
@@ -158,6 +158,8 @@ const Navtabs: FC<{
         },
         complete() {},
       });
+
+    dispatch(updateRoomLastAccessed(roomID));
   }, [roomID]);
 
   function handleContextMenu(user: RoomUser) {

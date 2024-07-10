@@ -56,3 +56,23 @@ export function updateTimetableGenConf(config: TimetableGeneratorConfig) {
     },
   };
 }
+
+export const UPDATE_ROOM_LAST_ACCESSED = "UPDATE_ROOM_LAST_ACCESSED" as const;
+export function updateRoomLastAccessed(roomID: string) {
+  return {
+    type: UPDATE_ROOM_LAST_ACCESSED,
+    payload: {
+      roomID,
+    },
+  };
+}
+
+export const REMOVE_ROOM = "REMOVE_ROOM" as const;
+export function removeRoom(roomIDs: string[]) {
+  return {
+    type: REMOVE_ROOM,
+    payload: {
+      roomIDs,
+    },
+  };
+}

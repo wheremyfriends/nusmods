@@ -150,7 +150,7 @@ export const TimetableContainerComponent: FC = () => {
     ({ app }: State) => app.activeUserMapping,
   );
   const roomID = params.roomID;
-  const userID = activeUserMapping[roomID] ?? -1;
+  const userID = activeUserMapping[roomID]?.userID ?? -1;
 
   const multiTimetable = useSelector(getSemesterTimetableMultiLessons)(
     userID,
