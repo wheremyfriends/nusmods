@@ -1,50 +1,37 @@
 import { useEffect, useState } from "react";
-import CloseButton from "./CloseButton";
 import Modal from "./Modal";
-import { RoomUser } from "types/timetables";
 import Input from "./Input";
 import { Button } from "@/components/ui/button";
+import { useHistory } from "react-router-dom";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  curEditUser: RoomUser | undefined;
   onSubmit: (newName: string) => void;
 };
 
-export default function RenameUserModal({
-  isOpen,
-  curEditUser,
-  onClose,
-  onSubmit,
-}: Props) {
-  const [newName, setNewName] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    setNewName(curEditUser?.name.valueOf());
-  }, [isOpen]);
+export default function RenameUserModal({ isOpen, onClose, onSubmit }: Props) {
+  const [name, setName] = useState<string>("");
+  const history = useHistory();
 
   function handleSubmit() {
-    if (newName === undefined) return;
-
-    setNewName(undefined);
-    onSubmit(newName);
+    if (name === "") history.push("/");
+    else history.push(`/${name}`);
   }
 
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} animate>
-      <CloseButton absolutePositioned onClick={onClose} />
-
-      <h1 className="header">Rename User</h1>
+      <h1 className="header">Create Room</h1>
       <Input
-        label="New Name"
+        label="Room Name"
+        helperText="Leave blank for random name"
         autoFocus
         type="text"
         className="form-control"
         placeholder="Enter new name"
-        value={newName}
+        value={name}
         onChange={(e) => {
-          setNewName(e.target.value);
+          setName(e.target.value);
         }}
         onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
           if (e.key === "Enter") handleSubmit();
@@ -52,7 +39,7 @@ export default function RenameUserModal({
       />
 
       <Button variant="submit" className="mt-5" onClick={handleSubmit}>
-        Rename
+        Create
       </Button>
     </Modal>
   );

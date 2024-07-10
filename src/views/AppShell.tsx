@@ -1,7 +1,7 @@
 import { FC, useCallback, useEffect, useState } from "react";
 
 import { Helmet } from "react-helmet";
-import { NavLink, useHistory } from "react-router-dom";
+import { Link, NavLink, useHistory, useLocation } from "react-router-dom";
 import { useDispatch, useSelector, useStore } from "react-redux";
 import classnames from "classnames";
 import { each } from "lodash";
@@ -32,6 +32,9 @@ import FeedbackModal from "./components/FeedbackModal";
 import KeyboardShortcuts from "./components/KeyboardShortcuts";
 
 import styles from "./AppShell.scss";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, List } from "react-feather";
+import { Home } from "lucide-react";
 
 /**
  * Fetch module list on mount.
@@ -142,20 +145,26 @@ const AppShell: FC = ({ children }) => {
         <NavLink className={styles.brand} to="#" title="Home">
           Where are my friends?
         </NavLink>
+
+        <div className={styles.navRight}>
+          <Link to="/rooms">
+            <Button variant="link" className="!py-0 !px-2">
+              Rooms
+            </Button>
+          </Link>
+        </div>
       </nav>
 
       <div className="main-container">
         {/* <Navtabs /> */}
 
-        <main className="main-content">
-          {isModuleListReady ? (
-            <ErrorBoundary errorPage={() => <ErrorPage showReportDialog />}>
-              {children}
-            </ErrorBoundary>
-          ) : (
-            <LoadingSpinner />
-          )}
-        </main>
+        {isModuleListReady ? (
+          <ErrorBoundary errorPage={() => <ErrorPage showReportDialog />}>
+            {children}
+          </ErrorBoundary>
+        ) : (
+          <LoadingSpinner />
+        )}
       </div>
 
       <ErrorBoundary>

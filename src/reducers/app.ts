@@ -13,10 +13,14 @@ import {
   OPEN_NOTIFICATION,
   POP_NOTIFICATION,
   PROMPT_REFRESH,
+  REMOVE_ROOM,
   SET_ONLINE_STATUS,
   TOGGLE_FEEDBACK_MODAL,
+  UPDATE_ROOM_LAST_ACCESSED,
   UPDATE_TIMETABLE_GEN_CONF,
 } from "actions/app";
+import _ from "lodash";
+import { format } from "date-fns";
 
 const defaultAppState = (): AppState => ({
   // Default to the current semester from config.
@@ -41,15 +45,39 @@ const defaultAppState = (): AppState => ({
 // This reducer is for storing state pertaining to the UI.
 function app(state: AppState = defaultAppState(), action: Actions): AppState {
   switch (action.type) {
-    case SWITCH_USER:
+    case SWITCH_USER: {
       const { userID, roomID } = action.payload;
       return {
         ...state,
         activeUserMapping: {
           ...state.activeUserMapping,
-          [roomID]: userID,
+          [roomID]: {
+            ...state.activeUserMapping[roomID],
+            userID,
+          },
         },
       };
+    }
+    case UPDATE_ROOM_LAST_ACCESSED: {
+      const { roomID } = action.payload;
+      return {
+        ...state,
+        activeUserMapping: {
+          ...state.activeUserMapping,
+          [roomID]: {
+            ...state.activeUserMapping[roomID],
+            lastAccessed: format(new Date(), "dd MMM yyyy, hh:mm a"),
+          },
+        },
+      };
+    }
+    case REMOVE_ROOM: {
+      const { roomIDs } = action.payload;
+      return {
+        ...state,
+        activeUserMapping: _.omit(state.activeUserMapping, roomIDs),
+      };
+    }
     case SELECT_SEMESTER:
       return {
         ...state,

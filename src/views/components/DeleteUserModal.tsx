@@ -19,8 +19,10 @@ export default function DeleteUserModal({
       <CloseButton absolutePositioned onClick={onClose} />
 
       {/* Why is this <h3>? Because the ResetTimetable.tsx uses h3 */}
-      <h3>Are you sure you want to delete "{curEditUser?.name}"</h3>
-      <p>This action cannot be undone</p>
+      <h1 className="header">
+        Are you sure you want to delete "{curEditUser?.name}"
+      </h1>
+      <p className="text-base my-5">This action cannot be undone.</p>
 
       <button
         type="button"

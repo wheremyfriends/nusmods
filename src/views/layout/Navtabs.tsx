@@ -18,6 +18,8 @@ import { ListItemIcon, ListItemText, MenuItem } from "@mui/material";
 import RenameUserModal from "views/components/RenameUserModal";
 import DeleteUserModal from "views/components/DeleteUserModal";
 import { deleteTimetableUser } from "actions/timetables";
+import { updateRoomLastAccessed } from "actions/app";
+import { createUser } from "utils/graphql";
 
 export const NAVTAB_HEIGHT = 48;
 
@@ -28,12 +30,6 @@ export const USER_CHANGE_SUBSCRIPTION = gql`
       userID
       name
     }
-  }
-`;
-
-export const CREATE_USER = gql`
-  mutation CreateUser($roomID: String!) {
-    createUser(roomID: $roomID)
   }
 `;
 
@@ -82,7 +78,7 @@ function deleteUser(roomID: string, userID: number) {
 
 // TODO: move to a more appropriate location
 function getActiveUserID(roomID: string) {
-  return store.getState().app.activeUserMapping[roomID] ?? -1;
+  return store.getState().app.activeUserMapping[roomID]?.userID ?? -1;
 }
 
 const Navtabs: FC<{
@@ -158,6 +154,8 @@ const Navtabs: FC<{
         },
         complete() {},
       });
+
+    dispatch(updateRoomLastAccessed(roomID));
   }, [roomID]);
 
   function handleContextMenu(user: RoomUser) {
@@ -261,17 +259,8 @@ const Navtabs: FC<{
         <a
           className={styles.link}
           aria-label="New User"
-          onClick={() => {
-            apolloClient
-              .mutate({
-                mutation: CREATE_USER,
-                variables: {
-                  roomID: roomID,
-                },
-              })
-              .catch((err) => {
-                console.error("CREATE_USER error: ", err);
-              });
+          onClick={async () => {
+            await createUser(apolloClient, roomID);
           }}
         >
           <UserPlus />

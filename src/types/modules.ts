@@ -230,5 +230,8 @@ export type Module = {
 };
 
 export type ActiveUserMapping = {
-  [roomID: string]: UserID;
+  [roomID: string]: {
+    userID: UserID;
+    lastAccessed: string;
+  };
 };
