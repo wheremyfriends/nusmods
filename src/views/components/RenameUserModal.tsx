@@ -3,6 +3,7 @@ import CloseButton from "./CloseButton";
 import Modal from "./Modal";
 import { RoomUser } from "types/timetables";
 import Input from "./Input";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   isOpen: boolean;
@@ -34,7 +35,7 @@ export default function RenameUserModal({
     <Modal isOpen={isOpen} onRequestClose={onClose} animate>
       <CloseButton absolutePositioned onClick={onClose} />
 
-      <h3>Rename User</h3>
+      <h1 className="header">Rename User</h1>
       <Input
         label="New Name"
         autoFocus
@@ -50,13 +51,9 @@ export default function RenameUserModal({
         }}
       />
 
-      <button
-        type="button"
-        className="btn btn-primary btn-block mt-2"
-        onClick={handleSubmit}
-      >
+      <Button variant="submit" className="mt-5" onClick={handleSubmit}>
         Rename
-      </button>
+      </Button>
     </Modal>
   );
 }
