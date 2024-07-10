@@ -18,6 +18,8 @@ import { ListItemIcon, ListItemText, MenuItem } from "@mui/material";
 import RenameUserModal from "views/components/RenameUserModal";
 import DeleteUserModal from "views/components/DeleteUserModal";
 import { deleteTimetableUser } from "actions/timetables";
+import { updateRoomLastAccessed } from "actions/app";
+import { createUser } from "utils/graphql";
 
 export const NAVTAB_HEIGHT = 48;
 
@@ -28,12 +30,6 @@ export const USER_CHANGE_SUBSCRIPTION = gql`
       userID
       name
     }
-  }
-`;
-
-export const CREATE_USER = gql`
-  mutation CreateUser($roomID: String!) {
-    createUser(roomID: $roomID)
   }
 `;
 
@@ -263,17 +259,8 @@ const Navtabs: FC<{
         <a
           className={styles.link}
           aria-label="New User"
-          onClick={() => {
-            apolloClient
-              .mutate({
-                mutation: CREATE_USER,
-                variables: {
-                  roomID: roomID,
-                },
-              })
-              .catch((err) => {
-                console.error("CREATE_USER error: ", err);
-              });
+          onClick={async () => {
+            await createUser(apolloClient, roomID);
           }}
         >
           <UserPlus />
