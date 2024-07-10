@@ -221,7 +221,7 @@ export const TimetableContainerComponent: FC = () => {
   // }
 
   return (
-    <>
+    <main className="main-content">
       <div className="main-container">
         <Navtabs roomID={roomID} />
       </div>
@@ -243,7 +243,7 @@ export const TimetableContainerComponent: FC = () => {
         }
         readOnly={readOnly}
       />
-    </>
+    </main>
   );
 };
 
