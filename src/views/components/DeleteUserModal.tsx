@@ -22,7 +22,7 @@ export default function DeleteUserModal({
       <h1 className="header">
         Are you sure you want to delete "{curEditUser?.name}"
       </h1>
-      <p className="text-base">This action cannot be undone</p>
+      <p className="text-base my-5">This action cannot be undone.</p>
 
       <button
         type="button"
