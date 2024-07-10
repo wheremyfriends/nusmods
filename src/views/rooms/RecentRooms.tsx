@@ -17,14 +17,16 @@ export default function RecentRooms() {
     (state: State) => state.app.activeUserMapping,
   );
 
-  const data: Room[] = Object.entries(activeUsers).map(
-    ([roomID, { userID, lastAccessed }]) => {
+  const data: Room[] = Object.entries(activeUsers)
+    .map(([roomID, { userID, lastAccessed }]) => {
       return {
         roomID,
         lastAccessed: new Date(lastAccessed),
       };
-    },
-  );
+    })
+    .sort((a, b) => {
+      return b.lastAccessed.valueOf() - a.lastAccessed.valueOf();
+    });
 
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
   const [isRemoveRoomModalOpen, setIsRemoveRoomModalOpen] =
