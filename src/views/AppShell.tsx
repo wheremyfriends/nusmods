@@ -1,4 +1,5 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useContext, useEffect, useState } from "react";
+import { AuthUser } from "types/accounts";
 
 import { Helmet } from "react-helmet";
 import { Link, NavLink, useHistory, useLocation } from "react-router-dom";
@@ -35,6 +36,9 @@ import styles from "./AppShell.scss";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, List } from "react-feather";
 import { Home } from "lucide-react";
+import { AuthContext } from "./account/AuthContext";
+import { getUser, logoutUser } from "utils/graphql";
+import { apolloClient } from "./timetable/TimetableContent";
 
 /**
  * Fetch module list on mount.
@@ -108,7 +112,7 @@ function useFetchModuleListAndTimetableModules(): {
   };
 }
 
-const AppShell: FC = ({ children }) => {
+const AppShell = ({ children }: { children: React.ReactNode }) => {
   const { moduleListError, refetchModuleListAndTimetableModules } =
     useFetchModuleListAndTimetableModules();
 
@@ -129,56 +133,81 @@ const AppShell: FC = ({ children }) => {
     );
   }
 
+  const [user, setUser] = useState<AuthUser>(undefined);
+
+  useEffect(() => {
+    getUser(apolloClient).then((user) => setUser(user));
+  }, []);
+
+  const handleLogout = async () => {
+    await logoutUser(apolloClient);
+    setUser(undefined);
+  };
+
   return (
-    <div className="app-container">
-      <Helmet>
-        <body
-          className={classnames(`theme-${theme}`, {
-            "mode-dark": isDarkMode,
-            "mdc-theme--dark": isDarkMode,
-            "mobile-safari": isIOS,
-          })}
-        />
-      </Helmet>
+    <AuthContext.Provider value={{ user, setUser }}>
+      <div className="app-container">
+        <Helmet>
+          <body
+            className={classnames(`theme-${theme}`, {
+              "mode-dark": isDarkMode,
+              "mdc-theme--dark": isDarkMode,
+              "mobile-safari": isIOS,
+            })}
+          />
+        </Helmet>
 
-      <nav className={styles.navbar}>
-        <NavLink className={styles.brand} to="#" title="Home">
-          Where are my friends?
-        </NavLink>
+        <nav className={styles.navbar}>
+          <NavLink className={styles.brand} to="#" title="Home">
+            Where are my friends?
+          </NavLink>
 
-        <div className={styles.navRight}>
-          <Link to="/rooms">
-            <Button variant="link" className="!py-0 !px-2">
-              Rooms
-            </Button>
-          </Link>
+          <div className={styles.navRight}>
+            <Link to="/rooms">
+              <Button variant="link">Rooms</Button>
+            </Link>
+            {user ? (
+              <>
+                <Link to="/me">
+                  <Button variant="link">WhyAre</Button>
+                </Link>
+                <Button onClick={handleLogout} variant="link">
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Link to="/login">
+                <Button variant="link">Login</Button>
+              </Link>
+            )}
+          </div>
+        </nav>
+
+        <div className="main-container">
+          {/* <Navtabs /> */}
+
+          {isModuleListReady ? (
+            <ErrorBoundary errorPage={() => <ErrorPage showReportDialog />}>
+              {children}
+            </ErrorBoundary>
+          ) : (
+            <LoadingSpinner />
+          )}
         </div>
-      </nav>
 
-      <div className="main-container">
-        {/* <Navtabs /> */}
+        <ErrorBoundary>
+          <FeedbackModal />
+        </ErrorBoundary>
 
-        {isModuleListReady ? (
-          <ErrorBoundary errorPage={() => <ErrorPage showReportDialog />}>
-            {children}
-          </ErrorBoundary>
-        ) : (
-          <LoadingSpinner />
-        )}
+        <ErrorBoundary>
+          <Notification />
+        </ErrorBoundary>
+
+        <ErrorBoundary>
+          <KeyboardShortcuts />
+        </ErrorBoundary>
       </div>
-
-      <ErrorBoundary>
-        <FeedbackModal />
-      </ErrorBoundary>
-
-      <ErrorBoundary>
-        <Notification />
-      </ErrorBoundary>
-
-      <ErrorBoundary>
-        <KeyboardShortcuts />
-      </ErrorBoundary>
-    </div>
+    </AuthContext.Provider>
   );
 };
 
