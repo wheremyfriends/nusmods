@@ -47,25 +47,14 @@ import { Action } from "actions/constants";
 import store from "entry/main";
 import _ from "lodash";
 import config from "config";
-
-export const LESSON_CHANGE_SUBSCRIPTION = gql`
-  subscription LessonChange($roomID: String!) {
-    lessonChange(roomID: $roomID) {
-      action
-      userID
-      semester
-      moduleCode
-      lessonType
-      classNo
-    }
-  }
-`;
+import { subscribeToLessonChanges } from "utils/graphql";
 
 type Params = {
   roomID: string;
 };
 
-function handleLessonChange(lessonChange: LessonChange) {
+// Receives lesson change subscription from the backend, then updates the redux state
+export function handleLessonChange(lessonChange: LessonChange) {
   // TODO: Include semester param
   // TODO: Check if request is intended for correct user via name
   const state = store.getState();
@@ -169,25 +158,7 @@ export const TimetableContainerComponent: FC = () => {
   useEffect(() => {
     // Clear the state first
     dispatch(resetAllTimetables());
-
-    apolloClient
-      .subscribe({
-        query: LESSON_CHANGE_SUBSCRIPTION,
-        variables: {
-          roomID: roomID,
-        },
-      })
-      .subscribe({
-        next(data) {
-          if (data.data) {
-            handleLessonChange(data.data.lessonChange);
-          }
-        },
-        error(error) {
-          console.log("Apollo subscribe error", error);
-        },
-        complete() {},
-      });
+    subscribeToLessonChanges(apolloClient, roomID, handleLessonChange);
   }, [roomID]);
 
   // Not needed as modules are fetched on demand
