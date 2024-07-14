@@ -8,7 +8,7 @@ import ContextMenu from "views/components/ContextMenu";
 
 import styles from "./Navtabs.scss";
 import { apolloClient } from "views/timetable/TimetableContent";
-import { gql } from "@apollo/client";
+import { ApolloClient, gql } from "@apollo/client";
 import { RoomUser, UserChange } from "types/timetables";
 import { Action } from "actions/constants";
 import { switchUser } from "actions/settings";
@@ -19,19 +19,9 @@ import RenameUserModal from "views/components/RenameUserModal";
 import DeleteUserModal from "views/components/DeleteUserModal";
 import { deleteTimetableUser } from "actions/timetables";
 import { updateRoomLastAccessed } from "actions/app";
-import { createUser } from "utils/graphql";
+import { createUser, subscribeToUserChanges } from "utils/graphql";
 
 export const NAVTAB_HEIGHT = 48;
-
-export const USER_CHANGE_SUBSCRIPTION = gql`
-  subscription UserChange($roomID: String!) {
-    userChange(roomID: $roomID) {
-      action
-      userID
-      name
-    }
-  }
-`;
 
 export const UPDATE_USER = gql`
   mutation UpdateUser($roomID: String!, $userID: Int!, $newname: String!) {
@@ -100,60 +90,41 @@ const Navtabs: FC<{
   useEffect(() => {
     setUsers([]);
 
-    apolloClient
-      .subscribe({
-        query: USER_CHANGE_SUBSCRIPTION,
-        variables: {
-          roomID: roomID,
-        },
-      })
-      .subscribe({
-        next(data) {
-          if (data.data) {
-            const userChange: UserChange = data.data.userChange;
-            const { action, userID, name } = userChange;
+    subscribeToUserChanges(apolloClient, roomID, (userChange) => {
+      const { action, userID, name } = userChange;
 
-            switch (action) {
-              case Action.CREATE_USER: {
-                setUsers((users) => [...users, { userID, name }]);
-                if (getActiveUserID(roomID) === -1) {
-                  dispatch(switchUser(userID, roomID));
-                }
-                return;
-              }
-              case Action.UPDATE_USER: {
-                setUsers((users) =>
-                  users.map((user) => {
-                    if (user.userID === userID) return { ...user, name: name };
-                    return user;
-                  }),
-                );
-                return;
-              }
-              case Action.DELETE_USER: {
-                setUsers((users) => {
-                  const filteredUsers = users.filter(
-                    (user) => user.userID !== userID,
-                  );
-                  // Switch to first user if current active user is deleted
-                  if (
-                    filteredUsers.length > 0 &&
-                    getActiveUserID(roomID) === userID
-                  )
-                    dispatch(switchUser(filteredUsers[0].userID, roomID));
-                  return filteredUsers;
-                });
-                dispatch(deleteTimetableUser(userID));
-                return;
-              }
-            }
+      switch (action) {
+        case Action.CREATE_USER: {
+          setUsers((users) => [...users, { userID, name }]);
+          if (getActiveUserID(roomID) === -1) {
+            dispatch(switchUser(userID, roomID));
           }
-        },
-        error(error) {
-          console.log("Apollo subscribe error", error);
-        },
-        complete() {},
-      });
+          return;
+        }
+        case Action.UPDATE_USER: {
+          setUsers((users) =>
+            users.map((user) => {
+              if (user.userID === userID) return { ...user, name: name };
+              return user;
+            }),
+          );
+          return;
+        }
+        case Action.DELETE_USER: {
+          setUsers((users) => {
+            const filteredUsers = users.filter(
+              (user) => user.userID !== userID,
+            );
+            // Switch to first user if current active user is deleted
+            if (filteredUsers.length > 0 && getActiveUserID(roomID) === userID)
+              dispatch(switchUser(filteredUsers[0].userID, roomID));
+            return filteredUsers;
+          });
+          dispatch(deleteTimetableUser(userID));
+          return;
+        }
+      }
+    });
 
     dispatch(updateRoomLastAccessed(roomID));
   }, [roomID]);

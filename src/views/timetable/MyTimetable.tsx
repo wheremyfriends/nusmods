@@ -2,8 +2,12 @@ import React, { FC } from "react";
 import TimetableContent, { apolloClient } from "./TimetableContent";
 import { Semester } from "types/modules";
 import SemesterSwitcher from "views/components/semester-switcher/SemesterSwitcher";
-import { resetAllTimetables } from "actions/timetables";
-import { getRooms, subscribeToLessonChanges } from "utils/graphql";
+import { deleteTimetableUser, resetAllTimetables } from "actions/timetables";
+import {
+  getRooms,
+  subscribeToLessonChanges,
+  subscribeToUserChanges,
+} from "utils/graphql";
 import { handleLessonChange } from "./TimetableContainer";
 import { useDispatch, useSelector } from "react-redux";
 import { State } from "types/state";
@@ -13,6 +17,7 @@ import {
   getSemesterTimetableMultiLessons,
 } from "selectors/timetables";
 import { AuthContext } from "views/account/AuthContext";
+import { Action } from "actions/constants";
 
 const TimetableHeader: FC<{
   semester: Semester;
@@ -34,14 +39,19 @@ export const MyTimetable = () => {
   const dispatch = useDispatch();
 
   const userID = 47;
-  const multiTimetable = useSelector(getSemesterTimetableMultiLessons)(
+  const multiTimetableKeys = Object.keys(
+    useSelector(({ timetables }: State) => timetables.multiUserLessons),
+  );
+  console.log({ multiTimetableKeys });
+
+  const userTimetable = useSelector(getSemesterTimetableMultiLessons)(
     userID,
     semester,
   );
   const colors = useSelector(getSemesterTimetableColors)(semester);
   const filledColors = React.useMemo(
-    () => fillColorMapping(multiTimetable, colors),
-    [colors, multiTimetable],
+    () => fillColorMapping(userTimetable, colors),
+    [colors, userTimetable],
   );
 
   // Listen to changes from all joined rooms of the user
@@ -53,15 +63,24 @@ export const MyTimetable = () => {
       if (!rooms) return;
 
       setRooms(rooms);
-      rooms.forEach((room) => {
-        subscribeToLessonChanges(apolloClient, room, handleLessonChange);
+      rooms.forEach((roomID) => {
+        subscribeToLessonChanges(apolloClient, roomID, handleLessonChange);
+        subscribeToUserChanges(apolloClient, roomID, (userChange) => {
+          const { action, userID } = userChange;
+
+          switch (action) {
+            case Action.DELETE_USER: {
+              dispatch(deleteTimetableUser(userID));
+              return;
+            }
+          }
+        });
       });
     });
   }, []);
 
   return (
     <div className="container">
-      {rooms.join(", ")}
       <TimetableContent
         readOnly={false}
         header={
@@ -78,6 +97,11 @@ export const MyTimetable = () => {
         roomID="room1"
         userID={user!.userID}
       />
+
+      <h1 className="header">Debug</h1>
+      {rooms.join(", ")}
+      <br />
+      {multiTimetableKeys.join(", ")}
     </div>
   );
 };

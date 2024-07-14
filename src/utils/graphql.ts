@@ -1,5 +1,7 @@
 import { ApolloClient, NormalizedCacheObject, gql } from "@apollo/client";
+import { Action } from "actions/constants";
 import { AuthUser } from "types/accounts";
+import { LessonChange, UserChange } from "types/timetables";
 
 export async function createUser(
   apolloClient: ApolloClient<NormalizedCacheObject>,
@@ -142,7 +144,7 @@ export async function getRooms(
 export function subscribeToLessonChanges(
   apolloClient: ApolloClient<NormalizedCacheObject>,
   roomID: string,
-  callback: (arg: any) => void,
+  callback: (arg: LessonChange) => void,
 ) {
   const LESSON_CHANGE_SUBSCRIPTION = gql`
     subscription LessonChange($roomID: String!) {
@@ -167,7 +169,42 @@ export function subscribeToLessonChanges(
     .subscribe({
       next(data) {
         if (data.data) {
-          callback(data.data.lessonChange);
+          callback(data.data.lessonChange as LessonChange);
+        }
+      },
+      error(error) {
+        console.log("Apollo subscribe error", error);
+      },
+      complete() {},
+    });
+}
+
+export function subscribeToUserChanges(
+  apolloClient: ApolloClient<NormalizedCacheObject>,
+  roomID: string,
+  callback: (data: UserChange) => void,
+) {
+  const USER_CHANGE_SUBSCRIPTION = gql`
+    subscription UserChange($roomID: String!) {
+      userChange(roomID: $roomID) {
+        action
+        userID
+        name
+      }
+    }
+  `;
+
+  apolloClient
+    .subscribe({
+      query: USER_CHANGE_SUBSCRIPTION,
+      variables: {
+        roomID: roomID,
+      },
+    })
+    .subscribe({
+      next(data) {
+        if (data.data) {
+          callback(data.data.userChange as UserChange);
         }
       },
       error(error) {
