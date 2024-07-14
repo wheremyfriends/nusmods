@@ -118,6 +118,27 @@ export async function logoutUser(
   }
 }
 
+export async function getRooms(
+  apolloClient: ApolloClient<NormalizedCacheObject>,
+) {
+  const query = gql`
+    query GetRooms {
+      getRooms
+    }
+  `;
+
+  try {
+    const res = await apolloClient.mutate({
+      mutation: query,
+    });
+
+    return res.data.getRooms as string[];
+  } catch (err) {
+    console.error("GET_ROOMS error: ", err);
+  }
+
+  return undefined;
+}
 export function subscribeToLessonChanges(
   apolloClient: ApolloClient<NormalizedCacheObject>,
   roomID: string,
