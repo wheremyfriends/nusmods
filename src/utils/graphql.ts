@@ -25,7 +25,7 @@ export async function createUser(
       },
     });
   } catch (err) {
-    console.error("CREATE_USER error: ", err);
+    console.error("CREATE_USER error: ", err.message);
   }
 }
 
@@ -47,7 +47,7 @@ export async function getUser(
     });
     return res.data.getUser as AuthUser;
   } catch (err) {
-    console.error("GET_USER error: ", err);
+    console.error("GET_USER error: ", err.message);
   }
 
   return undefined;
@@ -72,7 +72,7 @@ export async function registerUser(
       },
     });
   } catch (err) {
-    console.error("REGISTER_USER error: ", err);
+    console.error("REGISTER_USER error: ", err.message);
   }
 }
 
@@ -100,7 +100,7 @@ export async function loginUser(
     });
     return res.data.loginUser as AuthUser;
   } catch (err) {
-    console.error("LOGIN_USER error: ", err);
+    console.error("LOGIN_USER error: ", err.message);
   }
 
   return undefined;
@@ -120,7 +120,7 @@ export async function logoutUser(
       mutation: query,
     });
   } catch (err) {
-    console.error("LOGOUT_USER error: ", err);
+    console.error("LOGOUT_USER error: ", err.message);
   }
 }
 
@@ -140,13 +140,13 @@ export async function getRooms(
 
     return res.data.getRooms as string[];
   } catch (err) {
-    console.error("GET_ROOMS error: ", err);
+    console.error("GET_ROOMS error: ", err.message);
   }
 
   return undefined;
 }
 
-export function createLesson(
+export async function createLesson(
   apolloClient: ApolloClient<NormalizedCacheObject>,
   roomID: string | undefined,
   userID: number,
@@ -188,11 +188,11 @@ export function createLesson(
       },
     })
     .catch((err) => {
-      console.error("CREATE_LESSON error: ", err);
+      console.error("CREATE_LESSON error: ", err.message);
     });
 }
 
-export function deleteLesson(
+export async function deleteLesson(
   apolloClient: ApolloClient<NormalizedCacheObject>,
   roomID: string | undefined,
   userID: number,
@@ -233,11 +233,11 @@ export function deleteLesson(
       },
     })
     .catch((err) => {
-      console.error("DELETE_LESSON error: ", err);
+      console.error("DELETE_LESSON error: ", err.message);
     });
 }
 
-export function resetTimetable(
+export async function resetTimetable(
   apolloClient: ApolloClient<NormalizedCacheObject>,
   roomID: string | undefined,
   userID: number,
@@ -259,11 +259,11 @@ export function resetTimetable(
       },
     })
     .catch((err) => {
-      console.error("RESET_TIMETABLE error: ", err);
+      console.error("RESET_TIMETABLE error: ", err.message);
     });
 }
 
-export function deleteModule(
+export async function deleteModule(
   apolloClient: ApolloClient<NormalizedCacheObject>,
   roomID: string | undefined,
   userID: number,
@@ -286,7 +286,7 @@ export function deleteModule(
     }
   `;
   try {
-    apolloClient.mutate({
+    await apolloClient.mutate({
       mutation: DELETE_MODULE,
       variables: {
         roomID,
@@ -296,8 +296,7 @@ export function deleteModule(
       },
     });
   } catch (err) {
-    console.error("DELETE_MODULE error: ", err);
-    return;
+    console.error("DELETE_MODULE error: ", err.message);
   }
 }
 
@@ -313,9 +312,8 @@ export async function updateConfig(
     }
   `;
 
-  console.log({ config });
   try {
-    apolloClient.mutate({
+    await apolloClient.mutate({
       mutation: query,
       variables: {
         roomID,
@@ -324,8 +322,8 @@ export async function updateConfig(
       },
     });
   } catch (err) {
-    console.error("UPDATE_CONFIG error: ", err);
-    return;
+    console.error("UPDATE_CONFIG error: ", err.message);
+    alert(err.message);
   }
 }
 
