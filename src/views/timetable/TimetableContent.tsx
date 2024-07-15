@@ -1,7 +1,7 @@
 import * as React from "react";
 import classnames from "classnames";
-import { connect, useDispatch } from "react-redux";
-import _, { get, keys } from "lodash";
+import { connect } from "react-redux";
+import _ from "lodash";
 
 import {
   ColorMapping,
@@ -11,25 +11,15 @@ import {
   NotificationOptions,
   MultiUserFocusModulesMap,
 } from "types/reducers";
-import {
-  Module,
-  ModuleCode,
-  LessonType,
-  Semester,
-  ClassNo,
-  UserID,
-} from "types/modules";
+import { Module, ModuleCode, Semester, UserID } from "types/modules";
 import {
   ColoredLesson,
   Lesson,
   EditingType,
   ModifiableLesson,
-  SemTimetableConfig,
-  SemTimetableConfigWithLessons,
   SemTimetableMultiConfig,
   TimetableArrangement,
   TimetableMultiConfig,
-  LessonChange,
   MultiUserTimetableConfig,
   MultiUserSemTimetableConfigWithLessons,
   TimetableGeneratorConfig,
@@ -47,7 +37,6 @@ import {
   addModuleRT,
 } from "actions/timetables";
 import {
-  areLessonsSameClass,
   isLessonSelected,
   formatExamDate,
   getExamDate,
@@ -61,13 +50,11 @@ import {
   getSemesterModules,
   hydrateSemTimetableWithMultiLessons,
   lessonsForLessonType,
-  randomModuleLessonConfig,
   timetableLessonsArray,
 } from "utils/timetables";
 import { resetScrollPosition } from "utils/react";
 import ModulesSelectContainer from "views/timetable/ModulesSelectContainer";
 import Title from "views/components/Title";
-import ErrorBoundary from "views/errors/ErrorBoundary";
 import { State as StoreState } from "types/state";
 import { TombstoneModule } from "types/views";
 import Timetable from "./Timetable";
@@ -79,9 +66,7 @@ import styles from "./TimetableContent.scss";
 import {
   ApolloClient,
   InMemoryCache,
-  ApolloProvider,
   gql,
-  FetchResult,
   HttpLink,
   split,
 } from "@apollo/client";
@@ -89,53 +74,11 @@ import {
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
 import { openNotification } from "actions/app";
-import { fetchModule } from "actions/moduleBank";
-import type { Dispatch, GetState } from "types/redux";
-import { Action } from "actions/constants";
 import { getOptimisedTimetable } from "solver";
 import venues from "data/venues";
 import ExamCalendar from "./ExamCalendar";
 import { getMainDefinition } from "@apollo/client/utilities";
-
-export const CREATE_LESSON = gql`
-  mutation CreateLesson(
-    $roomID: String!
-    $userID: Int!
-    $semester: Int!
-    $moduleCode: String!
-    $lessonType: String!
-    $classNo: String!
-  ) {
-    createLesson(
-      roomID: $roomID
-      userID: $userID
-      semester: $semester
-      moduleCode: $moduleCode
-      lessonType: $lessonType
-      classNo: $classNo
-    )
-  }
-`;
-
-export const DELETE_LESSON = gql`
-  mutation DeleteLesson(
-    $roomID: String!
-    $userID: Int!
-    $semester: Int!
-    $moduleCode: String!
-    $lessonType: String!
-    $classNo: String!
-  ) {
-    deleteLesson(
-      roomID: $roomID
-      userID: $userID
-      semester: $semester
-      moduleCode: $moduleCode
-      lessonType: $lessonType
-      classNo: $classNo
-    )
-  }
-`;
+import { createLesson, deleteLesson } from "utils/graphql";
 
 export const DELETE_MODULE = gql`
   mutation DeleteModule(
@@ -177,7 +120,7 @@ const wsLink = new GraphQLWsLink(
 );
 
 const httpLink = new HttpLink({
-  uri: "http://localhost:4000/graphql",
+  uri: url,
   credentials: "include",
 });
 
@@ -199,7 +142,6 @@ const splitLink = split(
 );
 
 export const apolloClient = new ApolloClient({
-  // uri: url,
   link: splitLink,
   cache: new InMemoryCache(),
 });
@@ -216,7 +158,7 @@ type OwnProps = {
   semester: Semester;
   multiTimetable: SemTimetableMultiConfig;
   colors: ColorMapping;
-  roomID: String;
+  roomID: string | undefined;
   userID: UserID;
 };
 
@@ -238,7 +180,7 @@ type Props = OwnProps & {
     userID: UserID,
     semester: Semester,
     moduleCode: ModuleCode,
-    roomID: String,
+    roomID: string | undefined,
   ) => void;
   resetTimetable: (userID: UserID, semester: Semester) => void;
   modifyLesson: (lesson: Lesson) => void;
@@ -410,22 +352,27 @@ class TimetableContent extends React.Component<Props, State> {
           },
         );
       } else {
-        const MUTATION = lesson.isAvailable ? CREATE_LESSON : DELETE_LESSON;
-        apolloClient
-          .mutate({
-            mutation: MUTATION,
-            variables: {
-              roomID: roomID, // TODO: Use variable roomID and name
-              userID: userID,
-              semester: semester,
-              moduleCode: moduleCode,
-              lessonType: lessonType,
-              classNo: classNo,
-            },
-          })
-          .catch((err) => {
-            console.error("CREATE/DELETE_LESSON error: ", err);
-          });
+        if (lesson.isAvailable) {
+          createLesson(
+            apolloClient,
+            roomID,
+            userID,
+            semester,
+            moduleCode,
+            lessonType,
+            classNo,
+          );
+        } else {
+          deleteLesson(
+            apolloClient,
+            roomID,
+            userID,
+            semester,
+            moduleCode,
+            lessonType,
+            classNo,
+          );
+        }
       }
     } else {
       // Enter edit mode for the module and lesson type
@@ -511,21 +458,15 @@ class TimetableContent extends React.Component<Props, State> {
     Object.entries(lessons).forEach(([lessonType, classes]) => {
       classes.forEach((classNo) => {
         // Restore the shit
-        apolloClient
-          .mutate({
-            mutation: CREATE_LESSON,
-            variables: {
-              roomID: this.props.roomID,
-              userID: this.props.userID,
-              semester: this.props.semester,
-              moduleCode,
-              lessonType,
-              classNo,
-            },
-          })
-          .catch((err) => {
-            console.error("CREATE_LESSON error: ", err);
-          });
+        createLesson(
+          apolloClient,
+          this.props.roomID,
+          this.props.userID,
+          this.props.semester,
+          moduleCode,
+          lessonType,
+          classNo,
+        );
       });
     });
   };

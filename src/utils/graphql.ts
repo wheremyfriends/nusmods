@@ -1,6 +1,8 @@
 import { ApolloClient, NormalizedCacheObject, gql } from "@apollo/client";
 import { Action } from "actions/constants";
+import { Semester } from "nusmoderator";
 import { AuthUser } from "types/accounts";
+import { ClassNo, LessonType, ModuleCode } from "types/modules";
 import { LessonChange, UserChange } from "types/timetables";
 
 export async function createUser(
@@ -141,6 +143,98 @@ export async function getRooms(
 
   return undefined;
 }
+
+export function createLesson(
+  apolloClient: ApolloClient<NormalizedCacheObject>,
+  roomID: string | undefined,
+  userID: number,
+  semester: number,
+  moduleCode: ModuleCode,
+  lessonType: LessonType,
+  classNo: ClassNo,
+) {
+  const CREATE_LESSON = gql`
+    mutation CreateLesson(
+      $roomID: String
+      $userID: Int!
+      $semester: Int!
+      $moduleCode: String!
+      $lessonType: String!
+      $classNo: String!
+    ) {
+      createLesson(
+        roomID: $roomID
+        userID: $userID
+        semester: $semester
+        moduleCode: $moduleCode
+        lessonType: $lessonType
+        classNo: $classNo
+      )
+    }
+  `;
+
+  apolloClient
+    .mutate({
+      mutation: CREATE_LESSON,
+      variables: {
+        roomID: roomID,
+        userID: userID,
+        semester: semester,
+        moduleCode: moduleCode,
+        lessonType: lessonType,
+        classNo: classNo,
+      },
+    })
+    .catch((err) => {
+      console.error("CREATE_LESSON error: ", err);
+    });
+}
+
+export function deleteLesson(
+  apolloClient: ApolloClient<NormalizedCacheObject>,
+  roomID: string | undefined,
+  userID: number,
+  semester: number,
+  moduleCode: ModuleCode,
+  lessonType: LessonType,
+  classNo: ClassNo,
+) {
+  const DELETE_LESSON = gql`
+    mutation DeleteLesson(
+      $roomID: String
+      $userID: Int!
+      $semester: Int!
+      $moduleCode: String!
+      $lessonType: String!
+      $classNo: String!
+    ) {
+      deleteLesson(
+        roomID: $roomID
+        userID: $userID
+        semester: $semester
+        moduleCode: $moduleCode
+        lessonType: $lessonType
+        classNo: $classNo
+      )
+    }
+  `;
+  apolloClient
+    .mutate({
+      mutation: DELETE_LESSON,
+      variables: {
+        roomID,
+        userID,
+        semester,
+        moduleCode,
+        lessonType,
+        classNo,
+      },
+    })
+    .catch((err) => {
+      console.error("CREATE/DELETE_LESSON error: ", err);
+    });
+}
+
 export function subscribeToLessonChanges(
   apolloClient: ApolloClient<NormalizedCacheObject>,
   roomID: string,
@@ -190,6 +284,7 @@ export function subscribeToUserChanges(
         action
         userID
         name
+        isAuth
       }
     }
   `;

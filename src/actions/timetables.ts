@@ -26,7 +26,8 @@ import {
   validateTimetableModules,
 } from "utils/timetables";
 import { getModuleTimetable } from "utils/modules";
-import { CREATE_LESSON, apolloClient } from "views/timetable/TimetableContent";
+import { createLesson } from "utils/graphql";
+import { apolloClient } from "views/timetable/TimetableContent";
 
 // Actions that should not be used directly outside of thunks
 export const SET_TIMETABLE = "SET_TIMETABLE" as const;
@@ -72,11 +73,12 @@ export const Internal = {
 };
 
 // Realtime implementation which will mutate to GraphQL instead of modifying local timetable
+// Adds module (called from the searchbox)
 export function addModuleRT(
   userID: UserID,
   semester: Semester,
   moduleCode: ModuleCode,
-  roomID: String,
+  roomID: string,
 ) {
   return (dispatch: Dispatch, getState: GetState) =>
     dispatch(fetchModule(moduleCode)).then(() => {
@@ -100,21 +102,15 @@ export function addModuleRT(
       const moduleLessonConfig = randomModuleLessonConfig(lessons);
 
       for (const [lessonType, classNo] of Object.entries(moduleLessonConfig)) {
-        apolloClient
-          .mutate({
-            mutation: CREATE_LESSON,
-            variables: {
-              roomID: roomID, // TODO: Use variable roomID and name
-              userID: userID,
-              semester: semester,
-              moduleCode: moduleCode,
-              lessonType: lessonType,
-              classNo: classNo,
-            },
-          })
-          .catch((err) => {
-            console.error("CREATE_LESSON error: ", err);
-          });
+        createLesson(
+          apolloClient,
+          roomID,
+          userID,
+          semester,
+          moduleCode,
+          lessonType,
+          classNo,
+        );
       }
     });
 }
