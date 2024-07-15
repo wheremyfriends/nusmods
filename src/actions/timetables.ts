@@ -5,6 +5,7 @@ import type {
   Lesson,
   ModuleLessonConfig,
   SemTimetableConfig,
+  TimetableGeneratorConfig,
 } from "types/timetables";
 import type { Dispatch, GetState } from "types/redux";
 import type { ColorMapping } from "types/reducers";
@@ -452,5 +453,15 @@ export function unfocusLessonInTimetable(userID: UserID, semester: Semester) {
   return {
     type: UNFOCUS_LESSON_IN_TIMETABLE,
     payload: { userID, semester },
+  };
+}
+
+export const UPDATE_TIMETABLE_GEN_CONF = "UPDATE_TIMETABLE_GEN_CONF" as const;
+export function updateTimetableGenConf(config: TimetableGeneratorConfig) {
+  return {
+    type: UPDATE_TIMETABLE_GEN_CONF,
+    payload: {
+      config,
+    },
   };
 }

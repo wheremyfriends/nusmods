@@ -63,13 +63,7 @@ import TimetableModulesTable from "./TimetableModulesTable";
 import ModulesTableFooter from "./ModulesTableFooter";
 import styles from "./TimetableContent.scss";
 
-import {
-  ApolloClient,
-  InMemoryCache,
-  gql,
-  HttpLink,
-  split,
-} from "@apollo/client";
+import { ApolloClient, InMemoryCache, HttpLink, split } from "@apollo/client";
 
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
@@ -607,13 +601,42 @@ class TimetableContent extends React.Component<Props, State> {
 
     if (multiTimetableLessons[targetTimetableIdx]) {
       // if (false) {
+      const {
+        prefDaysEnabled,
+        maxDistEnabled,
+        breaksEnabled,
+        prefDays,
+        maxDist,
+        minDuration,
+        breaks,
+      } = timetableGeneratorConfig;
+
       optimisedTimetables = getOptimisedTimetable(
         multiTimetableLessons,
         targetTimetableIdx,
         {
           maxSols: 1,
           venueInfo: transformVenues(venues),
-          ...timetableGeneratorConfig,
+          maxDist: maxDistEnabled ? parseFloat(maxDist) : -1,
+          prefDays: prefDaysEnabled
+            ? prefDays.split(",").map((day) => {
+                day = day.trim();
+                return parseInt(day);
+              })
+            : [],
+          breaks: [
+            {
+              minDuration: breaksEnabled ? parseInt(minDuration) : -1,
+              timeslots: breaksEnabled
+                ? breaks.map((b) => {
+                    return {
+                      start: parseInt(b.start.split(":").join("")),
+                      end: parseInt(b.end.split(":").join("")),
+                    };
+                  })
+                : [],
+            },
+          ],
         },
       ) as Lesson[][];
 
@@ -689,7 +712,11 @@ class TimetableContent extends React.Component<Props, State> {
 
     return (
       <RoomContext.Provider
-        value={{ roomID: this.props.roomID, userID: this.props.userID }}
+        value={{
+          roomID: this.props.roomID,
+          userID: this.props.userID,
+          readOnly: this.props.readOnly,
+        }}
       >
         <div
           className={classnames("page-container", styles.container, {
@@ -859,20 +886,8 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
   const hiddenInTimetable =
     state.timetables.multiUserHidden?.[userID]?.[hiddenModulesKey] || [];
 
-  const timetableGeneratorConfig: TimetableGeneratorConfig = {
-    prefDaysEnabled: state.app.timetableGeneratorConfig.prefDaysEnabled,
-    maxDistEnabled: state.app.timetableGeneratorConfig.maxDistEnabled,
-    breaksEnabled: state.app.timetableGeneratorConfig.breaksEnabled,
-    prefDays: state.app.timetableGeneratorConfig.prefDaysEnabled
-      ? state.app.timetableGeneratorConfig.prefDays
-      : [],
-    maxDist: state.app.timetableGeneratorConfig.maxDistEnabled
-      ? state.app.timetableGeneratorConfig.maxDist
-      : -1,
-    breaks: state.app.timetableGeneratorConfig.breaksEnabled
-      ? state.app.timetableGeneratorConfig.breaks
-      : [],
-  };
+  const timetableGeneratorConfig = state.timetables.timetableGeneratorConfig;
+
   return {
     semester,
     multiUserTimetableWithLessons,

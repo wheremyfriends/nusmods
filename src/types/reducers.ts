@@ -69,7 +69,6 @@ export type AppState = {
   readonly isFeedbackModalOpen: boolean;
   readonly notifications: NotificationData[];
   readonly promptRefresh: boolean;
-  readonly timetableGeneratorConfig: TimetableGeneratorConfig;
 };
 
 /* requests.js */
@@ -140,6 +139,8 @@ export type TimetablesState = {
   readonly academicYear: string;
   // Mapping of academic year to old timetable config
   readonly archive: { [key: string]: MultiUserTimetableConfig };
+
+  readonly timetableGeneratorConfig: TimetableGeneratorConfig;
 };
 
 /* venueBank.js */

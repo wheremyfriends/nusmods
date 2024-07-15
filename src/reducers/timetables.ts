@@ -27,6 +27,7 @@ import {
   UNFOCUS_LESSON_IN_TIMETABLE,
   FOCUS_LESSON_IN_TIMETABLE,
   DELETE_TIMETABLE_USER,
+  UPDATE_TIMETABLE_GEN_CONF,
 } from "actions/timetables";
 import { getNewColor } from "utils/colors";
 import { SET_EXPORTED_DATA } from "actions/constants";
@@ -191,6 +192,15 @@ export const defaultTimetableState: TimetablesState = {
   multiUserFocus: {},
   academicYear: config.academicYear,
   archive: {},
+  timetableGeneratorConfig: {
+    prefDaysEnabled: false,
+    maxDistEnabled: false,
+    breaksEnabled: false,
+    prefDays: "",
+    maxDist: "",
+    minDuration: "",
+    breaks: [{ start: "", end: "" }],
+  },
 };
 
 function timetables(
@@ -376,6 +386,13 @@ function timetables(
         draft.multiUserFocus[userID] = { [semester]: moduleCode };
       });
     }
+
+    case UPDATE_TIMETABLE_GEN_CONF:
+      const { config } = action.payload;
+      return {
+        ...state,
+        timetableGeneratorConfig: config,
+      };
     // case SET_EXPORTED_DATA: {
     //   const { semester, timetable, colors, hidden } = action.payload;
 
