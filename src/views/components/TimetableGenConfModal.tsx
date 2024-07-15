@@ -4,39 +4,17 @@ import { X } from "react-feather";
 import Input from "./Input";
 import SwitchWithText from "./SwitchWithText";
 import { TimetableGeneratorConfig } from "types/timetables";
-import { useSelect } from "downshift";
 import { useDispatch, useSelector } from "react-redux";
-import { AppState } from "types/reducers";
-import { updateTimetableGenConf } from "actions/app";
+import { updateTimetableGenConf } from "actions/timetables";
 import { subscribeToConfigChanges, updateConfig } from "utils/graphql";
 import { apolloClient } from "views/timetable/TimetableContent";
 import { RoomContext } from "views/timetable/RoomContext";
-import { update } from "lodash";
+import { State } from "types/state";
 
 type Break = {
   start: string;
   end: string;
 };
-
-// Returns true if invalid, false if valid
-// Ensures that input is multiple of 30 minutes
-function isTimeInvalid(value: Date) {
-  return !(value.getMinutes() % 30 === 0 && value.getSeconds() === 0);
-}
-
-// Converts a number to string, returning defVal if input is negative
-function positiveNumberToStr(value: number, defVal: string = ""): string {
-  if (value < 0) return defVal;
-  return value.toString();
-}
-function addColon(str: string, position: number): string {
-  return str.slice(0, position) + ":" + str.slice(position);
-}
-// If value if negative, return default, else return value
-function nonEmptyStrToNumber(value: string, defVal: number = -1): number {
-  if (value === "") return defVal;
-  return parseFloat(value);
-}
 
 function addBreak(inp: Break[]) {
   return [...inp, { start: "", end: "" }];
@@ -65,8 +43,8 @@ export default function TimetableGeneratorConfigModal({
 }: Props) {
   const { roomID, userID } = useContext(RoomContext);
 
-  const config = useSelector((state: any) => {
-    return (state.app as AppState).timetableGeneratorConfig;
+  const config = useSelector((state: State) => {
+    return state.timetables.timetableGeneratorConfig;
   });
   const {
     prefDaysEnabled,
