@@ -84,6 +84,7 @@ import {
   deleteModule,
   resetTimetable as resetTimetableGraphQL,
 } from "utils/graphql";
+import { RoomContext } from "./RoomContext";
 
 let url = "";
 let wsURL = "";
@@ -687,146 +688,150 @@ class TimetableContent extends React.Component<Props, State> {
     const addedModules = this.addedModules();
 
     return (
-      <div
-        className={classnames("page-container", styles.container, {
-          verticalMode: isVerticalOrientation,
-        })}
-        onClick={this.cancelEditLesson}
-        onKeyUp={(e) => e.key === "Escape" && this.cancelEditLesson()} // Quit modifying when Esc is pressed
+      <RoomContext.Provider
+        value={{ roomID: this.props.roomID, userID: this.props.userID }}
       >
-        <Title>Timetable</Title>
+        <div
+          className={classnames("page-container", styles.container, {
+            verticalMode: isVerticalOrientation,
+          })}
+          onClick={this.cancelEditLesson}
+          onKeyUp={(e) => e.key === "Escape" && this.cancelEditLesson()} // Quit modifying when Esc is pressed
+        >
+          <Title>Timetable</Title>
 
-        <div>{this.props.header}</div>
+          <div>{this.props.header}</div>
 
-        <div className="row">
-          <div
-            className={classnames({
-              "col-md-12": !isVerticalOrientation,
-              "col-md-8": isVerticalOrientation,
-            })}
-          >
-            {(missingLessons[0] || []).length > 0 && (
-              <div className="alert alert-danger">
-                Warning! These lessons are unallocated
-                <ul style={{ marginBottom: 0 }}>
-                  {missingLessons[0].map((lesson) => (
-                    <li key={lesson}>{lesson}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {showExamCalendar ? (
-              <ExamCalendar
-                semester={semester}
-                modules={addedModules.map((module) => ({
-                  ...module,
-                  focused: false,
-                  colorIndex: this.props.colors[module.moduleCode],
-                  hiddenInTimetable: this.isHiddenInTimetable(
-                    module.moduleCode,
-                  ),
-                }))}
-              />
-            ) : (
-              <>
-                <div className={styles.timetableWrapper}>
-                  <h1 className="header">Recommended Timetable</h1>
-                  <Timetable
-                    lessons={arrangedOptimisedLessons}
-                    isVerticalOrientation={isVerticalOrientation}
-                    isScrolledHorizontally={this.state.isScrolledHorizontally}
-                    showTitle={isShowingTitle}
-                    onModifyCell={() => {}}
-                  />
+          <div className="row">
+            <div
+              className={classnames({
+                "col-md-12": !isVerticalOrientation,
+                "col-md-8": isVerticalOrientation,
+              })}
+            >
+              {(missingLessons[0] || []).length > 0 && (
+                <div className="alert alert-danger">
+                  Warning! These lessons are unallocated
+                  <ul style={{ marginBottom: 0 }}>
+                    {missingLessons[0].map((lesson) => (
+                      <li key={lesson}>{lesson}</li>
+                    ))}
+                  </ul>
                 </div>
-                <div
-                  className={styles.timetableWrapper}
-                  onScroll={this.onScroll}
-                  ref={this.timetableRef}
-                >
-                  <h1 className="header">
-                    Indicate your preferences (Note: You can select multiple
-                    timeslots)
-                  </h1>
-                  <Timetable
-                    lessons={arrangedLessonsWithModifiableFlag}
-                    isVerticalOrientation={isVerticalOrientation}
-                    isScrolledHorizontally={this.state.isScrolledHorizontally}
-                    showTitle={isShowingTitle}
-                    onModifyCell={this.modifyCell}
-                  />
-                </div>
-              </>
-            )}
-          </div>
-          <div
-            className={classnames({
-              "col-md-12": !isVerticalOrientation,
-              "col-md-4": isVerticalOrientation,
-            })}
-          >
-            <div className="row">
-              <div className="col-12 no-export">
-                <TimetableActions
-                  isVerticalOrientation={isVerticalOrientation}
-                  showTitle={isShowingTitle}
+              )}
+
+              {showExamCalendar ? (
+                <ExamCalendar
                   semester={semester}
-                  multiTimetable={
-                    this.props.multiUserLessons[userID]?.[semester]
-                  }
-                  showExamCalendar={showExamCalendar}
-                  resetTimetable={this.resetTimetable}
-                  toggleExamCalendar={() =>
-                    this.setState({ showExamCalendar: !showExamCalendar })
-                  }
-                  hiddenModules={hiddenInTimetable}
-                  readOnly={readOnly}
+                  modules={addedModules.map((module) => ({
+                    ...module,
+                    focused: false,
+                    colorIndex: this.props.colors[module.moduleCode],
+                    hiddenInTimetable: this.isHiddenInTimetable(
+                      module.moduleCode,
+                    ),
+                  }))}
                 />
-                <button
-                  hidden={process.env.NODE_ENV !== "development"}
-                  className="TimetableActions-titleBtn btn-outline-primary btn btn-svg"
-                  onClick={() => {
-                    navigator.clipboard.writeText(
-                      JSON.stringify(multiTimetableLessons, null, 4),
-                    );
-                  }}
-                >
-                  Copy as JSON
-                </button>
-              </div>
-
-              {/* Searchbox */}
-              <div className={styles.modulesSelect}>
-                {!readOnly && (
-                  <ModulesSelectContainer
+              ) : (
+                <>
+                  <div className={styles.timetableWrapper}>
+                    <h1 className="header">Recommended Timetable</h1>
+                    <Timetable
+                      lessons={arrangedOptimisedLessons}
+                      isVerticalOrientation={isVerticalOrientation}
+                      isScrolledHorizontally={this.state.isScrolledHorizontally}
+                      showTitle={isShowingTitle}
+                      onModifyCell={() => {}}
+                    />
+                  </div>
+                  <div
+                    className={styles.timetableWrapper}
+                    onScroll={this.onScroll}
+                    ref={this.timetableRef}
+                  >
+                    <h1 className="header">
+                      Indicate your preferences (Note: You can select multiple
+                      timeslots)
+                    </h1>
+                    <Timetable
+                      lessons={arrangedLessonsWithModifiableFlag}
+                      isVerticalOrientation={isVerticalOrientation}
+                      isScrolledHorizontally={this.state.isScrolledHorizontally}
+                      showTitle={isShowingTitle}
+                      onModifyCell={this.modifyCell}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+            <div
+              className={classnames({
+                "col-md-12": !isVerticalOrientation,
+                "col-md-4": isVerticalOrientation,
+              })}
+            >
+              <div className="row">
+                <div className="col-12 no-export">
+                  <TimetableActions
+                    isVerticalOrientation={isVerticalOrientation}
+                    showTitle={isShowingTitle}
                     semester={semester}
                     multiTimetable={
-                      this.props.multiUserLessons[userID]?.[semester] || {}
+                      this.props.multiUserLessons[userID]?.[semester]
                     }
-                    addModule={this.addModuleRT}
-                    removeModuleRT={this.removeModuleRT}
+                    showExamCalendar={showExamCalendar}
+                    resetTimetable={this.resetTimetable}
+                    toggleExamCalendar={() =>
+                      this.setState({ showExamCalendar: !showExamCalendar })
+                    }
+                    hiddenModules={hiddenInTimetable}
+                    readOnly={readOnly}
                   />
-                )}
-              </div>
+                  <button
+                    hidden={process.env.NODE_ENV !== "development"}
+                    className="TimetableActions-titleBtn btn-outline-primary btn btn-svg"
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        JSON.stringify(multiTimetableLessons, null, 4),
+                      );
+                    }}
+                  >
+                    Copy as JSON
+                  </button>
+                </div>
 
-              <div className="col-12">
-                {this.renderModuleSections(
-                  addedModules,
-                  !isVerticalOrientation,
-                )}
-              </div>
-              <div className="col-12">
-                <ModulesTableFooter
-                  modules={addedModules}
-                  semester={semester}
-                  hiddenInTimetable={hiddenInTimetable}
-                />
+                {/* Searchbox */}
+                <div className={styles.modulesSelect}>
+                  {!readOnly && (
+                    <ModulesSelectContainer
+                      semester={semester}
+                      multiTimetable={
+                        this.props.multiUserLessons[userID]?.[semester] || {}
+                      }
+                      addModule={this.addModuleRT}
+                      removeModuleRT={this.removeModuleRT}
+                    />
+                  )}
+                </div>
+
+                <div className="col-12">
+                  {this.renderModuleSections(
+                    addedModules,
+                    !isVerticalOrientation,
+                  )}
+                </div>
+                <div className="col-12">
+                  <ModulesTableFooter
+                    modules={addedModules}
+                    semester={semester}
+                    hiddenInTimetable={hiddenInTimetable}
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </RoomContext.Provider>
     );
   }
 }

@@ -1,5 +1,5 @@
 import Modal from "./Modal";
-import React from "react";
+import React, { useContext } from "react";
 import { X } from "react-feather";
 import Input from "./Input";
 import SwitchWithText from "./SwitchWithText";
@@ -8,6 +8,9 @@ import { useSelect } from "downshift";
 import { useDispatch, useSelector } from "react-redux";
 import { AppState } from "types/reducers";
 import { updateTimetableGenConf } from "actions/app";
+import { updateConfig } from "utils/graphql";
+import { apolloClient } from "views/timetable/TimetableContent";
+import { RoomContext } from "views/timetable/RoomContext";
 
 type Break = {
   start: string;
@@ -41,6 +44,8 @@ export default function TimetableGeneratorConfigModal({
   isOpen,
   onClose,
 }: Props) {
+  const { roomID, userID } = useContext(RoomContext);
+
   const config = useSelector((state: any) => {
     return (state.app as AppState).timetableGeneratorConfig;
   });
@@ -111,6 +116,8 @@ export default function TimetableGeneratorConfigModal({
       ],
     };
     dispatch(updateTimetableGenConf(config));
+
+    updateConfig(apolloClient, roomID, userID, config);
     onClose();
   }
 

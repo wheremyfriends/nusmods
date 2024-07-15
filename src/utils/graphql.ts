@@ -1,9 +1,11 @@
 import { ApolloClient, NormalizedCacheObject, gql } from "@apollo/client";
-import { Action } from "actions/constants";
-import { Semester } from "nusmoderator";
 import { AuthUser } from "types/accounts";
 import { ClassNo, LessonType, ModuleCode } from "types/modules";
-import { LessonChange, UserChange } from "types/timetables";
+import {
+  LessonChange,
+  TimetableGeneratorConfig,
+  UserChange,
+} from "types/timetables";
 
 export async function createUser(
   apolloClient: ApolloClient<NormalizedCacheObject>,
@@ -295,6 +297,34 @@ export function deleteModule(
     });
   } catch (err) {
     console.error("DELETE_MODULE error: ", err);
+    return;
+  }
+}
+
+export async function updateConfig(
+  apolloClient: ApolloClient<NormalizedCacheObject>,
+  roomID: string | undefined,
+  userID: number,
+  config: TimetableGeneratorConfig,
+) {
+  const query = gql`
+    mutation UpdateConfig($roomID: String, $userID: Int!, $data: String!) {
+      updateConfig(roomID: $roomID, userID: $userID, data: $data)
+    }
+  `;
+
+  console.log({ config });
+  try {
+    apolloClient.mutate({
+      mutation: query,
+      variables: {
+        roomID,
+        userID,
+        data: JSON.stringify(config),
+      },
+    });
+  } catch (err) {
+    console.error("UPDATE_CONFIG error: ", err);
     return;
   }
 }
