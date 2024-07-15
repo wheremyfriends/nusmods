@@ -114,7 +114,7 @@ const TimetableActions: React.FC<Props> = (props) => {
         )}
       </div>
 
-      {!props.readOnly && (
+      {
         <div
           className={styles.buttonGroup}
           role="group"
@@ -130,9 +130,11 @@ const TimetableActions: React.FC<Props> = (props) => {
             <Tool className={styles.titleIcon} />
             Configuration
           </button>
-          <ResetTimetable resetTimetable={props.resetTimetable} />
+          {props.readOnly && (
+            <ResetTimetable resetTimetable={props.resetTimetable} />
+          )}
         </div>
-      )}
+      }
     </div>
   );
 };
