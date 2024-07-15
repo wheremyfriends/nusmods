@@ -78,7 +78,7 @@ export function addModuleRT(
   userID: UserID,
   semester: Semester,
   moduleCode: ModuleCode,
-  roomID: string,
+  roomID: string | undefined,
 ) {
   return (dispatch: Dispatch, getState: GetState) =>
     dispatch(fetchModule(moduleCode)).then(() => {
