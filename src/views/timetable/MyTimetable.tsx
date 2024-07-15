@@ -65,19 +65,33 @@ export const MyTimetable = () => {
       if (!rooms) return;
 
       setRooms(rooms);
-      rooms.forEach((roomID) => {
-        subscribeToLessonChanges(apolloClient, roomID, handleLessonChange);
-        subscribeToUserChanges(apolloClient, roomID, (userChange) => {
-          const { action, userID } = userChange;
+      const subs = rooms.flatMap((roomID) => {
+        const sub1 = subscribeToLessonChanges(
+          apolloClient,
+          roomID,
+          handleLessonChange,
+        );
+        const sub2 = subscribeToUserChanges(
+          apolloClient,
+          roomID,
+          (userChange) => {
+            const { action, userID } = userChange;
 
-          switch (action) {
-            case Action.DELETE_USER: {
-              dispatch(deleteTimetableUser(userID));
-              return;
+            switch (action) {
+              case Action.DELETE_USER: {
+                dispatch(deleteTimetableUser(userID));
+                return;
+              }
             }
-          }
-        });
+          },
+        );
+
+        return [sub1, sub2];
       });
+
+      return () => {
+        subs.forEach((s) => s.unsubscribe());
+      };
     });
   }, []);
 

@@ -169,7 +169,15 @@ export const TimetableContainerComponent: FC = () => {
   useEffect(() => {
     // Clear the state first
     dispatch(resetAllTimetables());
-    subscribeToLessonChanges(apolloClient, roomID, handleLessonChange);
+    const sub = subscribeToLessonChanges(
+      apolloClient,
+      roomID,
+      handleLessonChange,
+    );
+
+    return () => {
+      sub.unsubscribe();
+    };
   }, [roomID]);
 
   // Not needed as modules are fetched on demand

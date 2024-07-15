@@ -58,9 +58,17 @@ export default function TimetableGeneratorConfigModal({
   const dispatch = useDispatch();
 
   React.useEffect(() => {
-    subscribeToConfigChanges(apolloClient, userID, (newConf) => {
-      dispatch(updateTimetableGenConf(newConf));
-    });
+    const subscription = subscribeToConfigChanges(
+      apolloClient,
+      userID,
+      (newConf) => {
+        dispatch(updateTimetableGenConf(newConf));
+      },
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [apolloClient, userID]);
 
   function handleClose() {

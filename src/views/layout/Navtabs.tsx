@@ -90,7 +90,7 @@ const Navtabs: FC<{
   useEffect(() => {
     setUsers([]);
 
-    subscribeToUserChanges(apolloClient, roomID, (userChange) => {
+    const sub = subscribeToUserChanges(apolloClient, roomID, (userChange) => {
       const { action, ...curUser } = userChange;
 
       switch (action) {
@@ -130,6 +130,8 @@ const Navtabs: FC<{
     });
 
     dispatch(updateRoomLastAccessed(roomID));
+
+    return () => sub.unsubscribe();
   }, [roomID]);
 
   function handleContextMenu(user: RoomUser) {

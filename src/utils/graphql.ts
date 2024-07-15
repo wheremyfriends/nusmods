@@ -345,7 +345,7 @@ export function subscribeToLessonChanges(
     }
   `;
 
-  apolloClient
+  return apolloClient
     .subscribe({
       query: LESSON_CHANGE_SUBSCRIPTION,
       variables: {
@@ -381,7 +381,7 @@ export function subscribeToUserChanges(
     }
   `;
 
-  apolloClient
+  return apolloClient
     .subscribe({
       query: USER_CHANGE_SUBSCRIPTION,
       variables: {
@@ -412,7 +412,7 @@ export function subscribeToConfigChanges(
     }
   `;
 
-  apolloClient
+  return apolloClient
     .subscribe({
       query: query,
       variables: {
