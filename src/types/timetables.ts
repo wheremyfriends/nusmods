@@ -126,13 +126,11 @@ export type TimetableGeneratorConfig = {
   prefDaysEnabled: boolean;
   maxDistEnabled: boolean;
   breaksEnabled: boolean;
-  prefDays: number[];
-  maxDist: number;
+  prefDays: string;
+  maxDist: string;
+  minDuration: string;
   breaks: {
-    minDuration: number;
-    timeslots: {
-      start: number;
-      end: number;
-    }[];
+    start: string;
+    end: string;
   }[];
 };

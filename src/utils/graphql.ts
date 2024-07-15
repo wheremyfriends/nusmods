@@ -402,3 +402,37 @@ export function subscribeToUserChanges(
       complete() {},
     });
 }
+
+export function subscribeToConfigChanges(
+  apolloClient: ApolloClient<NormalizedCacheObject>,
+  userID: number,
+  callback: (data: TimetableGeneratorConfig) => void,
+) {
+  const query = gql`
+    subscription ConfigChange($userID: Int!) {
+      configChange(userID: $userID)
+    }
+  `;
+
+  apolloClient
+    .subscribe({
+      query: query,
+      variables: {
+        userID,
+      },
+    })
+    .subscribe({
+      next(data) {
+        if (data.data) {
+          const config = JSON.parse(
+            data.data.configChange,
+          ) as TimetableGeneratorConfig;
+          callback(config);
+        }
+      },
+      error(error) {
+        console.log("Apollo subscribe error", error);
+      },
+      complete() {},
+    });
+}
