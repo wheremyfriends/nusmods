@@ -46,14 +46,14 @@ const defaultAppState = (): AppState => ({
 function app(state: AppState = defaultAppState(), action: Actions): AppState {
   switch (action.type) {
     case SWITCH_USER: {
-      const { userID, roomID } = action.payload;
+      const { user, roomID } = action.payload;
       return {
         ...state,
         activeUserMapping: {
           ...state.activeUserMapping,
           [roomID]: {
             ...state.activeUserMapping[roomID],
-            userID,
+            user,
           },
         },
       };

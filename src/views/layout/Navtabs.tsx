@@ -68,7 +68,7 @@ function deleteUser(roomID: string, userID: number) {
 
 // TODO: move to a more appropriate location
 function getActiveUserID(roomID: string) {
-  return store.getState().app.activeUserMapping[roomID]?.userID ?? -1;
+  return store.getState().app.activeUserMapping[roomID]?.user?.userID ?? -1;
 }
 
 const Navtabs: FC<{
@@ -91,20 +91,20 @@ const Navtabs: FC<{
     setUsers([]);
 
     subscribeToUserChanges(apolloClient, roomID, (userChange) => {
-      const { action, userID, name } = userChange;
+      const { action, ...curUser } = userChange;
 
       switch (action) {
         case Action.CREATE_USER: {
-          setUsers((users) => [...users, { userID, name }]);
+          setUsers((users) => [...users, curUser]);
           if (getActiveUserID(roomID) === -1) {
-            dispatch(switchUser(userID, roomID));
+            dispatch(switchUser(curUser, roomID));
           }
           return;
         }
         case Action.UPDATE_USER: {
           setUsers((users) =>
             users.map((user) => {
-              if (user.userID === userID) return { ...user, name: name };
+              if (user.userID === curUser.userID) return curUser;
               return user;
             }),
           );
@@ -113,14 +113,17 @@ const Navtabs: FC<{
         case Action.DELETE_USER: {
           setUsers((users) => {
             const filteredUsers = users.filter(
-              (user) => user.userID !== userID,
+              (user) => user.userID !== curUser.userID,
             );
             // Switch to first user if current active user is deleted
-            if (filteredUsers.length > 0 && getActiveUserID(roomID) === userID)
-              dispatch(switchUser(filteredUsers[0].userID, roomID));
+            if (
+              filteredUsers.length > 0 &&
+              getActiveUserID(roomID) === curUser.userID
+            )
+              dispatch(switchUser(filteredUsers[0], roomID));
             return filteredUsers;
           });
-          dispatch(deleteTimetableUser(userID));
+          dispatch(deleteTimetableUser(curUser.userID));
           return;
         }
       }
@@ -149,6 +152,12 @@ const Navtabs: FC<{
     setIsDelUserModalOpen(false);
   }
 
+  function handleSwitchUser(user: RoomUser) {
+    return (e: React.MouseEvent<HTMLAnchorElement, globalThis.MouseEvent>) => {
+      dispatch(switchUser(user, roomID));
+    };
+  }
+
   const navUsers = users.map((user) => {
     return (
       <a
@@ -159,14 +168,7 @@ const Navtabs: FC<{
             : styles.link
         }
         onContextMenu={handleContextMenu(user)}
-        onClick={(e) => {
-          const userIDString = e.currentTarget.getAttribute("data-userid");
-          if (userIDString) {
-            const userID: UserID = +userIDString;
-            dispatch(switchUser(userID, roomID));
-          }
-        }}
-        data-userid={user.userID}
+        onClick={handleSwitchUser(user)}
       >
         <User />
         <span className={styles.title}>{user.name}</span>

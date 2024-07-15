@@ -169,7 +169,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
             {user ? (
               <>
                 <Link to="/me">
-                  <Button variant="link">WhyAre</Button>
+                  <Button variant="link">{user.username}</Button>
                 </Link>
                 <Button onClick={handleLogout} variant="link">
                   Logout

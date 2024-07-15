@@ -1,4 +1,11 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect, useHistory, useLocation, useParams } from "react-router-dom";
 import { Repeat } from "react-feather";
@@ -48,6 +55,7 @@ import store from "entry/main";
 import _ from "lodash";
 import config from "config";
 import { subscribeToLessonChanges } from "utils/graphql";
+import { AuthContext } from "views/account/AuthContext";
 
 type Params = {
   roomID: string;
@@ -139,7 +147,9 @@ export const TimetableContainerComponent: FC = () => {
     ({ app }: State) => app.activeUserMapping,
   );
   const roomID = params.roomID;
-  const userID = activeUserMapping[roomID]?.userID ?? -1;
+  const activeUser = activeUserMapping[roomID]?.user;
+  const { user: curUser, setUser } = useContext(AuthContext)!;
+  const userID = activeUser?.userID ?? -1;
 
   const multiTimetable = useSelector(getSemesterTimetableMultiLessons)(
     userID,
@@ -212,7 +222,7 @@ export const TimetableContainerComponent: FC = () => {
             />
           </>
         }
-        readOnly={readOnly}
+        readOnly={activeUser.isAuth && curUser?.userID !== activeUser.userID}
       />
     </main>
   );

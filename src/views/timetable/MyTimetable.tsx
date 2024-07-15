@@ -23,7 +23,6 @@ const TimetableHeader: FC<{
   semester: Semester;
   onSelectSemester: (sem: number) => void;
   readOnly?: boolean;
-  roomID: String;
 }> = ({ semester, readOnly, onSelectSemester }) => {
   return (
     <SemesterSwitcher
@@ -38,7 +37,7 @@ export const MyTimetable = () => {
   const [semester, setSemester] = React.useState(1);
   const dispatch = useDispatch();
 
-  const userID = 47;
+  const userID = user?.userID ?? -1;
   const multiTimetableKeys = Object.keys(
     useSelector(({ timetables }: State) => timetables.multiUserLessons),
   );
@@ -48,11 +47,14 @@ export const MyTimetable = () => {
     userID,
     semester,
   );
+
   const colors = useSelector(getSemesterTimetableColors)(semester);
   const filledColors = React.useMemo(
     () => fillColorMapping(userTimetable, colors),
     [colors, userTimetable],
   );
+
+  console.log({ userTimetable, colors, filledColors });
 
   // Listen to changes from all joined rooms of the user
   const [rooms, setRooms] = React.useState<string[]>([]);
@@ -88,14 +90,13 @@ export const MyTimetable = () => {
             semester={semester}
             onSelectSemester={(semester) => setSemester(semester)}
             readOnly={false}
-            roomID="room1"
           />
         }
         semester={semester}
         multiTimetable={{}}
         colors={filledColors}
-        roomID="room1"
-        userID={user!.userID}
+        roomID={undefined}
+        userID={user?.userID ?? 0}
       />
 
       <h1 className="header">Debug</h1>
