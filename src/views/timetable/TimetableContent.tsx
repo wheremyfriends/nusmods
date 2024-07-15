@@ -78,29 +78,12 @@ import { getOptimisedTimetable } from "solver";
 import venues from "data/venues";
 import ExamCalendar from "./ExamCalendar";
 import { getMainDefinition } from "@apollo/client/utilities";
-import { createLesson, deleteLesson } from "utils/graphql";
-
-export const DELETE_MODULE = gql`
-  mutation DeleteModule(
-    $roomID: String!
-    $userID: Int!
-    $semester: Int!
-    $moduleCode: String!
-  ) {
-    deleteModule(
-      roomID: $roomID
-      userID: $userID
-      semester: $semester
-      moduleCode: $moduleCode
-    )
-  }
-`;
-
-export const RESET_TIMETABLE_MUTATION = gql`
-  mutation ResetTimetable($roomID: String!, $userID: Int!, $semester: Int!) {
-    resetTimetable(roomID: $roomID, userID: $userID, semester: $semester)
-  }
-`;
+import {
+  createLesson,
+  deleteLesson,
+  deleteModule,
+  resetTimetable as resetTimetableGraphQL,
+} from "utils/graphql";
 
 let url = "";
 let wsURL = "";
@@ -409,20 +392,13 @@ class TimetableContent extends React.Component<Props, State> {
         moduleCode
       ];
 
-    try {
-      apolloClient.mutate({
-        mutation: DELETE_MODULE,
-        variables: {
-          roomID: this.props.roomID,
-          userID: this.props.userID,
-          semester: this.props.semester,
-          moduleCode: moduleCode,
-        },
-      });
-    } catch (err) {
-      console.error("DELETE_MODULE error: ", err);
-      return;
-    }
+    deleteModule(
+      apolloClient,
+      this.props.roomID,
+      this.props.userID,
+      this.props.semester,
+      moduleCode,
+    );
 
     this.setState({
       tombstone: {
@@ -434,18 +410,12 @@ class TimetableContent extends React.Component<Props, State> {
     });
   };
   resetTimetable = () => {
-    apolloClient
-      .mutate({
-        mutation: RESET_TIMETABLE_MUTATION,
-        variables: {
-          roomID: this.props.roomID,
-          userID: this.props.userID,
-          semester: this.props.semester,
-        },
-      })
-      .catch((err) => {
-        console.error("RESET_TIMETABLE error: ", err);
-      });
+    resetTimetableGraphQL(
+      apolloClient,
+      this.props.roomID,
+      this.props.userID,
+      this.props.semester,
+    );
   };
 
   resetTombstone = () => this.setState({ tombstone: null });

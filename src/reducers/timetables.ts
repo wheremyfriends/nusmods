@@ -3,14 +3,8 @@ import produce from "immer";
 import { createMigrate } from "redux-persist";
 
 import { PersistConfig } from "storage/persistReducer";
-import { ModuleCode, Semester } from "types/modules";
-import {
-  ModuleLessonConfig,
-  SemTimetableConfig,
-  SemTimetableMultiConfig,
-  TimetableConfig,
-  TimetableMultiConfig,
-} from "types/timetables";
+import { ModuleCode } from "types/modules";
+import { ModuleLessonConfig, SemTimetableConfig } from "types/timetables";
 import { ColorMapping, TimetablesState } from "types/reducers";
 
 import config from "config";
@@ -22,7 +16,6 @@ import {
   REMOVE_MODULE,
   RESET_TIMETABLE,
   SELECT_MODULE_COLOR,
-  SET_HIDDEN_IMPORTED,
   SET_LESSON_CONFIG,
   SET_TIMETABLE,
   SHOW_LESSON_IN_TIMETABLE,

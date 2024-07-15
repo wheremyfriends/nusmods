@@ -231,8 +231,72 @@ export function deleteLesson(
       },
     })
     .catch((err) => {
-      console.error("CREATE/DELETE_LESSON error: ", err);
+      console.error("DELETE_LESSON error: ", err);
     });
+}
+
+export function resetTimetable(
+  apolloClient: ApolloClient<NormalizedCacheObject>,
+  roomID: string | undefined,
+  userID: number,
+  semester: number,
+) {
+  const RESET_TIMETABLE_MUTATION = gql`
+    mutation ResetTimetable($roomID: String, $userID: Int!, $semester: Int!) {
+      resetTimetable(roomID: $roomID, userID: $userID, semester: $semester)
+    }
+  `;
+
+  apolloClient
+    .mutate({
+      mutation: RESET_TIMETABLE_MUTATION,
+      variables: {
+        roomID,
+        userID,
+        semester,
+      },
+    })
+    .catch((err) => {
+      console.error("RESET_TIMETABLE error: ", err);
+    });
+}
+
+export function deleteModule(
+  apolloClient: ApolloClient<NormalizedCacheObject>,
+  roomID: string | undefined,
+  userID: number,
+  semester: number,
+  moduleCode: string,
+) {
+  const DELETE_MODULE = gql`
+    mutation DeleteModule(
+      $roomID: String
+      $userID: Int!
+      $semester: Int!
+      $moduleCode: String!
+    ) {
+      deleteModule(
+        roomID: $roomID
+        userID: $userID
+        semester: $semester
+        moduleCode: $moduleCode
+      )
+    }
+  `;
+  try {
+    apolloClient.mutate({
+      mutation: DELETE_MODULE,
+      variables: {
+        roomID,
+        userID,
+        semester,
+        moduleCode,
+      },
+    });
+  } catch (err) {
+    console.error("DELETE_MODULE error: ", err);
+    return;
+  }
 }
 
 export function subscribeToLessonChanges(
