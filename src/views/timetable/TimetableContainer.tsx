@@ -150,6 +150,7 @@ export const TimetableContainerComponent: FC = () => {
   const activeUser = activeUserMapping[roomID]?.user;
   const { user: curUser, setUser } = useContext(AuthContext)!;
   const userID = activeUser?.userID ?? -1;
+  const isAuth = activeUser?.isAuth ?? false;
 
   const multiTimetable = useSelector(getSemesterTimetableMultiLessons)(
     userID,
@@ -222,7 +223,7 @@ export const TimetableContainerComponent: FC = () => {
             />
           </>
         }
-        readOnly={activeUser.isAuth && curUser?.userID !== activeUser.userID}
+        readOnly={isAuth && curUser?.userID !== activeUser.userID}
       />
     </main>
   );
