@@ -781,6 +781,7 @@ class TimetableContent extends React.Component<Props, State> {
                     this.setState({ showExamCalendar: !showExamCalendar })
                   }
                   hiddenModules={hiddenInTimetable}
+                  readOnly={readOnly}
                 />
                 <button
                   hidden={process.env.NODE_ENV !== "development"}

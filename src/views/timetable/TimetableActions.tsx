@@ -28,6 +28,7 @@ import styles from "./TimetableActions.scss";
 import TimetableGeneratorConfigModal from "views/components/TimetableGenConfModal";
 
 type Props = {
+  readOnly: boolean;
   semester: Semester;
   multiTimetable: SemTimetableMultiConfig;
 
@@ -113,23 +114,25 @@ const TimetableActions: React.FC<Props> = (props) => {
         )}
       </div>
 
-      <div
-        className={styles.buttonGroup}
-        role="group"
-        aria-label="Timetable exporting"
-      >
-        <button
-          type="button"
-          className={classnames("btn-outline-primary btn btn-svg")}
-          onClick={() => {
-            setIsConfigOpen(true);
-          }}
+      {!props.readOnly && (
+        <div
+          className={styles.buttonGroup}
+          role="group"
+          aria-label="Timetable exporting"
         >
-          <Tool className={styles.titleIcon} />
-          Configuration
-        </button>
-        <ResetTimetable resetTimetable={props.resetTimetable} />
-      </div>
+          <button
+            type="button"
+            className={classnames("btn-outline-primary btn btn-svg")}
+            onClick={() => {
+              setIsConfigOpen(true);
+            }}
+          >
+            <Tool className={styles.titleIcon} />
+            Configuration
+          </button>
+          <ResetTimetable resetTimetable={props.resetTimetable} />
+        </div>
+      )}
     </div>
   );
 };
