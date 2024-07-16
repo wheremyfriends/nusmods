@@ -1,30 +1,64 @@
 import { Button } from "@/components/ui/button";
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import Input from "views/components/Input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { loginUser, logoutUser, registerUser } from "utils/graphql";
+import { loginUser, registerUser } from "utils/graphql";
 import { apolloClient } from "views/timetable/TimetableContent";
 import { AuthContext } from "./AuthContext";
+import { Alert } from "views/components/Alert";
 
 export const Login = () => {
-  const { user, setUser } = useContext(AuthContext)!;
+  const { setUser } = useContext(AuthContext);
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
+
+  const history = useHistory();
+
+  const [msg, setMsg] = React.useState("");
+  const [isErr, setIsErr] = React.useState(false);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const user = await loginUser(apolloClient, username, password);
-    console.log({ user });
+
+    if (!user) {
+      setIsErr(true);
+      setMsg("Login failed.");
+      return;
+    }
+
     setUser(user);
+    history.push("/rooms");
   };
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    await registerUser(apolloClient, username, password);
+    // Validate password and confirmPassword are the same
+    if (password !== confirmPassword) {
+      setIsErr(true);
+      setMsg("Passwords don't match.");
+      return;
+    }
+
+    try {
+      await registerUser(apolloClient, username, password);
+    } catch (err) {
+      setIsErr(true);
+      setMsg(err.message);
+      return;
+    }
+
+    // Success
+    setIsErr(false);
+    setMsg("Registration successful. Please proceed to login.");
+
+    setUsername("");
+    setPassword("");
+    setConfirmPassword("");
   };
 
   return (
@@ -38,6 +72,13 @@ export const Login = () => {
           <TabsTrigger value="login">Login</TabsTrigger>
           <TabsTrigger value="register">Register</TabsTrigger>
         </TabsList>
+        {msg && (
+          <Alert
+            msg={msg}
+            variant={isErr ? "danger" : "success"}
+            className="mt-5"
+          />
+        )}
         <TabsContent value="login">
           <form onSubmit={handleLogin}>
             <Input

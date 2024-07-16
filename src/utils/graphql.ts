@@ -73,6 +73,7 @@ export async function registerUser(
     });
   } catch (err) {
     console.error("REGISTER_USER error: ", err.message);
+    throw err;
   }
 }
 
