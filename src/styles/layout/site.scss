@@ -11,10 +11,10 @@ body,
 }
 
 body {
-  padding-top: $navbar-height + 1rem;
+  /* padding-top: $navbar-height + 1rem; */
 
   @include media-breakpoint-down(sm) {
-    padding-top: $navbar-height;
+    /* padding-top: $navbar-height; */
     font-size: 1rem * $sm-font-size-ratio;
   }
 }

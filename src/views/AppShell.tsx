@@ -146,7 +146,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>
-      <div className="app-container">
+      <div className="overflow-hidden grid grid-rows-[auto_minmax(0,_1fr)] h-[100vh]">
         <Helmet>
           <body
             className={classnames(`theme-${theme}`, {
@@ -183,9 +183,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
           </div>
         </nav>
 
-        <div className="main-container">
-          {/* <Navtabs /> */}
-
+        <>
           {isModuleListReady ? (
             <ErrorBoundary errorPage={() => <ErrorPage showReportDialog />}>
               {children}
@@ -193,7 +191,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
           ) : (
             <LoadingSpinner />
           )}
-        </div>
+        </>
 
         <ErrorBoundary>
           <FeedbackModal />

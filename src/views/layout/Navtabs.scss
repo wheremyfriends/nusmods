@@ -5,12 +5,6 @@
   For breakpoint-lg (desktop), show the links as traditional link with icon to the left.
 */
 .nav {
-  position: fixed;
-  top: $navbar-height + 1rem;
-  right: 0;
-  left: 0;
-  z-index: $navtabs-z-index;
-  // See site.scss for width on md and lg sizes
   display: none;
   justify-content: space-around;
   align-items: stretch;
@@ -59,13 +53,10 @@
 
 .link {
   cursor: pointer;
-  position: relative;
-  flex: 1 0 auto;
   line-height: 1.6;
   text-align: center;
   color: var(--gray-mid);
   transition: color 0.15s;
-  justify-content: start;
 
   &.linkActive {
     color: theme-color(primary);
@@ -75,25 +66,10 @@
     text-decoration: underline;
   }
 
-  @include media-breakpoint-down(sm) {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    svg {
-      margin-bottom: 0.1rem;
-    }
-  }
-
   @include media-breakpoint-up(md) {
-    padding: 0.8rem 0.5rem;
-  }
-
-  @include media-breakpoint-up(xl) {
     display: flex;
-    align-items: center;
-    padding: 0.8rem 0 0.8rem 2rem;
-    text-align: left;
+    min-width: 0;
+    padding: 0.8rem 2rem;
   }
 }
 

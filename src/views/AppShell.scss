@@ -6,11 +6,6 @@ $vert-padding: 0.5rem;
 $logo-vert-padding: 0.875rem;
 
 .navbar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: $navbar-z-index;
   display: flex;
   justify-content: space-between;
   align-items: center;

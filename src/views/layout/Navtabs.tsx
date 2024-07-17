@@ -20,6 +20,7 @@ import DeleteUserModal from "views/components/DeleteUserModal";
 import { deleteTimetableUser } from "actions/timetables";
 import { updateRoomLastAccessed } from "actions/app";
 import { createUser, subscribeToUserChanges } from "utils/graphql";
+import { cn } from "@/lib/utils";
 
 export const NAVTAB_HEIGHT = 48;
 
@@ -172,8 +173,8 @@ const Navtabs: FC<{
         onContextMenu={handleContextMenu(user)}
         onClick={handleSwitchUser(user)}
       >
-        <User />
-        <span className={styles.title}>{user.name}</span>
+        <User className="shrink-0" />
+        <span className={cn("truncate", styles.title)}>{user.name}</span>
       </a>
     );
   });
@@ -228,8 +229,8 @@ const Navtabs: FC<{
           </MenuItem>,
         ]}
       </ContextMenu>
-      <nav className={styles.nav}>
-        <div>{navUsers}</div>
+      <nav className="flex flex-col justify-start min-h-0 max-w-[15rem]">
+        <div className="overflow-auto pt-3">{navUsers}</div>
         <div className={styles.divider} />
         <a
           className={styles.link}

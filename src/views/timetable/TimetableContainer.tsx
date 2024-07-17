@@ -211,28 +211,28 @@ export const TimetableContainerComponent: FC = () => {
   // }
 
   return (
-    <main className="main-content">
-      <div className="main-container">
-        <Navtabs roomID={roomID} />
+    <main className="grid grid-cols-[auto_minmax(0,_1fr)]">
+      <Navtabs roomID={roomID} />
+      <div className="overflow-auto pt-3">
+        <TimetableContent
+          key={semester}
+          semester={semester}
+          userID={userID}
+          multiTimetable={displayedMultiTimetable}
+          colors={filledColors}
+          roomID={roomID}
+          header={
+            <>
+              <TimetableHeader
+                semester={semester}
+                readOnly={readOnly}
+                roomID={roomID}
+              />
+            </>
+          }
+          readOnly={isAuth && curUser?.userID !== activeUser.userID}
+        />
       </div>
-      <TimetableContent
-        key={semester}
-        semester={semester}
-        userID={userID}
-        multiTimetable={displayedMultiTimetable}
-        colors={filledColors}
-        roomID={roomID}
-        header={
-          <>
-            <TimetableHeader
-              semester={semester}
-              readOnly={readOnly}
-              roomID={roomID}
-            />
-          </>
-        }
-        readOnly={isAuth && curUser?.userID !== activeUser.userID}
-      />
     </main>
   );
 };
