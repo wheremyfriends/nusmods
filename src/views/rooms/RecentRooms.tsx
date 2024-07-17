@@ -54,7 +54,7 @@ export default function RecentRooms() {
       <h1 className="header">Recent Rooms</h1>
       <p className="text-base">List of previously visited rooms</p>
       <div className="mb-5 flex gap-x-1">
-        <Button onClick={() => setIsCreateRoomModalOpen(true)}>
+        <Button hidden onClick={() => setIsCreateRoomModalOpen(true)}>
           <Plus />
           Join/Create room
         </Button>
