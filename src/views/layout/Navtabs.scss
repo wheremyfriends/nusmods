@@ -4,59 +4,14 @@
   For breakpoint-md (tablets), show the links as compact buttons with labels below icons.
   For breakpoint-lg (desktop), show the links as traditional link with icon to the left.
 */
-.nav {
-  display: none;
-  justify-content: space-around;
-  align-items: stretch;
-  max-height: $navtab-height;
-  overflow-y: auto;
-
-  & > div:first-child {
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-  }
-
-  @include media-breakpoint-up(md) {
-    flex-direction: column;
-    justify-content: flex-start;
-    box-shadow: none;
-    display: flex;
-  }
-
-  @include media-breakpoint-up(xl) {
-  }
-
-  @include media-breakpoint-down(sm) {
-    position: sticky;
-    top: 0;
-    background-color: var(--body-bg);
-
-    // Fake shadow - can't use box shadow because they will appear on top of the
-    // top nav bar
-    &::after {
-      content: "";
-      position: absolute;
-      right: 0;
-      bottom: -$navtab-shadow-height;
-      left: 0;
-      height: $navtab-shadow-height;
-      background: linear-gradient(
-        to bottom,
-        var(--navtab-shadow),
-        rgba(#000, 0)
-      );
-      pointer-events: none;
-    }
-  }
-}
-
 .link {
   cursor: pointer;
   line-height: 1.6;
   text-align: center;
   color: var(--gray-mid);
   transition: color 0.15s;
+  display: block;
+  padding: 0.5rem;
 
   &.linkActive {
     color: theme-color(primary);
@@ -69,22 +24,14 @@
   @include media-breakpoint-up(md) {
     display: flex;
     min-width: 0;
+    align-items: center;
     padding: 0.8rem 2rem;
+    gap: 0.5rem;
   }
 }
 
 .title {
-  display: none;
-  font-size: 0.7rem;
-
-  @include media-breakpoint-up(md) {
-    display: block;
-  }
-
-  @include media-breakpoint-up(xl) {
-    margin-left: 0.4rem;
-    font-size: 1rem;
-  }
+  display: block;
 }
 
 .hiddenOnMobile {
