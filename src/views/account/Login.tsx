@@ -62,68 +62,70 @@ export const Login = () => {
   };
 
   return (
-    <div className="container">
-      <h1 className="header text-center">Login/Register</h1>
-      <Tabs
-        defaultValue="login"
-        className="w-full m-0 md:w-1/2 md:mx-auto mt-5"
-      >
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="login">Login</TabsTrigger>
-          <TabsTrigger value="register">Register</TabsTrigger>
-        </TabsList>
-        {msg && (
-          <Alert
-            msg={msg}
-            variant={isErr ? "danger" : "success"}
-            className="mt-5"
-          />
-        )}
-        <TabsContent value="login">
-          <form onSubmit={handleLogin}>
-            <Input
-              label="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+    <main className="pt-3 overflow-auto">
+      <div className="container">
+        <h1 className="header text-center">Login/Register</h1>
+        <Tabs
+          defaultValue="login"
+          className="w-full m-0 md:w-1/2 md:mx-auto mt-5"
+        >
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="login">Login</TabsTrigger>
+            <TabsTrigger value="register">Register</TabsTrigger>
+          </TabsList>
+          {msg && (
+            <Alert
+              msg={msg}
+              variant={isErr ? "danger" : "success"}
+              className="mt-5"
             />
-            <Input
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <Button className="mt-5" variant="submit" type="submit">
-              Login
-            </Button>
-          </form>
-        </TabsContent>
-        <TabsContent value="register">
-          <form onSubmit={handleRegister}>
-            <Input
-              label="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-            <Input
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <Input
-              label="Confirm Password"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => {
-                setConfirmPassword(e.target.value);
-              }}
-            />
-            <Button className="mt-5" variant="submit" type="submit">
-              Register
-            </Button>
-          </form>
-        </TabsContent>
-      </Tabs>
-    </div>
+          )}
+          <TabsContent value="login">
+            <form onSubmit={handleLogin}>
+              <Input
+                label="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+              <Input
+                label="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <Button className="mt-5" variant="submit" type="submit">
+                Login
+              </Button>
+            </form>
+          </TabsContent>
+          <TabsContent value="register">
+            <form onSubmit={handleRegister}>
+              <Input
+                label="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+              <Input
+                label="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <Input
+                label="Confirm Password"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                }}
+              />
+              <Button className="mt-5" variant="submit" type="submit">
+                Register
+              </Button>
+            </form>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </main>
   );
 };

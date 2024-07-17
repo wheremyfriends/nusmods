@@ -35,7 +35,7 @@ export default function RecentRooms() {
     React.useState(false);
 
   return (
-    <main className="px-10 pb-10">
+    <main className="px-10 pb-10 pt-3 overflow-auto">
       <RemoveRoomModal
         isOpen={isRemoveRoomModalOpen}
         onClose={() => setIsRemoveRoomModalOpen(false)}

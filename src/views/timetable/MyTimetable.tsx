@@ -96,27 +96,29 @@ export const MyTimetable = () => {
   }, []);
 
   return (
-    <div className="container">
-      <TimetableContent
-        readOnly={false}
-        header={
-          <TimetableHeader
-            semester={semester}
-            onSelectSemester={(semester) => setSemester(semester)}
-            readOnly={false}
-          />
-        }
-        semester={semester}
-        multiTimetable={{}}
-        colors={filledColors}
-        roomID={undefined}
-        userID={user?.userID ?? 0}
-      />
+    <main className="overflow-auto pt-3">
+      <div className="container">
+        <TimetableContent
+          readOnly={false}
+          header={
+            <TimetableHeader
+              semester={semester}
+              onSelectSemester={(semester) => setSemester(semester)}
+              readOnly={false}
+            />
+          }
+          semester={semester}
+          multiTimetable={{}}
+          colors={filledColors}
+          roomID={undefined}
+          userID={user?.userID ?? 0}
+        />
 
-      <h1 className="header">Debug</h1>
-      {rooms.join(", ")}
-      <br />
-      {multiTimetableKeys.join(", ")}
-    </div>
+        <h1 className="header">Debug</h1>
+        {rooms.join(", ")}
+        <br />
+        {multiTimetableKeys.join(", ")}
+      </div>
+    </main>
   );
 };
