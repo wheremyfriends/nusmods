@@ -29,6 +29,28 @@ export async function createUser(
   }
 }
 
+export async function joinRoom(
+  apolloClient: ApolloClient<NormalizedCacheObject>,
+  roomID: string,
+) {
+  const query = gql`
+    mutation joinRoom($roomID: String!) {
+      joinRoom(roomID: $roomID)
+    }
+  `;
+
+  try {
+    await apolloClient.mutate({
+      mutation: query,
+      variables: {
+        roomID,
+      },
+    });
+  } catch (err) {
+    console.error("JOIN_ROOM error: ", err);
+  }
+}
+
 export async function getUser(
   apolloClient: ApolloClient<NormalizedCacheObject>,
 ) {

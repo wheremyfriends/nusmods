@@ -1,4 +1,4 @@
-import { useEffect, useState, MouseEvent, type FC } from "react";
+import { useEffect, useState, MouseEvent, type FC, useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import classnames from "classnames";
 import { UserPlus, User, Trash, Edit } from "react-feather";
@@ -19,8 +19,10 @@ import RenameUserModal from "views/components/RenameUserModal";
 import DeleteUserModal from "views/components/DeleteUserModal";
 import { deleteTimetableUser } from "actions/timetables";
 import { updateRoomLastAccessed } from "actions/app";
-import { createUser, subscribeToUserChanges } from "utils/graphql";
+import { createUser, joinRoom, subscribeToUserChanges } from "utils/graphql";
 import { cn } from "@/lib/utils";
+import { AuthContext } from "views/account/AuthContext";
+import { Button } from "@/components/ui/button";
 
 export const NAVTAB_HEIGHT = 48;
 
@@ -75,6 +77,8 @@ function getActiveUserID(roomID: string) {
 const Navtabs: FC<{
   roomID: string;
 }> = ({ roomID }) => {
+  const { user: authUser } = useContext(AuthContext);
+
   const dispatch = useDispatch();
 
   const [users, setUsers] = useState<RoomUser[]>([]);
@@ -175,6 +179,7 @@ const Navtabs: FC<{
       >
         <User className="shrink-0" />
         <span className={cn("truncate", styles.title)}>{user.name}</span>
+        {authUser?.userID === user.userID && <span>(You)</span>}
       </a>
     );
   });
@@ -229,8 +234,30 @@ const Navtabs: FC<{
           </MenuItem>,
         ]}
       </ContextMenu>
-      <nav className="flex flex-col justify-start min-h-0 max-w-[15rem]">
-        <div className="overflow-auto pt-3">{navUsers}</div>
+      <nav className="flex flex-col justify-start min-h-0 max-w-[15rem] pt-3">
+        {authUser &&
+          (users.map((u) => u.userID).includes(authUser.userID) ? (
+            <a
+              className={styles.link}
+              aria-label="Join"
+              onClick={async () => {
+                deleteUser(roomID, authUser.userID);
+              }}
+            >
+              <Button variant="danger">Leave Room</Button>
+            </a>
+          ) : (
+            <a
+              className={styles.link}
+              aria-label="Join"
+              onClick={async () => {
+                await joinRoom(apolloClient, roomID);
+              }}
+            >
+              <Button variant="success">Join Room</Button>
+            </a>
+          ))}
+        <div className="overflow-auto">{navUsers}</div>
         <div className={styles.divider} />
         <a
           className={styles.link}
