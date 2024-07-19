@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { DataTable } from "./DataTable";
 import { Room, columns } from "./columns";
 import { Button } from "@/components/ui/button";
@@ -9,16 +9,48 @@ import { State } from "types/state";
 import RemoveRoomModal from "views/components/RemoveRoomModal";
 import { removeRoom } from "actions/app";
 import CreateRoomModal from "views/components/CreateRoomModal";
+import { AuthContext } from "views/account/AuthContext";
+import { getRooms } from "utils/graphql";
+import { apolloClient } from "views/timetable/TimetableContent";
 
 export default function RecentRooms() {
   const dispatch = useDispatch();
+  const { user: authUser } = useContext(AuthContext);
 
   const activeUsers = useSelector(
     (state: State) => state.app.activeUserMapping,
   );
 
+  const recentRooms = Object.entries(activeUsers).reduce(
+    (acc, [roomID, { lastAccessed }]) => {
+      acc[roomID] = new Date(lastAccessed);
+      return acc;
+    },
+    {} as { [roomID: string]: Date },
+  );
+
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
+  const [isRemoveRoomModalOpen, setIsRemoveRoomModalOpen] =
+    React.useState(false);
+  const [isCreateRoomModalOpen, setIsCreateRoomModalOpen] =
+    React.useState(false);
+
+  const [authRooms, setAuthRooms] = useState<Room[]>([]);
+  useEffect(() => {
+    getRooms(apolloClient).then((rooms) => {
+      if (!rooms) return;
+      setAuthRooms(
+        rooms.map((r) => ({
+          roomID: r,
+          lastAccessed: recentRooms[r],
+        })),
+      );
+    });
+  }, []);
+
   const data: Room[] = Object.entries(activeUsers)
-    .map(([roomID, { userID, lastAccessed }]) => {
+    .filter(([roomID, {}]) => !authRooms.map((r) => r.roomID).includes(roomID))
+    .map(([roomID, { lastAccessed }]) => {
       return {
         roomID,
         lastAccessed: new Date(lastAccessed),
@@ -27,12 +59,6 @@ export default function RecentRooms() {
     .sort((a, b) => {
       return b.lastAccessed.valueOf() - a.lastAccessed.valueOf();
     });
-
-  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
-  const [isRemoveRoomModalOpen, setIsRemoveRoomModalOpen] =
-    React.useState(false);
-  const [isCreateRoomModalOpen, setIsCreateRoomModalOpen] =
-    React.useState(false);
 
   return (
     <main className="px-10 pb-10 pt-3 overflow-auto">
@@ -69,6 +95,15 @@ export default function RecentRooms() {
           Remove
         </Button>
       </div>
+      <h2 className="header">Your rooms</h2>
+      <DataTable
+        columns={columns}
+        data={authRooms}
+        rowSelection={rowSelection}
+        setRowSelection={setRowSelection}
+      />
+      <div className="mt-5"></div>
+      <h2 className="header">Other Rooms</h2>
       <DataTable
         columns={columns}
         data={data}

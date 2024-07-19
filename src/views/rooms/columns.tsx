@@ -9,7 +9,7 @@ import { format } from "date-fns";
 // You can use a Zod schema here if you want.
 export type Room = {
   roomID: string;
-  lastAccessed: Date;
+  lastAccessed: Date | undefined;
 };
 
 export const columns: ColumnDef<Room>[] = [
@@ -71,7 +71,11 @@ export const columns: ColumnDef<Room>[] = [
       );
     },
     cell: (props: any) => (
-      <span>{format(props.getValue(), "dd MMM yyyy, hh:mm a")}</span>
+      <span>
+        {props.getValue()
+          ? format(props.getValue(), "dd MMM yyyy, hh:mm a")
+          : "-"}
+      </span>
     ),
   },
 ];
