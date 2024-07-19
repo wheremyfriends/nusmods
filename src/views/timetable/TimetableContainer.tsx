@@ -25,6 +25,7 @@ import {
 import {
   addModule,
   cancelEditLesson,
+  deleteTimetableUser,
   deselectLesson,
   removeModule,
   resetAllTimetables,
@@ -49,13 +50,18 @@ import useScrollToTop from "views/hooks/useScrollToTop";
 import TimetableContent, { apolloClient } from "./TimetableContent";
 
 import styles from "./TimetableContainer.scss";
-import { gql } from "@apollo/client";
+import { ApolloClient, gql } from "@apollo/client";
 import { Action } from "actions/constants";
 import store from "entry/main";
 import _ from "lodash";
 import config from "config";
-import { subscribeToLessonChanges } from "utils/graphql";
+import {
+  getRooms,
+  subscribeToLessonChanges,
+  subscribeToUserChanges,
+} from "utils/graphql";
 import { AuthContext } from "views/account/AuthContext";
+import { handleProtocols } from "graphql-ws";
 
 type Params = {
   roomID: string;
@@ -148,7 +154,7 @@ export const TimetableContainerComponent: FC = () => {
   );
   const roomID = params.roomID;
   const activeUser = activeUserMapping[roomID]?.user;
-  const { user: curUser, setUser } = useContext(AuthContext)!;
+  const { user: authUser } = useContext(AuthContext);
   const userID = activeUser?.userID ?? -1;
   const isAuth = activeUser?.isAuth ?? false;
 
@@ -165,9 +171,8 @@ export const TimetableContainerComponent: FC = () => {
   const dispatch = useDispatch();
 
   // Resubscribe if roomID changes
-  // TODO: Unsubscribe
   useEffect(() => {
-    // Clear the state first
+    // Clear the state first                                                                                                               ║
     dispatch(resetAllTimetables());
     const sub = subscribeToLessonChanges(
       apolloClient,
@@ -179,6 +184,64 @@ export const TimetableContainerComponent: FC = () => {
       sub.unsubscribe();
     };
   }, [roomID]);
+
+  useEffect(() => {
+    if (authUser === undefined) {
+      return;
+    }
+
+    if (authUser.userID !== userID) {
+      return;
+    }
+
+    let userIDs = new Set<number>(); // UserID of extra users
+
+    // Subscribe to additional rooms, other than the original one
+    const subscriptions = getRooms(apolloClient).then((rooms) => {
+      if (!rooms) return;
+      return rooms
+        .filter((room) => roomID !== room)
+        .flatMap((roomID) => {
+          const sub1 = subscribeToLessonChanges(
+            apolloClient,
+            roomID,
+            (lessonChange) => {
+              if (lessonChange.userID === authUser?.userID) {
+                return;
+              }
+
+              userIDs.add(lessonChange.userID);
+              handleLessonChange(lessonChange);
+            },
+          );
+          const sub2 = subscribeToUserChanges(
+            apolloClient,
+            roomID,
+            (userChange) => {
+              const { action, userID } = userChange;
+
+              switch (action) {
+                case Action.DELETE_USER: {
+                  if (authUser?.userID === userID) return;
+
+                  dispatch(deleteTimetableUser(userID));
+                  return;
+                }
+              }
+            },
+          );
+
+          return [sub1, sub2];
+        });
+    });
+
+    return () => {
+      subscriptions.then((subs) => subs?.forEach((s) => s.unsubscribe()));
+      userIDs.forEach((id) => {
+        dispatch(deleteTimetableUser(id));
+      });
+    };
+  }, [roomID, userID]);
 
   // Not needed as modules are fetched on demand
   const isLoading = useMemo(() => {
@@ -230,7 +293,7 @@ export const TimetableContainerComponent: FC = () => {
               />
             </>
           }
-          readOnly={isAuth && curUser?.userID !== activeUser.userID}
+          readOnly={isAuth && authUser?.userID !== activeUser.userID}
         />
       </div>
     </main>
