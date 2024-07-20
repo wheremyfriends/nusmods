@@ -9,12 +9,16 @@ import { AuthContext } from "./AuthContext";
 import { Alert } from "views/components/Alert";
 
 export const Login = () => {
-  const { setUser } = useContext(AuthContext);
+  const { user: authUser, setUser } = useContext(AuthContext);
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
 
   const history = useHistory();
+
+  if (authUser) {
+    history.push("/rooms");
+  }
 
   const [msg, setMsg] = React.useState("");
   const [isErr, setIsErr] = React.useState(false);
