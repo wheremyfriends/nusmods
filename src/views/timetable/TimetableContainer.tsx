@@ -186,7 +186,7 @@ export const TimetableContainerComponent: FC = () => {
   }, [roomID]);
 
   useEffect(() => {
-    if (authUser === undefined) {
+    if (!authUser) {
       return;
     }
 
