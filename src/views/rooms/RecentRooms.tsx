@@ -46,7 +46,7 @@ export default function RecentRooms() {
         })),
       );
     });
-  }, []);
+  }, [authUser]);
 
   const data: Room[] = Object.entries(activeUsers)
     .filter(([roomID, {}]) => !authRooms.map((r) => r.roomID).includes(roomID))
@@ -95,15 +95,19 @@ export default function RecentRooms() {
           Remove
         </Button>
       </div>
-      <h2 className="header">Your rooms</h2>
-      <DataTable
-        columns={columns}
-        data={authRooms}
-        rowSelection={rowSelection}
-        setRowSelection={setRowSelection}
-      />
-      <div className="mt-5"></div>
-      <h2 className="header">Other Rooms</h2>
+      {authUser && (
+        <>
+          <h2 className="header">Your rooms</h2>
+          <DataTable
+            columns={columns}
+            data={authRooms}
+            rowSelection={rowSelection}
+            setRowSelection={setRowSelection}
+          />
+          <div className="mt-5"></div>
+          <h2 className="header">Other Rooms</h2>
+        </>
+      )}
       <DataTable
         columns={columns}
         data={data}

@@ -34,11 +34,19 @@ import KeyboardShortcuts from "./components/KeyboardShortcuts";
 
 import styles from "./AppShell.scss";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, List } from "react-feather";
-import { Home } from "lucide-react";
+import { ChevronDown, ChevronsDown } from "lucide-react";
+
 import { AuthContext } from "./account/AuthContext";
 import { getUser, logoutUser } from "utils/graphql";
 import { apolloClient } from "./timetable/TimetableContent";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 /**
  * Fetch module list on mount.
@@ -168,17 +176,25 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
             </Link>
             {user ? (
               <>
-                <Link to="/me">
-                  <Button variant="link">{user.username}</Button>
-                </Link>
-                <Button onClick={handleLogout} variant="link">
-                  Logout
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <Button variant="link">
+                      {user.username} <ChevronDown />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={handleLogout}>
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             ) : (
-              <Link to="/login">
-                <Button variant="link">Login</Button>
-              </Link>
+              <>
+                <Link to="/login">
+                  <Button variant="link">Login</Button>
+                </Link>
+              </>
             )}
           </div>
         </nav>
