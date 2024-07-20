@@ -177,10 +177,8 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
             {user ? (
               <>
                 <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <Button variant="link">
-                      {user.username} <ChevronDown />
-                    </Button>
+                  <DropdownMenuTrigger className="btn text-black underline-offset-4 hover:bg-gray-200">
+                    {user.username} <ChevronDown />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem onClick={handleLogout}>
