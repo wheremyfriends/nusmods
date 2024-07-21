@@ -19,7 +19,12 @@ import RenameUserModal from "views/components/RenameUserModal";
 import DeleteUserModal from "views/components/DeleteUserModal";
 import { deleteTimetableUser } from "actions/timetables";
 import { updateRoomLastAccessed } from "actions/app";
-import { createUser, joinRoom, subscribeToUserChanges } from "utils/graphql";
+import {
+  createUser,
+  deleteUser,
+  joinRoom,
+  subscribeToUserChanges,
+} from "utils/graphql";
 import { cn } from "@/lib/utils";
 import { AuthContext } from "views/account/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -29,12 +34,6 @@ export const NAVTAB_HEIGHT = 48;
 export const UPDATE_USER = gql`
   mutation UpdateUser($roomID: String!, $userID: Int!, $newname: String!) {
     updateUser(roomID: $roomID, userID: $userID, newname: $newname)
-  }
-`;
-
-export const DELETE_USER = gql`
-  mutation DeleteUser($roomID: String!, $userID: Int!) {
-    deleteUser(roomID: $roomID, userID: $userID)
   }
 `;
 
@@ -51,21 +50,6 @@ function updateUser(roomID: string, userID: number, newname: string) {
     .catch((err) => {
       console.error("DELETE_USER: ", err);
       alert("Failed to update user");
-    });
-}
-
-function deleteUser(roomID: string, userID: number) {
-  apolloClient
-    .mutate({
-      mutation: DELETE_USER,
-      variables: {
-        roomID: roomID,
-        userID: userID,
-      },
-    })
-    .catch((err) => {
-      console.error("DELETE_USER: ", err);
-      alert("Failed to delete user");
     });
 }
 
@@ -153,9 +137,9 @@ const Navtabs: FC<{
     setIsRenameUserModalOpen(false);
   }
 
-  function handleDeleteUser() {
+  async function handleDeleteUser() {
     if (curEditUser != undefined)
-      deleteUser(roomID.valueOf(), curEditUser.userID);
+      await deleteUser(apolloClient, roomID.valueOf(), curEditUser.userID);
     setIsDelUserModalOpen(false);
   }
 
@@ -241,7 +225,7 @@ const Navtabs: FC<{
               className={styles.link}
               aria-label="Join"
               onClick={async () => {
-                deleteUser(roomID, authUser.userID);
+                await deleteUser(apolloClient, roomID, authUser.userID);
               }}
             >
               <Button variant="danger">Leave Room</Button>

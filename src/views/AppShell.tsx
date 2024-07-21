@@ -181,7 +181,10 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
                     {user.username} <ChevronDown />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem onClick={handleLogout}>
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={handleLogout}
+                    >
                       Logout
                     </DropdownMenuItem>
                   </DropdownMenuContent>

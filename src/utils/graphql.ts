@@ -74,6 +74,32 @@ export async function getUser(
 
   return undefined;
 }
+
+export async function deleteUser(
+  apolloClient: ApolloClient<NormalizedCacheObject>,
+  roomID: string,
+  userID: number,
+) {
+  const query = gql`
+    mutation DeleteUser($roomID: String!, $userID: Int!) {
+      deleteUser(roomID: $roomID, userID: $userID)
+    }
+  `;
+
+  try {
+    await apolloClient.mutate({
+      mutation: query,
+      variables: {
+        roomID: roomID,
+        userID: userID,
+      },
+    });
+  } catch (err) {
+    console.error("DELETE_USER: ", err);
+    alert("Failed to delete user");
+  }
+}
+
 export async function registerUser(
   apolloClient: ApolloClient<NormalizedCacheObject>,
   username: string,
