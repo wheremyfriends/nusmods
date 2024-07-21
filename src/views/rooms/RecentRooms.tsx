@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { DataTable } from "./DataTable";
 import { Room, columns } from "./columns";
 import { Button } from "@/components/ui/button";
@@ -9,16 +9,49 @@ import { State } from "types/state";
 import RemoveRoomModal from "views/components/RemoveRoomModal";
 import { removeRoom } from "actions/app";
 import CreateRoomModal from "views/components/CreateRoomModal";
+import { AuthContext } from "views/account/AuthContext";
+import { deleteUser, getRooms } from "utils/graphql";
+import { apolloClient } from "views/timetable/TimetableContent";
+import LeaveRoomModal from "views/components/LeaveRoomModal";
 
 export default function RecentRooms() {
   const dispatch = useDispatch();
+  const { user: authUser } = useContext(AuthContext);
 
   const activeUsers = useSelector(
     (state: State) => state.app.activeUserMapping,
   );
 
+  const recentRooms = Object.entries(activeUsers).reduce(
+    (acc, [roomID, { lastAccessed }]) => {
+      acc[roomID] = new Date(lastAccessed);
+      return acc;
+    },
+    {} as { [roomID: string]: Date },
+  );
+
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
+  const [isRemoveRoomModalOpen, setIsRemoveRoomModalOpen] =
+    React.useState(false);
+  const [isCreateRoomModalOpen, setIsCreateRoomModalOpen] =
+    React.useState(false);
+
+  const [authRooms, setAuthRooms] = useState<Room[]>([]);
+  useEffect(() => {
+    getRooms(apolloClient).then((rooms) => {
+      if (!rooms) return;
+      setAuthRooms(
+        rooms.map((r) => ({
+          roomID: r,
+          lastAccessed: recentRooms[r],
+        })),
+      );
+    });
+  }, [authUser]);
+
   const data: Room[] = Object.entries(activeUsers)
-    .map(([roomID, { userID, lastAccessed }]) => {
+    .filter(([roomID, {}]) => !authRooms.map((r) => r.roomID).includes(roomID))
+    .map(([roomID, { lastAccessed }]) => {
       return {
         roomID,
         lastAccessed: new Date(lastAccessed),
@@ -28,14 +61,8 @@ export default function RecentRooms() {
       return b.lastAccessed.valueOf() - a.lastAccessed.valueOf();
     });
 
-  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
-  const [isRemoveRoomModalOpen, setIsRemoveRoomModalOpen] =
-    React.useState(false);
-  const [isCreateRoomModalOpen, setIsCreateRoomModalOpen] =
-    React.useState(false);
-
   return (
-    <main className="px-10 pb-10">
+    <main className="px-10 pb-10 pt-3 overflow-auto">
       <RemoveRoomModal
         isOpen={isRemoveRoomModalOpen}
         onClose={() => setIsRemoveRoomModalOpen(false)}
@@ -51,24 +78,37 @@ export default function RecentRooms() {
           setIsCreateRoomModalOpen(false);
         }}
       />
-      <h1 className="header">Recent Rooms</h1>
-      <p className="text-base">List of previously visited rooms</p>
-      <div className="mb-5 flex gap-x-1">
-        <Button onClick={() => setIsCreateRoomModalOpen(true)}>
-          <Plus />
-          Join/Create room
-        </Button>
-        <Button
-          variant="secondary"
-          disabled={Boolean(Object.keys(rowSelection).length <= 0)}
-          onClick={() => {
-            setIsRemoveRoomModalOpen(true);
-          }}
-        >
-          <Trash />
-          Remove
-        </Button>
-      </div>
+      <h1 className="header">Rooms</h1>
+      {!authUser && <p className="text-base m-0">Rooms previously visited</p>}
+      <div className="mb-5"></div>
+      {authUser && (
+        <>
+          <h2 className="header">Your rooms</h2>
+          <p className="text-base mb-0">Rooms that you joined</p>
+          <DataTable
+            columns={columns.slice(1)}
+            data={authRooms}
+            rowSelection={rowSelection}
+            setRowSelection={setRowSelection}
+          />
+          <div className="mt-5"></div>
+          <h2 className="header">Other Rooms</h2>
+          <p className="text-base mb-0">
+            Rooms previously visited but not joined
+          </p>
+        </>
+      )}
+      <Button
+        variant="secondary"
+        disabled={Boolean(Object.keys(rowSelection).length <= 0)}
+        onClick={() => {
+          setIsRemoveRoomModalOpen(true);
+        }}
+        className="mb-2"
+      >
+        <Trash />
+        Remove
+      </Button>
       <DataTable
         columns={columns}
         data={data}

@@ -47,16 +47,6 @@ export function promptRefresh() {
   };
 }
 
-export const UPDATE_TIMETABLE_GEN_CONF = "UPDATE_TIMETABLE_GEN_CONF" as const;
-export function updateTimetableGenConf(config: TimetableGeneratorConfig) {
-  return {
-    type: UPDATE_TIMETABLE_GEN_CONF,
-    payload: {
-      config,
-    },
-  };
-}
-
 export const UPDATE_ROOM_LAST_ACCESSED = "UPDATE_ROOM_LAST_ACCESSED" as const;
 export function updateRoomLastAccessed(roomID: string) {
   return {

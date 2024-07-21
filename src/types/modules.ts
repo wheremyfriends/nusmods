@@ -1,3 +1,5 @@
+import { RoomUser } from "./timetables";
+
 // Components within a module:
 export type AcadYear = string;
 export type ClassNo = string;
@@ -231,7 +233,7 @@ export type Module = {
 
 export type ActiveUserMapping = {
   [roomID: string]: {
-    userID: UserID;
+    user: RoomUser;
     lastAccessed: string;
   };
 };

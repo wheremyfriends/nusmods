@@ -1,38 +1,38 @@
 import Modal from "./Modal";
-import React from "react";
+import React, { useContext } from "react";
 import { X } from "react-feather";
 import Input from "./Input";
 import SwitchWithText from "./SwitchWithText";
 import { TimetableGeneratorConfig } from "types/timetables";
-import { useSelect } from "downshift";
 import { useDispatch, useSelector } from "react-redux";
-import { AppState } from "types/reducers";
-import { updateTimetableGenConf } from "actions/app";
+import { updateTimetableGenConf } from "actions/timetables";
+import { subscribeToConfigChanges, updateConfig } from "utils/graphql";
+import { apolloClient } from "views/timetable/TimetableContent";
+import { RoomContext } from "views/timetable/RoomContext";
+import { State } from "types/state";
 
 type Break = {
   start: string;
   end: string;
 };
 
-// Returns true if invalid, false if valid
-// Ensures that input is multiple of 30 minutes
-function isTimeInvalid(value: Date) {
-  return !(value.getMinutes() % 30 === 0 && value.getSeconds() === 0);
+function addBreak(inp: Break[]) {
+  return [...inp, { start: "", end: "" }];
 }
 
-// Converts a number to string, returning defVal if input is negative
-function positiveNumberToStr(value: number, defVal: string = ""): string {
-  if (value < 0) return defVal;
-  return value.toString();
+function delBreak(inp: Break[], ind: number) {
+  return inp.filter((_, i) => i !== ind);
 }
-function addColon(str: string, position: number): string {
-  return str.slice(0, position) + ":" + str.slice(position);
+
+function editBreak(
+  inp: Break[],
+  key: "start" | "end",
+  val: string,
+  ind: number,
+) {
+  return inp.map((b, i) => (i === ind ? { ...b, [key]: val } : b));
 }
-// If value if negative, return default, else return value
-function nonEmptyStrToNumber(value: string, defVal: number = -1): number {
-  if (value === "") return defVal;
-  return parseFloat(value);
-}
+
 type Props = {
   isOpen: boolean;
   onClose: () => void;
@@ -41,77 +41,42 @@ export default function TimetableGeneratorConfigModal({
   isOpen,
   onClose,
 }: Props) {
-  const config = useSelector((state: any) => {
-    return (state.app as AppState).timetableGeneratorConfig;
+  const { roomID, userID } = useContext(RoomContext);
+
+  const config = useSelector((state: State) => {
+    return state.timetables.timetableGeneratorConfig;
   });
+  const {
+    prefDaysEnabled,
+    maxDistEnabled,
+    breaksEnabled,
+    prefDays,
+    maxDist,
+    minDuration,
+    breaks,
+  } = config;
   const dispatch = useDispatch();
 
-  const [breaks, setBreaks] = React.useState<Break[]>(
-    config.breaks?.length >= 1
-      ? config.breaks[0].timeslots.map(({ start, end }) => ({
-          start: addColon(positiveNumberToStr(start).padStart(4, "0"), 2),
-          end: addColon(positiveNumberToStr(end).padStart(4, "0"), 2),
-        }))
-      : [{ start: "", end: "" }],
-  );
-  const [prefDays, setPrefDays] = React.useState<string>(
-    config.prefDays.filter((d) => d >= 0).join(", "),
-  );
-  const [maxDist, setMaxDist] = React.useState<string>(
-    positiveNumberToStr(config.maxDist),
-  );
+  React.useEffect(() => {
+    const subscription = subscribeToConfigChanges(
+      apolloClient,
+      userID,
+      (newConf) => {
+        dispatch(updateTimetableGenConf(newConf));
+      },
+    );
 
-  const [minBreakDuration, setMinBreakDuration] = React.useState<string>(
-    positiveNumberToStr(config.breaks?.[0]?.minDuration),
-  );
-
-  const [prefDaysEnabled, setPrefDaysEnabled] = React.useState<boolean>(
-    config.prefDaysEnabled,
-  );
-  const [maxDistEnabled, setMaxDistEnabled] = React.useState<boolean>(
-    config.maxDistEnabled,
-  );
-  const [breaksEnabled, setBreaksEnabled] = React.useState<boolean>(
-    config.breaksEnabled,
-  );
-
-  function editBreak(property: string, newVal: string, index: number) {
-    const newBreaks = breaks.map((b, i) => {
-      if (i !== index) return b;
-      else
-        return {
-          ...b,
-          [property]: newVal,
-        };
-    });
-
-    setBreaks(newBreaks);
-  }
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [apolloClient, userID]);
 
   function handleClose() {
-    const config: TimetableGeneratorConfig = {
-      prefDaysEnabled,
-      maxDistEnabled,
-      breaksEnabled,
-      prefDays: prefDays
-        .split(",")
-        .filter((d) => d.trim() !== "")
-        .map((d) => nonEmptyStrToNumber(d.trim())),
-      maxDist: nonEmptyStrToNumber(maxDist),
-      breaks: [
-        {
-          minDuration: nonEmptyStrToNumber(minBreakDuration!),
-          timeslots: breaks.map(({ start, end }) => {
-            return {
-              start: nonEmptyStrToNumber(start.replace(":", "")),
-              end: nonEmptyStrToNumber(end.replace(":", "")),
-            };
-          }),
-        },
-      ],
-    };
-    dispatch(updateTimetableGenConf(config));
     onClose();
+  }
+
+  function handleChange(newConf: TimetableGeneratorConfig) {
+    updateConfig(apolloClient, roomID, userID, newConf);
   }
 
   return (
@@ -122,7 +87,9 @@ export default function TimetableGeneratorConfigModal({
       <fieldset>
         <SwitchWithText
           checked={prefDaysEnabled}
-          onCheckedChange={setPrefDaysEnabled}
+          onCheckedChange={(val) =>
+            handleChange({ ...config, prefDaysEnabled: val })
+          }
         />
         <Input
           label="Preferred Days"
@@ -130,14 +97,18 @@ export default function TimetableGeneratorConfigModal({
           helperText="Ranking of days separated by comma. 0 = Sunday, 1 = Monday etc"
           disabled={!prefDaysEnabled}
           value={prefDays}
-          onChange={(e) => setPrefDays(e.target.value)}
+          onChange={(e) => {
+            handleChange({ ...config, prefDays: e.target.value });
+          }}
         />
       </fieldset>
       <hr className="mt-5" />
       <fieldset>
         <SwitchWithText
           checked={maxDistEnabled}
-          onCheckedChange={setMaxDistEnabled}
+          onCheckedChange={(val) =>
+            handleChange({ ...config, maxDistEnabled: val })
+          }
         />
         <Input
           type="number"
@@ -146,14 +117,16 @@ export default function TimetableGeneratorConfigModal({
           placeholder="0.8"
           disabled={!maxDistEnabled}
           value={maxDist}
-          onChange={(e) => setMaxDist(e.target.value)}
+          onChange={(e) => handleChange({ ...config, maxDist: e.target.value })}
         />
       </fieldset>
       <hr className="mt-5" />
       <fieldset>
         <SwitchWithText
           checked={breaksEnabled}
-          onCheckedChange={setBreaksEnabled}
+          onCheckedChange={(val) =>
+            handleChange({ ...config, breaksEnabled: val })
+          }
         />
         <Input
           type="number"
@@ -161,8 +134,13 @@ export default function TimetableGeneratorConfigModal({
           helperText="Minimum consecutive minutes to be free from classes"
           placeholder="60"
           disabled={!breaksEnabled}
-          value={minBreakDuration}
-          onChange={(e) => setMinBreakDuration(e.target.value)}
+          value={minDuration}
+          onChange={(e) =>
+            handleChange({
+              ...config,
+              minDuration: e.target.value,
+            })
+          }
         />
         <div
           className="grid gap-x-2 gap-y-2 items-end"
@@ -175,23 +153,32 @@ export default function TimetableGeneratorConfigModal({
                 type="time"
                 disabled={!breaksEnabled}
                 value={b.start}
-                onChange={(event) => {
-                  editBreak("start", event.target.value, ind);
-                }}
+                onChange={(event) =>
+                  handleChange({
+                    ...config,
+                    breaks: editBreak(breaks, "start", event.target.value, ind),
+                  })
+                }
               />
               <Input
                 label={ind === 0 ? "End" : undefined}
                 type="time"
                 disabled={!breaksEnabled}
                 value={b.end}
-                onChange={(event) => {
-                  editBreak("end", event.target.value, ind);
-                }}
+                onChange={(event) =>
+                  handleChange({
+                    ...config,
+                    breaks: editBreak(breaks, "end", event.target.value, ind),
+                  })
+                }
               />
               <button
                 className="btn btn-outline-secondary"
                 onClick={() => {
-                  setBreaks(breaks.filter((_, i) => i !== ind));
+                  handleChange({
+                    ...config,
+                    breaks: delBreak(breaks, ind),
+                  });
                 }}
               >
                 <X />
@@ -202,7 +189,10 @@ export default function TimetableGeneratorConfigModal({
         <button
           className="btn btn-outline-primary mt-5"
           onClick={() => {
-            setBreaks([...breaks, { start: "", end: "" }]);
+            handleChange({
+              ...config,
+              breaks: addBreak(breaks),
+            });
           }}
         >
           Add time range

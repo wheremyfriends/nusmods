@@ -104,9 +104,7 @@ export type ColorIndex = number;
 
 export type UserChange = {
   readonly action: String;
-  readonly userID: UserID;
-  readonly name: String;
-};
+} & RoomUser;
 
 export type LessonChange = {
   readonly action: String;
@@ -119,7 +117,8 @@ export type LessonChange = {
 
 export type RoomUser = {
   readonly userID: UserID;
-  name: String;
+  name: string;
+  isAuth: boolean;
 };
 
 // Format for the timetable generator config
@@ -127,13 +126,11 @@ export type TimetableGeneratorConfig = {
   prefDaysEnabled: boolean;
   maxDistEnabled: boolean;
   breaksEnabled: boolean;
-  prefDays: number[];
-  maxDist: number;
+  prefDays: string;
+  maxDist: string;
+  minDuration: string;
   breaks: {
-    minDuration: number;
-    timeslots: {
-      start: number;
-      end: number;
-    }[];
+    start: string;
+    end: string;
   }[];
 };

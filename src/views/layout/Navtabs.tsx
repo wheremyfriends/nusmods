@@ -1,4 +1,4 @@
-import { useEffect, useState, MouseEvent, type FC } from "react";
+import { useEffect, useState, MouseEvent, type FC, useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import classnames from "classnames";
 import { UserPlus, User, Trash, Edit } from "react-feather";
@@ -8,7 +8,7 @@ import ContextMenu from "views/components/ContextMenu";
 
 import styles from "./Navtabs.scss";
 import { apolloClient } from "views/timetable/TimetableContent";
-import { gql } from "@apollo/client";
+import { ApolloClient, gql } from "@apollo/client";
 import { RoomUser, UserChange } from "types/timetables";
 import { Action } from "actions/constants";
 import { switchUser } from "actions/settings";
@@ -19,29 +19,21 @@ import RenameUserModal from "views/components/RenameUserModal";
 import DeleteUserModal from "views/components/DeleteUserModal";
 import { deleteTimetableUser } from "actions/timetables";
 import { updateRoomLastAccessed } from "actions/app";
-import { createUser } from "utils/graphql";
+import {
+  createUser,
+  deleteUser,
+  joinRoom,
+  subscribeToUserChanges,
+} from "utils/graphql";
+import { cn } from "@/lib/utils";
+import { AuthContext } from "views/account/AuthContext";
+import { Button } from "@/components/ui/button";
 
 export const NAVTAB_HEIGHT = 48;
-
-export const USER_CHANGE_SUBSCRIPTION = gql`
-  subscription UserChange($roomID: String!) {
-    userChange(roomID: $roomID) {
-      action
-      userID
-      name
-    }
-  }
-`;
 
 export const UPDATE_USER = gql`
   mutation UpdateUser($roomID: String!, $userID: Int!, $newname: String!) {
     updateUser(roomID: $roomID, userID: $userID, newname: $newname)
-  }
-`;
-
-export const DELETE_USER = gql`
-  mutation DeleteUser($roomID: String!, $userID: Int!) {
-    deleteUser(roomID: $roomID, userID: $userID)
   }
 `;
 
@@ -61,29 +53,16 @@ function updateUser(roomID: string, userID: number, newname: string) {
     });
 }
 
-function deleteUser(roomID: string, userID: number) {
-  apolloClient
-    .mutate({
-      mutation: DELETE_USER,
-      variables: {
-        roomID: roomID,
-        userID: userID,
-      },
-    })
-    .catch((err) => {
-      console.error("DELETE_USER: ", err);
-      alert("Failed to delete user");
-    });
-}
-
 // TODO: move to a more appropriate location
 function getActiveUserID(roomID: string) {
-  return store.getState().app.activeUserMapping[roomID]?.userID ?? -1;
+  return store.getState().app.activeUserMapping[roomID]?.user?.userID ?? -1;
 }
 
 const Navtabs: FC<{
   roomID: string;
 }> = ({ roomID }) => {
+  const { user: authUser } = useContext(AuthContext);
+
   const dispatch = useDispatch();
 
   const [users, setUsers] = useState<RoomUser[]>([]);
@@ -100,62 +79,48 @@ const Navtabs: FC<{
   useEffect(() => {
     setUsers([]);
 
-    apolloClient
-      .subscribe({
-        query: USER_CHANGE_SUBSCRIPTION,
-        variables: {
-          roomID: roomID,
-        },
-      })
-      .subscribe({
-        next(data) {
-          if (data.data) {
-            const userChange: UserChange = data.data.userChange;
-            const { action, userID, name } = userChange;
+    const sub = subscribeToUserChanges(apolloClient, roomID, (userChange) => {
+      const { action, ...curUser } = userChange;
 
-            switch (action) {
-              case Action.CREATE_USER: {
-                setUsers((users) => [...users, { userID, name }]);
-                if (getActiveUserID(roomID) === -1) {
-                  dispatch(switchUser(userID, roomID));
-                }
-                return;
-              }
-              case Action.UPDATE_USER: {
-                setUsers((users) =>
-                  users.map((user) => {
-                    if (user.userID === userID) return { ...user, name: name };
-                    return user;
-                  }),
-                );
-                return;
-              }
-              case Action.DELETE_USER: {
-                setUsers((users) => {
-                  const filteredUsers = users.filter(
-                    (user) => user.userID !== userID,
-                  );
-                  // Switch to first user if current active user is deleted
-                  if (
-                    filteredUsers.length > 0 &&
-                    getActiveUserID(roomID) === userID
-                  )
-                    dispatch(switchUser(filteredUsers[0].userID, roomID));
-                  return filteredUsers;
-                });
-                dispatch(deleteTimetableUser(userID));
-                return;
-              }
-            }
+      switch (action) {
+        case Action.CREATE_USER: {
+          setUsers((users) => [...users, curUser]);
+          if (getActiveUserID(roomID) === -1) {
+            dispatch(switchUser(curUser, roomID));
           }
-        },
-        error(error) {
-          console.log("Apollo subscribe error", error);
-        },
-        complete() {},
-      });
+          return;
+        }
+        case Action.UPDATE_USER: {
+          setUsers((users) =>
+            users.map((user) => {
+              if (user.userID === curUser.userID) return curUser;
+              return user;
+            }),
+          );
+          return;
+        }
+        case Action.DELETE_USER: {
+          setUsers((users) => {
+            const filteredUsers = users.filter(
+              (user) => user.userID !== curUser.userID,
+            );
+            // Switch to first user if current active user is deleted
+            if (
+              filteredUsers.length > 0 &&
+              getActiveUserID(roomID) === curUser.userID
+            )
+              dispatch(switchUser(filteredUsers[0], roomID));
+            return filteredUsers;
+          });
+          dispatch(deleteTimetableUser(curUser.userID));
+          return;
+        }
+      }
+    });
 
     dispatch(updateRoomLastAccessed(roomID));
+
+    return () => sub.unsubscribe();
   }, [roomID]);
 
   function handleContextMenu(user: RoomUser) {
@@ -172,10 +137,16 @@ const Navtabs: FC<{
     setIsRenameUserModalOpen(false);
   }
 
-  function handleDeleteUser() {
+  async function handleDeleteUser() {
     if (curEditUser != undefined)
-      deleteUser(roomID.valueOf(), curEditUser.userID);
+      await deleteUser(apolloClient, roomID.valueOf(), curEditUser.userID);
     setIsDelUserModalOpen(false);
+  }
+
+  function handleSwitchUser(user: RoomUser) {
+    return (e: React.MouseEvent<HTMLAnchorElement, globalThis.MouseEvent>) => {
+      dispatch(switchUser(user, roomID));
+    };
   }
 
   const navUsers = users.map((user) => {
@@ -188,17 +159,11 @@ const Navtabs: FC<{
             : styles.link
         }
         onContextMenu={handleContextMenu(user)}
-        onClick={(e) => {
-          const userIDString = e.currentTarget.getAttribute("data-userid");
-          if (userIDString) {
-            const userID: UserID = +userIDString;
-            dispatch(switchUser(userID, roomID));
-          }
-        }}
-        data-userid={user.userID}
+        onClick={handleSwitchUser(user)}
       >
-        <User />
-        <span className={styles.title}>{user.name}</span>
+        <User className="shrink-0" />
+        <span className={cn("truncate", styles.title)}>{user.name}</span>
+        {authUser?.userID === user.userID && <span>(You)</span>}
       </a>
     );
   });
@@ -253,8 +218,30 @@ const Navtabs: FC<{
           </MenuItem>,
         ]}
       </ContextMenu>
-      <nav className={styles.nav}>
-        <div>{navUsers}</div>
+      <nav className="flex flex-col justify-start min-h-0 max-w-[15rem] pt-3">
+        {authUser &&
+          (users.map((u) => u.userID).includes(authUser.userID) ? (
+            <a
+              className={styles.link}
+              aria-label="Join"
+              onClick={async () => {
+                await deleteUser(apolloClient, roomID, authUser.userID);
+              }}
+            >
+              <Button variant="danger">Leave Room</Button>
+            </a>
+          ) : (
+            <a
+              className={styles.link}
+              aria-label="Join"
+              onClick={async () => {
+                await joinRoom(apolloClient, roomID);
+              }}
+            >
+              <Button variant="success">Join Room</Button>
+            </a>
+          ))}
+        <div className="overflow-auto">{navUsers}</div>
         <div className={styles.divider} />
         <a
           className={styles.link}

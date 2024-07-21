@@ -3,14 +3,8 @@ import produce from "immer";
 import { createMigrate } from "redux-persist";
 
 import { PersistConfig } from "storage/persistReducer";
-import { ModuleCode, Semester } from "types/modules";
-import {
-  ModuleLessonConfig,
-  SemTimetableConfig,
-  SemTimetableMultiConfig,
-  TimetableConfig,
-  TimetableMultiConfig,
-} from "types/timetables";
+import { ModuleCode } from "types/modules";
+import { ModuleLessonConfig, SemTimetableConfig } from "types/timetables";
 import { ColorMapping, TimetablesState } from "types/reducers";
 
 import config from "config";
@@ -22,7 +16,6 @@ import {
   REMOVE_MODULE,
   RESET_TIMETABLE,
   SELECT_MODULE_COLOR,
-  SET_HIDDEN_IMPORTED,
   SET_LESSON_CONFIG,
   SET_TIMETABLE,
   SHOW_LESSON_IN_TIMETABLE,
@@ -34,6 +27,7 @@ import {
   UNFOCUS_LESSON_IN_TIMETABLE,
   FOCUS_LESSON_IN_TIMETABLE,
   DELETE_TIMETABLE_USER,
+  UPDATE_TIMETABLE_GEN_CONF,
 } from "actions/timetables";
 import { getNewColor } from "utils/colors";
 import { SET_EXPORTED_DATA } from "actions/constants";
@@ -198,6 +192,15 @@ export const defaultTimetableState: TimetablesState = {
   multiUserFocus: {},
   academicYear: config.academicYear,
   archive: {},
+  timetableGeneratorConfig: {
+    prefDaysEnabled: false,
+    maxDistEnabled: false,
+    breaksEnabled: false,
+    prefDays: "",
+    maxDist: "",
+    minDuration: "",
+    breaks: [{ start: "", end: "" }],
+  },
 };
 
 function timetables(
@@ -383,6 +386,13 @@ function timetables(
         draft.multiUserFocus[userID] = { [semester]: moduleCode };
       });
     }
+
+    case UPDATE_TIMETABLE_GEN_CONF:
+      const { config } = action.payload;
+      return {
+        ...state,
+        timetableGeneratorConfig: config,
+      };
     // case SET_EXPORTED_DATA: {
     //   const { semester, timetable, colors, hidden } = action.payload;
 

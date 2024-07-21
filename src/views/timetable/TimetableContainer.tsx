@@ -1,4 +1,11 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect, useHistory, useLocation, useParams } from "react-router-dom";
 import { Repeat } from "react-feather";
@@ -18,6 +25,7 @@ import {
 import {
   addModule,
   cancelEditLesson,
+  deleteTimetableUser,
   deselectLesson,
   removeModule,
   resetAllTimetables,
@@ -42,30 +50,25 @@ import useScrollToTop from "views/hooks/useScrollToTop";
 import TimetableContent, { apolloClient } from "./TimetableContent";
 
 import styles from "./TimetableContainer.scss";
-import { gql } from "@apollo/client";
+import { ApolloClient, gql } from "@apollo/client";
 import { Action } from "actions/constants";
 import store from "entry/main";
 import _ from "lodash";
 import config from "config";
-
-export const LESSON_CHANGE_SUBSCRIPTION = gql`
-  subscription LessonChange($roomID: String!) {
-    lessonChange(roomID: $roomID) {
-      action
-      userID
-      semester
-      moduleCode
-      lessonType
-      classNo
-    }
-  }
-`;
+import {
+  getRooms,
+  subscribeToLessonChanges,
+  subscribeToUserChanges,
+} from "utils/graphql";
+import { AuthContext } from "views/account/AuthContext";
+import { handleProtocols } from "graphql-ws";
 
 type Params = {
   roomID: string;
 };
 
-function handleLessonChange(lessonChange: LessonChange) {
+// Receives lesson change subscription from the backend, then updates the redux state
+export function handleLessonChange(lessonChange: LessonChange) {
   // TODO: Include semester param
   // TODO: Check if request is intended for correct user via name
   const state = store.getState();
@@ -150,7 +153,10 @@ export const TimetableContainerComponent: FC = () => {
     ({ app }: State) => app.activeUserMapping,
   );
   const roomID = params.roomID;
-  const userID = activeUserMapping[roomID]?.userID ?? -1;
+  const activeUser = activeUserMapping[roomID]?.user;
+  const { user: authUser } = useContext(AuthContext);
+  const userID = activeUser?.userID ?? -1;
+  const isAuth = activeUser?.isAuth ?? false;
 
   const multiTimetable = useSelector(getSemesterTimetableMultiLessons)(
     userID,
@@ -165,30 +171,77 @@ export const TimetableContainerComponent: FC = () => {
   const dispatch = useDispatch();
 
   // Resubscribe if roomID changes
-  // TODO: Unsubscribe
   useEffect(() => {
-    // Clear the state first
+    // Clear the state first                                                                                                               ║
     dispatch(resetAllTimetables());
+    const sub = subscribeToLessonChanges(
+      apolloClient,
+      roomID,
+      handleLessonChange,
+    );
 
-    apolloClient
-      .subscribe({
-        query: LESSON_CHANGE_SUBSCRIPTION,
-        variables: {
-          roomID: roomID,
-        },
-      })
-      .subscribe({
-        next(data) {
-          if (data.data) {
-            handleLessonChange(data.data.lessonChange);
-          }
-        },
-        error(error) {
-          console.log("Apollo subscribe error", error);
-        },
-        complete() {},
-      });
+    return () => {
+      sub.unsubscribe();
+    };
   }, [roomID]);
+
+  useEffect(() => {
+    if (!authUser) {
+      return;
+    }
+
+    if (authUser.userID !== userID) {
+      return;
+    }
+
+    let userIDs = new Set<number>(); // UserID of extra users
+
+    // Subscribe to additional rooms, other than the original one
+    const subscriptions = getRooms(apolloClient).then((rooms) => {
+      if (!rooms) return;
+      return rooms
+        .filter((room) => roomID !== room)
+        .flatMap((roomID) => {
+          const sub1 = subscribeToLessonChanges(
+            apolloClient,
+            roomID,
+            (lessonChange) => {
+              if (lessonChange.userID === authUser?.userID) {
+                return;
+              }
+
+              userIDs.add(lessonChange.userID);
+              handleLessonChange(lessonChange);
+            },
+          );
+          const sub2 = subscribeToUserChanges(
+            apolloClient,
+            roomID,
+            (userChange) => {
+              const { action, userID } = userChange;
+
+              switch (action) {
+                case Action.DELETE_USER: {
+                  if (authUser?.userID === userID) return;
+
+                  dispatch(deleteTimetableUser(userID));
+                  return;
+                }
+              }
+            },
+          );
+
+          return [sub1, sub2];
+        });
+    });
+
+    return () => {
+      subscriptions.then((subs) => subs?.forEach((s) => s.unsubscribe()));
+      userIDs.forEach((id) => {
+        dispatch(deleteTimetableUser(id));
+      });
+    };
+  }, [roomID, userID]);
 
   // Not needed as modules are fetched on demand
   const isLoading = useMemo(() => {
@@ -221,28 +274,28 @@ export const TimetableContainerComponent: FC = () => {
   // }
 
   return (
-    <main className="main-content">
-      <div className="main-container">
-        <Navtabs roomID={roomID} />
+    <main className="grid grid-cols-[auto_minmax(0,_1fr)]">
+      <Navtabs roomID={roomID} />
+      <div className="overflow-auto pt-3">
+        <TimetableContent
+          key={semester}
+          semester={semester}
+          userID={userID}
+          multiTimetable={displayedMultiTimetable}
+          colors={filledColors}
+          roomID={roomID}
+          header={
+            <>
+              <TimetableHeader
+                semester={semester}
+                readOnly={readOnly}
+                roomID={roomID}
+              />
+            </>
+          }
+          readOnly={isAuth && authUser?.userID !== activeUser.userID}
+        />
       </div>
-      <TimetableContent
-        key={semester}
-        semester={semester}
-        userID={userID}
-        multiTimetable={displayedMultiTimetable}
-        colors={filledColors}
-        roomID={roomID}
-        header={
-          <>
-            <TimetableHeader
-              semester={semester}
-              readOnly={readOnly}
-              roomID={roomID}
-            />
-          </>
-        }
-        readOnly={readOnly}
-      />
     </main>
   );
 };

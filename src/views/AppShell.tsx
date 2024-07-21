@@ -1,4 +1,5 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useContext, useEffect, useState } from "react";
+import { AuthUser } from "types/accounts";
 
 import { Helmet } from "react-helmet";
 import { Link, NavLink, useHistory, useLocation } from "react-router-dom";
@@ -33,8 +34,19 @@ import KeyboardShortcuts from "./components/KeyboardShortcuts";
 
 import styles from "./AppShell.scss";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, List } from "react-feather";
-import { Home } from "lucide-react";
+import { ChevronDown, ChevronsDown } from "lucide-react";
+
+import { AuthContext } from "./account/AuthContext";
+import { getUser, logoutUser } from "utils/graphql";
+import { apolloClient } from "./timetable/TimetableContent";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 /**
  * Fetch module list on mount.
@@ -108,7 +120,7 @@ function useFetchModuleListAndTimetableModules(): {
   };
 }
 
-const AppShell: FC = ({ children }) => {
+const AppShell = ({ children }: { children: React.ReactNode }) => {
   const { moduleListError, refetchModuleListAndTimetableModules } =
     useFetchModuleListAndTimetableModules();
 
@@ -129,56 +141,88 @@ const AppShell: FC = ({ children }) => {
     );
   }
 
+  const [user, setUser] = useState<AuthUser>(undefined);
+
+  useEffect(() => {
+    getUser(apolloClient).then((user) => setUser(user));
+  }, []);
+
+  const handleLogout = async () => {
+    await logoutUser(apolloClient);
+    setUser(undefined);
+  };
+
   return (
-    <div className="app-container">
-      <Helmet>
-        <body
-          className={classnames(`theme-${theme}`, {
-            "mode-dark": isDarkMode,
-            "mdc-theme--dark": isDarkMode,
-            "mobile-safari": isIOS,
-          })}
-        />
-      </Helmet>
+    <AuthContext.Provider value={{ user, setUser }}>
+      <div className="overflow-hidden grid grid-rows-[auto_minmax(0,_1fr)] h-[100vh]">
+        <Helmet>
+          <body
+            className={classnames(`theme-${theme}`, {
+              "mode-dark": isDarkMode,
+              "mdc-theme--dark": isDarkMode,
+              "mobile-safari": isIOS,
+            })}
+          />
+        </Helmet>
 
-      <nav className={styles.navbar}>
-        <NavLink className={styles.brand} to="#" title="Home">
-          Where are my friends?
-        </NavLink>
+        <nav className={styles.navbar}>
+          <NavLink className={styles.brand} to="#" title="Home">
+            Where are my friends?
+          </NavLink>
 
-        <div className={styles.navRight}>
-          <Link to="/rooms">
-            <Button variant="link" className="!py-0 !px-2">
-              Rooms
-            </Button>
-          </Link>
-        </div>
-      </nav>
+          <div className={styles.navRight}>
+            <Link to="/rooms">
+              <Button variant="link">Rooms</Button>
+            </Link>
+            {user ? (
+              <>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="btn text-black underline-offset-4 hover:bg-gray-200">
+                    {user.username} <ChevronDown />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="link">Login</Button>
+                </Link>
+              </>
+            )}
+          </div>
+        </nav>
 
-      <div className="main-container">
-        {/* <Navtabs /> */}
+        <>
+          {isModuleListReady ? (
+            <ErrorBoundary errorPage={() => <ErrorPage showReportDialog />}>
+              {children}
+            </ErrorBoundary>
+          ) : (
+            <LoadingSpinner />
+          )}
+        </>
 
-        {isModuleListReady ? (
-          <ErrorBoundary errorPage={() => <ErrorPage showReportDialog />}>
-            {children}
-          </ErrorBoundary>
-        ) : (
-          <LoadingSpinner />
-        )}
+        <ErrorBoundary>
+          <FeedbackModal />
+        </ErrorBoundary>
+
+        <ErrorBoundary>
+          <Notification />
+        </ErrorBoundary>
+
+        <ErrorBoundary>
+          <KeyboardShortcuts />
+        </ErrorBoundary>
       </div>
-
-      <ErrorBoundary>
-        <FeedbackModal />
-      </ErrorBoundary>
-
-      <ErrorBoundary>
-        <Notification />
-      </ErrorBoundary>
-
-      <ErrorBoundary>
-        <KeyboardShortcuts />
-      </ErrorBoundary>
-    </div>
+    </AuthContext.Provider>
   );
 };
 

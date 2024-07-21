@@ -32,28 +32,20 @@ const defaultAppState = (): AppState => ({
   isFeedbackModalOpen: false,
   promptRefresh: forceRefreshPrompt(),
   notifications: [],
-  timetableGeneratorConfig: {
-    prefDaysEnabled: false,
-    maxDistEnabled: false,
-    breaksEnabled: false,
-    prefDays: [],
-    maxDist: -1,
-    breaks: [{ minDuration: -1, timeslots: [{ start: -1, end: -1 }] }],
-  },
 });
 
 // This reducer is for storing state pertaining to the UI.
 function app(state: AppState = defaultAppState(), action: Actions): AppState {
   switch (action.type) {
     case SWITCH_USER: {
-      const { userID, roomID } = action.payload;
+      const { user, roomID } = action.payload;
       return {
         ...state,
         activeUserMapping: {
           ...state.activeUserMapping,
           [roomID]: {
             ...state.activeUserMapping[roomID],
-            userID,
+            user,
           },
         },
       };
@@ -150,13 +142,6 @@ function app(state: AppState = defaultAppState(), action: Actions): AppState {
       return {
         ...state,
         notifications: state.notifications.slice(1),
-      };
-
-    case UPDATE_TIMETABLE_GEN_CONF:
-      const { config } = action.payload;
-      return {
-        ...state,
-        timetableGeneratorConfig: config,
       };
 
     default:

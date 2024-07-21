@@ -1,7 +1,7 @@
 import * as React from "react";
 import classnames from "classnames";
-import { connect, useDispatch } from "react-redux";
-import _, { get, keys } from "lodash";
+import { connect } from "react-redux";
+import _ from "lodash";
 
 import {
   ColorMapping,
@@ -11,25 +11,15 @@ import {
   NotificationOptions,
   MultiUserFocusModulesMap,
 } from "types/reducers";
-import {
-  Module,
-  ModuleCode,
-  LessonType,
-  Semester,
-  ClassNo,
-  UserID,
-} from "types/modules";
+import { Module, ModuleCode, Semester, UserID } from "types/modules";
 import {
   ColoredLesson,
   Lesson,
   EditingType,
   ModifiableLesson,
-  SemTimetableConfig,
-  SemTimetableConfigWithLessons,
   SemTimetableMultiConfig,
   TimetableArrangement,
   TimetableMultiConfig,
-  LessonChange,
   MultiUserTimetableConfig,
   MultiUserSemTimetableConfigWithLessons,
   TimetableGeneratorConfig,
@@ -47,7 +37,6 @@ import {
   addModuleRT,
 } from "actions/timetables";
 import {
-  areLessonsSameClass,
   isLessonSelected,
   formatExamDate,
   getExamDate,
@@ -61,13 +50,11 @@ import {
   getSemesterModules,
   hydrateSemTimetableWithMultiLessons,
   lessonsForLessonType,
-  randomModuleLessonConfig,
   timetableLessonsArray,
 } from "utils/timetables";
 import { resetScrollPosition } from "utils/react";
 import ModulesSelectContainer from "views/timetable/ModulesSelectContainer";
 import Title from "views/components/Title";
-import ErrorBoundary from "views/errors/ErrorBoundary";
 import { State as StoreState } from "types/state";
 import { TombstoneModule } from "types/views";
 import Timetable from "./Timetable";
@@ -76,85 +63,22 @@ import TimetableModulesTable from "./TimetableModulesTable";
 import ModulesTableFooter from "./ModulesTableFooter";
 import styles from "./TimetableContent.scss";
 
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  gql,
-  FetchResult,
-} from "@apollo/client";
+import { ApolloClient, InMemoryCache, HttpLink, split } from "@apollo/client";
 
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
 import { openNotification } from "actions/app";
-import { fetchModule } from "actions/moduleBank";
-import type { Dispatch, GetState } from "types/redux";
-import { Action } from "actions/constants";
 import { getOptimisedTimetable } from "solver";
 import venues from "data/venues";
 import ExamCalendar from "./ExamCalendar";
-
-export const CREATE_LESSON = gql`
-  mutation CreateLesson(
-    $roomID: String!
-    $userID: Int!
-    $semester: Int!
-    $moduleCode: String!
-    $lessonType: String!
-    $classNo: String!
-  ) {
-    createLesson(
-      roomID: $roomID
-      userID: $userID
-      semester: $semester
-      moduleCode: $moduleCode
-      lessonType: $lessonType
-      classNo: $classNo
-    )
-  }
-`;
-
-export const DELETE_LESSON = gql`
-  mutation DeleteLesson(
-    $roomID: String!
-    $userID: Int!
-    $semester: Int!
-    $moduleCode: String!
-    $lessonType: String!
-    $classNo: String!
-  ) {
-    deleteLesson(
-      roomID: $roomID
-      userID: $userID
-      semester: $semester
-      moduleCode: $moduleCode
-      lessonType: $lessonType
-      classNo: $classNo
-    )
-  }
-`;
-
-export const DELETE_MODULE = gql`
-  mutation DeleteModule(
-    $roomID: String!
-    $userID: Int!
-    $semester: Int!
-    $moduleCode: String!
-  ) {
-    deleteModule(
-      roomID: $roomID
-      userID: $userID
-      semester: $semester
-      moduleCode: $moduleCode
-    )
-  }
-`;
-
-export const RESET_TIMETABLE_MUTATION = gql`
-  mutation ResetTimetable($roomID: String!, $userID: Int!, $semester: Int!) {
-    resetTimetable(roomID: $roomID, userID: $userID, semester: $semester)
-  }
-`;
+import { getMainDefinition } from "@apollo/client/utilities";
+import {
+  createLesson,
+  deleteLesson,
+  deleteModule,
+  resetTimetable as resetTimetableGraphQL,
+} from "utils/graphql";
+import { RoomContext } from "./RoomContext";
 
 let url = "";
 let wsURL = "";
@@ -173,9 +97,30 @@ const wsLink = new GraphQLWsLink(
   }),
 );
 
-export const apolloClient = new ApolloClient({
+const httpLink = new HttpLink({
   uri: url,
-  link: wsLink,
+  credentials: "include",
+});
+
+// The split function takes three parameters:
+//
+// * A function that's called for each operation to execute
+// * The Link to use for an operation if the function returns a "truthy" value
+// * The Link to use for an operation if the function returns a "falsy" value
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === "OperationDefinition" &&
+      definition.operation === "subscription"
+    );
+  },
+  wsLink,
+  httpLink,
+);
+
+export const apolloClient = new ApolloClient({
+  link: splitLink,
   cache: new InMemoryCache(),
 });
 
@@ -191,7 +136,7 @@ type OwnProps = {
   semester: Semester;
   multiTimetable: SemTimetableMultiConfig;
   colors: ColorMapping;
-  roomID: String;
+  roomID: string | undefined;
   userID: UserID;
 };
 
@@ -213,7 +158,7 @@ type Props = OwnProps & {
     userID: UserID,
     semester: Semester,
     moduleCode: ModuleCode,
-    roomID: String,
+    roomID: string | undefined,
   ) => void;
   resetTimetable: (userID: UserID, semester: Semester) => void;
   modifyLesson: (lesson: Lesson) => void;
@@ -385,22 +330,27 @@ class TimetableContent extends React.Component<Props, State> {
           },
         );
       } else {
-        const MUTATION = lesson.isAvailable ? CREATE_LESSON : DELETE_LESSON;
-        apolloClient
-          .mutate({
-            mutation: MUTATION,
-            variables: {
-              roomID: roomID, // TODO: Use variable roomID and name
-              userID: userID,
-              semester: semester,
-              moduleCode: moduleCode,
-              lessonType: lessonType,
-              classNo: classNo,
-            },
-          })
-          .catch((err) => {
-            console.error("CREATE/DELETE_LESSON error: ", err);
-          });
+        if (lesson.isAvailable) {
+          createLesson(
+            apolloClient,
+            roomID,
+            userID,
+            semester,
+            moduleCode,
+            lessonType,
+            classNo,
+          );
+        } else {
+          deleteLesson(
+            apolloClient,
+            roomID,
+            userID,
+            semester,
+            moduleCode,
+            lessonType,
+            classNo,
+          );
+        }
       }
     } else {
       // Enter edit mode for the module and lesson type
@@ -437,20 +387,13 @@ class TimetableContent extends React.Component<Props, State> {
         moduleCode
       ];
 
-    try {
-      apolloClient.mutate({
-        mutation: DELETE_MODULE,
-        variables: {
-          roomID: this.props.roomID,
-          userID: this.props.userID,
-          semester: this.props.semester,
-          moduleCode: moduleCode,
-        },
-      });
-    } catch (err) {
-      console.error("DELETE_MODULE error: ", err);
-      return;
-    }
+    deleteModule(
+      apolloClient,
+      this.props.roomID,
+      this.props.userID,
+      this.props.semester,
+      moduleCode,
+    );
 
     this.setState({
       tombstone: {
@@ -462,18 +405,12 @@ class TimetableContent extends React.Component<Props, State> {
     });
   };
   resetTimetable = () => {
-    apolloClient
-      .mutate({
-        mutation: RESET_TIMETABLE_MUTATION,
-        variables: {
-          roomID: this.props.roomID,
-          userID: this.props.userID,
-          semester: this.props.semester,
-        },
-      })
-      .catch((err) => {
-        console.error("RESET_TIMETABLE error: ", err);
-      });
+    resetTimetableGraphQL(
+      apolloClient,
+      this.props.roomID,
+      this.props.userID,
+      this.props.semester,
+    );
   };
 
   resetTombstone = () => this.setState({ tombstone: null });
@@ -486,21 +423,15 @@ class TimetableContent extends React.Component<Props, State> {
     Object.entries(lessons).forEach(([lessonType, classes]) => {
       classes.forEach((classNo) => {
         // Restore the shit
-        apolloClient
-          .mutate({
-            mutation: CREATE_LESSON,
-            variables: {
-              roomID: this.props.roomID,
-              userID: this.props.userID,
-              semester: this.props.semester,
-              moduleCode,
-              lessonType,
-              classNo,
-            },
-          })
-          .catch((err) => {
-            console.error("CREATE_LESSON error: ", err);
-          });
+        createLesson(
+          apolloClient,
+          this.props.roomID,
+          this.props.userID,
+          this.props.semester,
+          moduleCode,
+          lessonType,
+          classNo,
+        );
       });
     });
   };
@@ -670,13 +601,42 @@ class TimetableContent extends React.Component<Props, State> {
 
     if (multiTimetableLessons[targetTimetableIdx]) {
       // if (false) {
+      const {
+        prefDaysEnabled,
+        maxDistEnabled,
+        breaksEnabled,
+        prefDays,
+        maxDist,
+        minDuration,
+        breaks,
+      } = timetableGeneratorConfig;
+
       optimisedTimetables = getOptimisedTimetable(
         multiTimetableLessons,
         targetTimetableIdx,
         {
           maxSols: 1,
           venueInfo: transformVenues(venues),
-          ...timetableGeneratorConfig,
+          maxDist: maxDistEnabled ? parseFloat(maxDist) : -1,
+          prefDays: prefDaysEnabled
+            ? prefDays.split(",").map((day) => {
+                day = day.trim();
+                return parseInt(day);
+              })
+            : [],
+          breaks: [
+            {
+              minDuration: breaksEnabled ? parseInt(minDuration) : -1,
+              timeslots: breaksEnabled
+                ? breaks.map((b) => {
+                    return {
+                      start: parseInt(b.start.split(":").join("")),
+                      end: parseInt(b.end.split(":").join("")),
+                    };
+                  })
+                : [],
+            },
+          ],
         },
       ) as Lesson[][];
 
@@ -751,145 +711,154 @@ class TimetableContent extends React.Component<Props, State> {
     const addedModules = this.addedModules();
 
     return (
-      <div
-        className={classnames("page-container", styles.container, {
-          verticalMode: isVerticalOrientation,
-        })}
-        onClick={this.cancelEditLesson}
-        onKeyUp={(e) => e.key === "Escape" && this.cancelEditLesson()} // Quit modifying when Esc is pressed
+      <RoomContext.Provider
+        value={{
+          roomID: this.props.roomID,
+          userID: this.props.userID,
+          readOnly: this.props.readOnly,
+        }}
       >
-        <Title>Timetable</Title>
+        <div
+          className={classnames("page-container", styles.container, {
+            verticalMode: isVerticalOrientation,
+          })}
+          onClick={this.cancelEditLesson}
+          onKeyUp={(e) => e.key === "Escape" && this.cancelEditLesson()} // Quit modifying when Esc is pressed
+        >
+          <Title>Timetable</Title>
 
-        <div>{this.props.header}</div>
+          <div>{this.props.header}</div>
 
-        <div className="row">
-          <div
-            className={classnames({
-              "col-md-12": !isVerticalOrientation,
-              "col-md-8": isVerticalOrientation,
-            })}
-          >
-            {(missingLessons[0] || []).length > 0 && (
-              <div className="alert alert-danger">
-                Warning! These lessons are unallocated
-                <ul style={{ marginBottom: 0 }}>
-                  {missingLessons[0].map((lesson) => (
-                    <li key={lesson}>{lesson}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {showExamCalendar ? (
-              <ExamCalendar
-                semester={semester}
-                modules={addedModules.map((module) => ({
-                  ...module,
-                  focused: false,
-                  colorIndex: this.props.colors[module.moduleCode],
-                  hiddenInTimetable: this.isHiddenInTimetable(
-                    module.moduleCode,
-                  ),
-                }))}
-              />
-            ) : (
-              <>
-                <div className={styles.timetableWrapper}>
-                  <h1 className="header">Recommended Timetable</h1>
-                  <Timetable
-                    lessons={arrangedOptimisedLessons}
-                    isVerticalOrientation={isVerticalOrientation}
-                    isScrolledHorizontally={this.state.isScrolledHorizontally}
-                    showTitle={isShowingTitle}
-                    onModifyCell={() => {}}
-                  />
+          <div className="row">
+            <div
+              className={classnames({
+                "col-md-12": !isVerticalOrientation,
+                "col-md-8": isVerticalOrientation,
+              })}
+            >
+              {(missingLessons[0] || []).length > 0 && (
+                <div className="alert alert-danger">
+                  Warning! These lessons are unallocated
+                  <ul style={{ marginBottom: 0 }}>
+                    {missingLessons[0].map((lesson) => (
+                      <li key={lesson}>{lesson}</li>
+                    ))}
+                  </ul>
                 </div>
-                <div
-                  className={styles.timetableWrapper}
-                  onScroll={this.onScroll}
-                  ref={this.timetableRef}
-                >
-                  <h1 className="header">
-                    Indicate your preferences (Note: You can select multiple
-                    timeslots)
-                  </h1>
-                  <Timetable
-                    lessons={arrangedLessonsWithModifiableFlag}
-                    isVerticalOrientation={isVerticalOrientation}
-                    isScrolledHorizontally={this.state.isScrolledHorizontally}
-                    showTitle={isShowingTitle}
-                    onModifyCell={this.modifyCell}
-                  />
-                </div>
-              </>
-            )}
-          </div>
-          <div
-            className={classnames({
-              "col-md-12": !isVerticalOrientation,
-              "col-md-4": isVerticalOrientation,
-            })}
-          >
-            <div className="row">
-              <div className="col-12 no-export">
-                <TimetableActions
-                  isVerticalOrientation={isVerticalOrientation}
-                  showTitle={isShowingTitle}
+              )}
+
+              {showExamCalendar ? (
+                <ExamCalendar
                   semester={semester}
-                  multiTimetable={
-                    this.props.multiUserLessons[userID]?.[semester]
-                  }
-                  showExamCalendar={showExamCalendar}
-                  resetTimetable={this.resetTimetable}
-                  toggleExamCalendar={() =>
-                    this.setState({ showExamCalendar: !showExamCalendar })
-                  }
-                  hiddenModules={hiddenInTimetable}
+                  modules={addedModules.map((module) => ({
+                    ...module,
+                    focused: false,
+                    colorIndex: this.props.colors[module.moduleCode],
+                    hiddenInTimetable: this.isHiddenInTimetable(
+                      module.moduleCode,
+                    ),
+                  }))}
                 />
-                <button
-                  hidden={process.env.NODE_ENV !== "development"}
-                  className="TimetableActions-titleBtn btn-outline-primary btn btn-svg"
-                  onClick={() => {
-                    navigator.clipboard.writeText(
-                      JSON.stringify(multiTimetableLessons, null, 4),
-                    );
-                  }}
-                >
-                  Copy as JSON
-                </button>
-              </div>
-
-              {/* Searchbox */}
-              <div className={styles.modulesSelect}>
-                {!readOnly && (
-                  <ModulesSelectContainer
+              ) : (
+                <>
+                  <div className={styles.timetableWrapper}>
+                    <h1 className="header">Recommended Timetable</h1>
+                    <Timetable
+                      lessons={arrangedOptimisedLessons}
+                      isVerticalOrientation={isVerticalOrientation}
+                      isScrolledHorizontally={this.state.isScrolledHorizontally}
+                      showTitle={isShowingTitle}
+                      onModifyCell={() => {}}
+                    />
+                  </div>
+                  <div
+                    className={styles.timetableWrapper}
+                    onScroll={this.onScroll}
+                    ref={this.timetableRef}
+                  >
+                    <h1 className="header">
+                      Indicate your preferences (Note: You can select multiple
+                      timeslots)
+                    </h1>
+                    <Timetable
+                      lessons={arrangedLessonsWithModifiableFlag}
+                      isVerticalOrientation={isVerticalOrientation}
+                      isScrolledHorizontally={this.state.isScrolledHorizontally}
+                      showTitle={isShowingTitle}
+                      onModifyCell={this.modifyCell}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+            <div
+              className={classnames({
+                "col-md-12": !isVerticalOrientation,
+                "col-md-4": isVerticalOrientation,
+              })}
+            >
+              <div className="row">
+                <div className="col-12 no-export">
+                  <TimetableActions
+                    isVerticalOrientation={isVerticalOrientation}
+                    showTitle={isShowingTitle}
                     semester={semester}
                     multiTimetable={
-                      this.props.multiUserLessons[userID]?.[semester] || {}
+                      this.props.multiUserLessons[userID]?.[semester]
                     }
-                    addModule={this.addModuleRT}
-                    removeModuleRT={this.removeModuleRT}
+                    showExamCalendar={showExamCalendar}
+                    resetTimetable={this.resetTimetable}
+                    toggleExamCalendar={() =>
+                      this.setState({ showExamCalendar: !showExamCalendar })
+                    }
+                    hiddenModules={hiddenInTimetable}
+                    readOnly={readOnly}
                   />
-                )}
-              </div>
+                  <button
+                    hidden={process.env.NODE_ENV !== "development"}
+                    className="TimetableActions-titleBtn btn-outline-primary btn btn-svg"
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        JSON.stringify(multiTimetableLessons, null, 4),
+                      );
+                    }}
+                  >
+                    Copy as JSON
+                  </button>
+                </div>
 
-              <div className="col-12">
-                {this.renderModuleSections(
-                  addedModules,
-                  !isVerticalOrientation,
-                )}
-              </div>
-              <div className="col-12">
-                <ModulesTableFooter
-                  modules={addedModules}
-                  semester={semester}
-                  hiddenInTimetable={hiddenInTimetable}
-                />
+                {/* Searchbox */}
+                <div className={styles.modulesSelect}>
+                  {!readOnly && (
+                    <ModulesSelectContainer
+                      semester={semester}
+                      multiTimetable={
+                        this.props.multiUserLessons[userID]?.[semester] || {}
+                      }
+                      addModule={this.addModuleRT}
+                      removeModuleRT={this.removeModuleRT}
+                    />
+                  )}
+                </div>
+
+                <div className="col-12">
+                  {this.renderModuleSections(
+                    addedModules,
+                    !isVerticalOrientation,
+                  )}
+                </div>
+                <div className="col-12">
+                  <ModulesTableFooter
+                    modules={addedModules}
+                    semester={semester}
+                    hiddenInTimetable={hiddenInTimetable}
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </RoomContext.Provider>
     );
   }
 }
@@ -917,20 +886,8 @@ function mapStateToProps(state: StoreState, ownProps: OwnProps) {
   const hiddenInTimetable =
     state.timetables.multiUserHidden?.[userID]?.[hiddenModulesKey] || [];
 
-  const timetableGeneratorConfig: TimetableGeneratorConfig = {
-    prefDaysEnabled: state.app.timetableGeneratorConfig.prefDaysEnabled,
-    maxDistEnabled: state.app.timetableGeneratorConfig.maxDistEnabled,
-    breaksEnabled: state.app.timetableGeneratorConfig.breaksEnabled,
-    prefDays: state.app.timetableGeneratorConfig.prefDaysEnabled
-      ? state.app.timetableGeneratorConfig.prefDays
-      : [],
-    maxDist: state.app.timetableGeneratorConfig.maxDistEnabled
-      ? state.app.timetableGeneratorConfig.maxDist
-      : -1,
-    breaks: state.app.timetableGeneratorConfig.breaksEnabled
-      ? state.app.timetableGeneratorConfig.breaks
-      : [],
-  };
+  const timetableGeneratorConfig = state.timetables.timetableGeneratorConfig;
+
   return {
     semester,
     multiUserTimetableWithLessons,
