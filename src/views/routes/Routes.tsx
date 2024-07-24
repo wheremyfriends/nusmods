@@ -6,6 +6,7 @@ import RecentRooms from "views/rooms/RecentRooms";
 import NotFoundPage from "views/errors/NotFoundPage";
 import { MyTimetable } from "views/timetable/MyTimetable";
 import { Login } from "views/account/Login";
+import { Landing } from "views/Landing";
 
 // IMPORTANT: Remember to update any route changes on the sitemap
 const Routes: React.FC = () => (
@@ -13,7 +14,8 @@ const Routes: React.FC = () => (
     <Route path="/rooms" component={RecentRooms} />
     <Route path="/me" component={MyTimetable} />
     <Route path="/login" component={Login} />
-    <Route path="/:roomID?" component={TimetableContainer} />
+    <Route path="/:roomID" component={TimetableContainer} />
+    <Route path="/" component={Landing} />
 
     {/* 404 page */}
     <Route component={NotFoundPage} />
