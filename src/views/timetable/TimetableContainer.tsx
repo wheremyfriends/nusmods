@@ -262,11 +262,6 @@ export const TimetableContainerComponent: FC = () => {
 
   // Early returns must be placed last
 
-  // Redirect to auto generated roomID
-  if (!roomID) {
-    return <Redirect to={pageWithRoomID(generateRoomID())} />;
-  }
-
   // 2. If we are importing a timetable, check that all imported modules are
   //    loaded first, and display a spinner if they're not.
   // if (isLoading) {
