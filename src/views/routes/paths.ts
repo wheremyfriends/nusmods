@@ -31,7 +31,7 @@ export function pageWithRoomID(roomID: String): string {
 
 // Semester -> Timetable path
 export function timetablePage(semester: Semester): string {
-  return `/`;
+  return `/timetable/${fromSemester[semester]}`;
 }
 
 export const TIMETABLE_SHARE = "share";
@@ -84,4 +84,8 @@ export function venuePage(venue?: Venue | null | undefined): string {
 // Creates an absolute URL from a relative path
 export function absolutePath(path: string): string {
   return `${window.location.protocol}//${window.location.host}${path}`;
+}
+
+export function exportPath(path: string): string {
+  return `${config.baseUrl}${path}`;
 }

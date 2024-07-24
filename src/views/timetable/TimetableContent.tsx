@@ -800,6 +800,7 @@ class TimetableContent extends React.Component<Props, State> {
               <div className="row">
                 <div className="col-12 no-export">
                   <TimetableActions
+                    optimisedLessons={arrangedOptimisedLessons}
                     isVerticalOrientation={isVerticalOrientation}
                     showTitle={isShowingTitle}
                     semester={semester}
