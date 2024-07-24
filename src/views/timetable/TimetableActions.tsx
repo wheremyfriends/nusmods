@@ -31,15 +31,17 @@ import TimetableGeneratorConfigModal from "views/components/TimetableGenConfModa
 
 function toSemTimetableConfig(timetableArrangement: TimetableArrangement) {
   const timetable: SemTimetableConfig = {};
-  Object.values(timetableArrangement).flat(2).forEach(lesson => {
-    const { moduleCode, lessonType, classNo } = lesson;
-    (timetable[moduleCode] ??= {})[lessonType] = classNo;
-  });
+  Object.values(timetableArrangement)
+    .flat(2)
+    .forEach((lesson) => {
+      const { moduleCode, lessonType, classNo } = lesson;
+      (timetable[moduleCode] ??= {})[lessonType] = classNo;
+    });
   return timetable;
 }
 
 type Props = {
-  optimisedLessons: TimetableArrangement
+  optimisedLessons: TimetableArrangement;
   readOnly: boolean;
   semester: Semester;
   multiTimetable: SemTimetableMultiConfig;
@@ -134,7 +136,11 @@ const TimetableActions: React.FC<Props> = (props) => {
         >
           <a
             type="button"
-            href={shareUrl(props.semester, toSemTimetableConfig(props.optimisedLessons), props.hiddenModules)}
+            href={shareUrl(
+              props.semester,
+              toSemTimetableConfig(props.optimisedLessons),
+              props.hiddenModules,
+            )}
             target="_blank"
             className={classnames("btn-outline-primary btn btn-svg")}
           >
