@@ -166,7 +166,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
         </Helmet>
 
         <nav className={styles.navbar}>
-          <NavLink className={styles.brand} to="#" title="Home">
+          <NavLink className={styles.brand} to="" title="Home">
             Where are my friends?
           </NavLink>
 
