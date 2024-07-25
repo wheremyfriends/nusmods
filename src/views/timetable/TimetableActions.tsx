@@ -3,6 +3,7 @@ import classnames from "classnames";
 import { connect } from "react-redux";
 
 import {
+  Upload,
   Calendar,
   Grid,
   Settings,
@@ -16,18 +17,31 @@ import { ModuleCode, Semester } from "types/modules";
 import {
   SemTimetableConfig,
   SemTimetableMultiConfig,
+  TimetableArrangement,
   TimetableGeneratorConfig,
 } from "types/timetables";
 
 import elements from "views/elements";
 import config from "config";
 import ResetTimetable from "./ResetTimetable";
-import ShareTimetable from "./ShareTimetable";
+import ShareTimetable, { shareUrl } from "./ShareTimetable";
 
 import styles from "./TimetableActions.scss";
 import TimetableGeneratorConfigModal from "views/components/TimetableGenConfModal";
 
+function toSemTimetableConfig(timetableArrangement: TimetableArrangement) {
+  const timetable: SemTimetableConfig = {};
+  Object.values(timetableArrangement)
+    .flat(2)
+    .forEach((lesson) => {
+      const { moduleCode, lessonType, classNo } = lesson;
+      (timetable[moduleCode] ??= {})[lessonType] = classNo;
+    });
+  return timetable;
+}
+
 type Props = {
+  optimisedLessons: TimetableArrangement;
   readOnly: boolean;
   semester: Semester;
   multiTimetable: SemTimetableMultiConfig;
@@ -130,6 +144,19 @@ const TimetableActions: React.FC<Props> = (props) => {
             <Tool className={styles.titleIcon} />
             Configuration
           </button>
+          <a
+            type="button"
+            href={shareUrl(
+              props.semester,
+              toSemTimetableConfig(props.optimisedLessons),
+              props.hiddenModules,
+            )}
+            target="_blank"
+            className={classnames("btn-outline-primary btn btn-svg")}
+          >
+            <Upload className={styles.titleIcon} />
+            Export
+          </a>
           {!props.readOnly && (
             <ResetTimetable resetTimetable={props.resetTimetable} />
           )}

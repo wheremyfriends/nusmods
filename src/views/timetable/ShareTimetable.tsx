@@ -10,7 +10,7 @@ import type { ModuleCode, Semester } from "types/modules";
 
 import config from "config";
 import { enableShortUrl } from "featureFlags";
-import { absolutePath, timetableShare } from "views/routes/paths";
+import { absolutePath, exportPath, timetableShare } from "views/routes/paths";
 import Modal from "views/components/Modal";
 import CloseButton from "views/components/CloseButton";
 import LoadingSpinner from "views/components/LoadingSpinner";
@@ -35,12 +35,12 @@ type State = {
   shortUrl: string | null;
 };
 
-function shareUrl(
+export function shareUrl(
   semester: Semester,
   timetable: SemTimetableConfig,
   hiddenModules: ModuleCode[],
 ): string {
-  return absolutePath(timetableShare(semester, timetable, hiddenModules));
+  return exportPath(timetableShare(semester, timetable, hiddenModules));
 }
 
 // So that I don't keep typing 'shortUrl' instead
