@@ -134,6 +134,16 @@ const TimetableActions: React.FC<Props> = (props) => {
           role="group"
           aria-label="Timetable exporting"
         >
+          <button
+            type="button"
+            className={classnames("btn-outline-primary btn btn-svg")}
+            onClick={() => {
+              setIsConfigOpen(true);
+            }}
+          >
+            <Tool className={styles.titleIcon} />
+            Configuration
+          </button>
           <a
             type="button"
             href={shareUrl(
@@ -147,16 +157,6 @@ const TimetableActions: React.FC<Props> = (props) => {
             <Upload className={styles.titleIcon} />
             Export
           </a>
-          <button
-            type="button"
-            className={classnames("btn-outline-primary btn btn-svg")}
-            onClick={() => {
-              setIsConfigOpen(true);
-            }}
-          >
-            <Tool className={styles.titleIcon} />
-            Configuration
-          </button>
           {!props.readOnly && (
             <ResetTimetable resetTimetable={props.resetTimetable} />
           )}
