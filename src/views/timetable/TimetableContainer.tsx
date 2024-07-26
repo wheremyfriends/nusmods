@@ -269,9 +269,11 @@ export const TimetableContainerComponent: FC = () => {
   // }
 
   return (
-    <main className="grid grid-cols-[auto_minmax(0,_1fr)]">
-      <Navtabs roomID={roomID} />
-      <div className="overflow-auto pt-3">
+    <main className="pt-3">
+      <aside className="md:fixed md:left-0 md:w-[10rem] md:h-[80vh] lg:w-[15rem]">
+        <Navtabs roomID={roomID} />
+      </aside>
+      <div className="md:pl-[10rem] lg:pl-[15rem]">
         <TimetableContent
           key={semester}
           semester={semester}

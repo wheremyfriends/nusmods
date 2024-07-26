@@ -47,6 +47,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 /**
  * Fetch module list on mount.
@@ -154,7 +155,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>
-      <div className="overflow-hidden grid grid-rows-[auto_minmax(0,_1fr)] h-[100vh]">
+      <div>
         <Helmet>
           <body
             className={classnames(`theme-${theme}`, {
@@ -165,7 +166,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
           />
         </Helmet>
 
-        <nav className={styles.navbar}>
+        <nav className={cn("sticky top-0 z-[100000]", styles.navbar)}>
           <NavLink className={styles.brand} to="" title="Home">
             Where are my friends?
           </NavLink>
