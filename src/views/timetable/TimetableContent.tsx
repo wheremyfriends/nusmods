@@ -8,7 +8,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
+} from "@/components/ui/accordion";
 
 import {
   ColorMapping,
@@ -768,7 +768,10 @@ class TimetableContent extends React.Component<Props, State> {
                 />
               ) : (
                 <>
-                  <Accordion type="multiple" defaultValue={["item-1", "item-2"]}>
+                  <Accordion
+                    type="multiple"
+                    defaultValue={["item-1", "item-2"]}
+                  >
                     <AccordionItem value="item-1">
                       <AccordionTrigger>
                         <h1 className="header">Recommended Timetable</h1>
@@ -778,9 +781,11 @@ class TimetableContent extends React.Component<Props, State> {
                           <Timetable
                             lessons={arrangedOptimisedLessons}
                             isVerticalOrientation={isVerticalOrientation}
-                            isScrolledHorizontally={this.state.isScrolledHorizontally}
+                            isScrolledHorizontally={
+                              this.state.isScrolledHorizontally
+                            }
                             showTitle={isShowingTitle}
-                            onModifyCell={() => { }}
+                            onModifyCell={() => {}}
                           />
                         </div>
                       </AccordionContent>
@@ -788,8 +793,8 @@ class TimetableContent extends React.Component<Props, State> {
                     <AccordionItem value="item-2">
                       <AccordionTrigger>
                         <h1 className="header">
-                          Indicate your preferences (Note: You can select multiple
-                          timeslots)
+                          Indicate your preferences (Note: You can select
+                          multiple timeslots)
                         </h1>
                       </AccordionTrigger>
                       <AccordionContent>
@@ -801,7 +806,9 @@ class TimetableContent extends React.Component<Props, State> {
                           <Timetable
                             lessons={arrangedLessonsWithModifiableFlag}
                             isVerticalOrientation={isVerticalOrientation}
-                            isScrolledHorizontally={this.state.isScrolledHorizontally}
+                            isScrolledHorizontally={
+                              this.state.isScrolledHorizontally
+                            }
                             showTitle={isShowingTitle}
                             onModifyCell={this.modifyCell}
                           />
