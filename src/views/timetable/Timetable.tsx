@@ -91,7 +91,13 @@ class Timetable extends React.PureComponent<Props, State> {
 
     return (
       <div>
-        <div className={classnames(styles.container, elements.timetable)}>
+        <div
+          className={classnames(
+            "overflow-hidden",
+            styles.container,
+            elements.timetable,
+          )}
+        >
           <TimetableTimings
             startingIndex={startingIndex}
             endingIndex={endingIndex}
