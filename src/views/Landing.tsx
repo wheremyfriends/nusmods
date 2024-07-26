@@ -4,6 +4,7 @@
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleTrigger,
@@ -15,22 +16,19 @@ export function Landing() {
   return (
     <div className="overflow-auto">
       <div className="flex flex-col min-h-dvh">
-        <header className="bg-primary text-primary-foreground py-8 md:py-12 lg:py-16">
+        <header className="bg-muted text-primary py-8 md:py-12 lg:py-16">
           <div className="container px-4 md:px-6">
             <div className="max-w-3xl mx-auto text-center space-y-4">
               <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
                 Plan Your Timetables with Friends in Real-Time
               </h1>
-              <p className="text-primary-foreground md:text-xl">
+              <p className="text-muted-foreground md:text-xl">
                 Easily coordinate lecture, tutorial, and lab slots with your
                 friends in real-time.
               </p>
               <div className="flex justify-center gap-2">
-                <Link
-                  to="/create"
-                  className="inline-flex h-10 items-center justify-center rounded-md bg-primary-foreground px-6 text-sm font-medium text-primary shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                >
-                  Get Started
+                <Link to="/create">
+                  <Button>Get Started</Button>
                 </Link>
               </div>
             </div>
@@ -45,12 +43,11 @@ export function Landing() {
                     Key Features
                   </div>
                   <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                    Streamline Your Travel Planning
+                    Streamline Your Planning
                   </h2>
                   <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                     Our real-time timetable planner app helps you and your
-                    friends easily coordinate schedules, share locations, and
-                    make plans together.
+                    friends easily coordinate schedules and make plans together.
                   </p>
                 </div>
               </div>
@@ -65,13 +62,14 @@ export function Landing() {
                 <div className="grid gap-1">
                   <h3 className="text-lg font-bold">Group Planning</h3>
                   <p className="text-sm text-muted-foreground">
-                    Collaborate with your friends to plan activities, trips, and
-                    events.
+                    Collaborate with your friends to plan classes{" "}
                   </p>
                 </div>
                 <div className="grid gap-1">
                   <h3 className="text-lg font-bold">Automated Planning</h3>
-                  <p className="text-sm text-muted-foreground"></p>
+                  <p className="text-sm text-muted-foreground">
+                    Algorithm to search for the best timetable arrangements.
+                  </p>
                 </div>
               </div>
             </div>
@@ -96,13 +94,13 @@ export function Landing() {
                 <div className="grid gap-4">
                   <div className="flex items-center gap-4">
                     <Avatar className="w-12 h-12 border">
-                      <AvatarImage src="/placeholder-user.jpg" />
+                      {/* <AvatarImage src="/placeholder-user.jpg" /> */}
                       <AvatarFallback>JL</AvatarFallback>
                     </Avatar>
                     <div className="grid">
                       <div className="font-semibold">Joshua Lee</div>
                       <div className="text-sm text-muted-foreground">
-                        NUS InfoSec '25
+                        NUS InfoSec, Class of 2025
                       </div>
                     </div>
                   </div>
@@ -120,63 +118,6 @@ export function Landing() {
                     timetables on Telegram and having to hunt them down through
                     the Semester. Only thing now is I have to find friends to
                     use this with 🤡."
-                  </p>
-                </div>
-                <div className="grid gap-4">
-                  <div className="flex items-center gap-4">
-                    <Avatar className="w-12 h-12 border">
-                      <AvatarImage src="/placeholder-user.jpg" />
-                      <AvatarFallback>SA</AvatarFallback>
-                    </Avatar>
-                    <div className="grid">
-                      <div className="font-semibold">Sarah Anderson</div>
-                      <div className="text-sm text-muted-foreground">
-                        New York, NY
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs font-semibold">
-                    <div className="flex items-center gap-px">
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                    </div>
-                  </div>
-                  <p>
-                    "I love how this app keeps me connected with my friends,
-                    even when we're in different places. The group planning
-                    feature makes it so easy to coordinate our schedules and
-                    make plans together."
-                  </p>
-                </div>
-                <div className="grid gap-4">
-                  <div className="flex items-center gap-4">
-                    <Avatar className="w-12 h-12 border">
-                      <AvatarImage src="/placeholder-user.jpg" />
-                      <AvatarFallback>MR</AvatarFallback>
-                    </Avatar>
-                    <div className="grid">
-                      <div className="font-semibold">Michael Rodriguez</div>
-                      <div className="text-sm text-muted-foreground">
-                        Chicago, IL
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs font-semibold">
-                    <div className="flex items-center gap-px">
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                    </div>
-                  </div>
-                  <p>
-                    "This app has made planning trips with my friends so much
-                    easier. The location sharing and notifications features help
-                    us stay on top of our plans and never miss a meetup."
                   </p>
                 </div>
               </div>
@@ -230,11 +171,7 @@ export function Landing() {
             &copy; 2024 Timetable Planner. All rights reserved.
           </p>
           <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-            <Link
-              href="#"
-              className="text-xs hover:underline underline-offset"
-              prefetch={false}
-            />
+            <Link to="#" className="text-xs hover:underline underline-offset" />
           </nav>
         </footer>
       </div>
