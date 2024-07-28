@@ -84,7 +84,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon } from "lucide-react";
 
 let url = "";
 let wsURL = "";
@@ -772,13 +772,12 @@ class TimetableContent extends React.Component<Props, State> {
                       className="flex items-center
                         justify-between px-3 py-4 gap-1 rounded-md transition-colors
                         hover:bg-muted/50 focus-visible:outline-none
-                        focus-visible:ring-1 focus-visible:ring-ring
-                        [&[data-state=open]>svg]:rotate-180"
+                        [&[data-state=open]>svg]:rotate-90"
                     >
-                      <ChevronDownIcon className="w-5 h-5 transition-transform" />
+                      <ChevronRightIcon className="w-5 h-5 transition-transform" />
                       <h1 className="header">Recommended Timetable</h1>
                     </CollapsibleTrigger>
-                    <CollapsibleContent>
+                    <CollapsibleContent className="[&[data-state=open]]:animate-slide-down [&[data-state=closed]]:animate-slide-up">
                       <div className={styles.timetableWrapper}>
                         <Timetable
                           lessons={arrangedOptimisedLessons}
@@ -797,17 +796,16 @@ class TimetableContent extends React.Component<Props, State> {
                       className="flex items-center
                           justify-between px-3 py-4 gap-1 mt-[1rem] rounded-md
                           transition-colors hover:bg-muted/50
-                          focus-visible:outline-none focus-visible:ring-1
-                          focus-visible:ring-ring
-                          [&[data-state=open]>svg]:rotate-180"
+                          focus-visible:outline-none
+                          [&[data-state=open]>svg]:rotate-90"
                     >
-                      <ChevronDownIcon className="w-5 h-5 transition-transform" />
+                      <ChevronRightIcon className="w-5 h-5 transition-transform" />
                       <h1 className="header">
                         Indicate your preferences (Note: You can select multiple
                         timeslots)
                       </h1>
                     </CollapsibleTrigger>
-                    <CollapsibleContent>
+                    <CollapsibleContent className="[&[data-state=open]]:animate-slide-down [&[data-state=closed]]:animate-slide-up">
                       <div
                         className={styles.timetableWrapper}
                         onScroll={this.onScroll}
