@@ -12,6 +12,7 @@
   transition: color 0.15s;
   display: block;
   padding: 0.5rem;
+  flex-direction: column;
 
   &.linkActive {
     color: theme-color(primary);
@@ -23,15 +24,20 @@
 
   @include media-breakpoint-up(md) {
     display: flex;
-    min-width: 0;
     align-items: center;
+    min-width: 0;
     padding: 0.8rem 2rem;
+  }
+
+  @include media-breakpoint-up(lg) {
     gap: 0.5rem;
+    flex-direction: row;
   }
 }
 
 .title {
   display: block;
+  max-width: 100%;
 }
 
 .hiddenOnMobile {

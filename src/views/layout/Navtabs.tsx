@@ -218,28 +218,28 @@ const Navtabs: FC<{
           </MenuItem>,
         ]}
       </ContextMenu>
-      <nav className="flex flex-col justify-start min-h-0 max-w-[15rem] pt-3">
+      <nav className={cn("flex flex-col justify-start h-full")}>
         {authUser &&
           (users.map((u) => u.userID).includes(authUser.userID) ? (
-            <a
-              className={styles.link}
-              aria-label="Join"
+            <Button
+              className="mx-[2rem]"
+              variant="danger"
               onClick={async () => {
                 await deleteUser(apolloClient, roomID, authUser.userID);
               }}
             >
-              <Button variant="danger">Leave Room</Button>
-            </a>
+              Leave
+            </Button>
           ) : (
-            <a
-              className={styles.link}
-              aria-label="Join"
+            <Button
+              className="mx-[2rem]"
+              variant="success"
               onClick={async () => {
                 await joinRoom(apolloClient, roomID);
               }}
             >
-              <Button variant="success">Join Room</Button>
-            </a>
+              Join
+            </Button>
           ))}
         <div className="overflow-auto">{navUsers}</div>
         <div className={styles.divider} />
