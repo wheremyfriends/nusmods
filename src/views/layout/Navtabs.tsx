@@ -222,7 +222,7 @@ const Navtabs: FC<{
         {authUser &&
           (users.map((u) => u.userID).includes(authUser.userID) ? (
             <Button
-              className="mx-[2rem]"
+              className="mx-[2rem] my-3"
               variant="danger"
               onClick={async () => {
                 await deleteUser(apolloClient, roomID, authUser.userID);
@@ -232,7 +232,7 @@ const Navtabs: FC<{
             </Button>
           ) : (
             <Button
-              className="mx-[2rem]"
+              className="mx-[2rem] my-3"
               variant="success"
               onClick={async () => {
                 await joinRoom(apolloClient, roomID);
