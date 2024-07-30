@@ -165,20 +165,24 @@ export const TimetableContainerComponent: FC = () => {
   const colors = useSelector(getSemesterTimetableColors)(semester);
   const getModule = useSelector(getModuleCondensed);
   const modules = useSelector(({ moduleBank }: State) => moduleBank.modules);
-  const activeSemester = useSelector(({ app }: State) => app.activeSemester);
-  const location = useLocation();
 
   const dispatch = useDispatch();
 
+  const [users, setUsers] = useState<number[]>([]);
   // Resubscribe if roomID changes
   useEffect(() => {
     // Clear the state first                                                                                                               ║
     dispatch(resetAllTimetables());
-    const sub = subscribeToLessonChanges(
-      apolloClient,
-      roomID,
-      handleLessonChange,
-    );
+    const sub = subscribeToLessonChanges(apolloClient, roomID, (inp) => {
+      handleLessonChange(inp);
+
+      setUsers((usersCur) => {
+        if (usersCur.includes(inp.userID)) {
+          return usersCur;
+        }
+        return [...usersCur, inp.userID];
+      });
+    });
 
     return () => {
       sub.unsubscribe();
@@ -186,18 +190,14 @@ export const TimetableContainerComponent: FC = () => {
   }, [roomID]);
 
   useEffect(() => {
-    if (!authUser) {
-      return;
-    }
-
-    if (authUser.userID !== userID) {
+    if (!userID) {
       return;
     }
 
     let userIDs = new Set<number>(); // UserID of extra users
 
     // Subscribe to additional rooms, other than the original one
-    const subscriptions = getRooms(apolloClient).then((rooms) => {
+    const subscriptions = getRooms(apolloClient, userID).then((rooms) => {
       if (!rooms) return;
       return rooms
         .filter((room) => roomID !== room)
@@ -206,7 +206,7 @@ export const TimetableContainerComponent: FC = () => {
             apolloClient,
             roomID,
             (lessonChange) => {
-              if (lessonChange.userID === authUser?.userID) {
+              if (users.includes(lessonChange.userID)) {
                 return;
               }
 
@@ -218,13 +218,13 @@ export const TimetableContainerComponent: FC = () => {
             apolloClient,
             roomID,
             (userChange) => {
-              const { action, userID } = userChange;
+              const { action, userID: changeUserID } = userChange;
 
               switch (action) {
                 case Action.DELETE_USER: {
-                  if (authUser?.userID === userID) return;
+                  if (users.includes(changeUserID)) return;
 
-                  dispatch(deleteTimetableUser(userID));
+                  dispatch(deleteTimetableUser(changeUserID));
                   return;
                 }
               }
@@ -241,7 +241,7 @@ export const TimetableContainerComponent: FC = () => {
         dispatch(deleteTimetableUser(id));
       });
     };
-  }, [roomID, userID]);
+  }, [roomID, userID, users]);
 
   // Not needed as modules are fetched on demand
   const isLoading = useMemo(() => {
