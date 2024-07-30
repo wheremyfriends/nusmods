@@ -175,16 +175,20 @@ export async function logoutUser(
 
 export async function getRooms(
   apolloClient: ApolloClient<NormalizedCacheObject>,
+  userID: number | undefined = undefined,
 ) {
   const query = gql`
-    query GetRooms {
-      getRooms
+    query GetRooms($userID: Int) {
+      getRooms(userID: $userID)
     }
   `;
 
   try {
     const res = await apolloClient.mutate({
       mutation: query,
+      variables: {
+        userID,
+      },
     });
 
     return res.data.getRooms as string[];
