@@ -79,6 +79,12 @@ import {
   resetTimetable as resetTimetableGraphQL,
 } from "utils/graphql";
 import { RoomContext } from "./RoomContext";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon } from "lucide-react";
 
 let url = "";
 let wsURL = "";
@@ -761,38 +767,67 @@ class TimetableContent extends React.Component<Props, State> {
                 />
               ) : (
                 <>
-                  <div className={styles.timetableWrapper}>
-                    <h1 className="header">Recommended Timetable</h1>
-                    <Timetable
-                      lessons={arrangedOptimisedLessons}
-                      isVerticalOrientation={isVerticalOrientation}
-                      isScrolledHorizontally={this.state.isScrolledHorizontally}
-                      showTitle={isShowingTitle}
-                      onModifyCell={() => {}}
-                    />
-                  </div>
-                  <div
-                    className={styles.timetableWrapper}
-                    onScroll={this.onScroll}
-                    ref={this.timetableRef}
-                  >
-                    <h1 className="header">
-                      Indicate your preferences (Note: You can select multiple
-                      timeslots)
-                    </h1>
-                    <Timetable
-                      lessons={arrangedLessonsWithModifiableFlag}
-                      isVerticalOrientation={isVerticalOrientation}
-                      isScrolledHorizontally={this.state.isScrolledHorizontally}
-                      showTitle={isShowingTitle}
-                      onModifyCell={this.modifyCell}
-                    />
-                  </div>
+                  <Collapsible defaultOpen={true}>
+                    <CollapsibleTrigger
+                      className="flex items-center
+                        justify-between px-3 py-4 gap-1 rounded-md transition-colors
+                        hover:bg-muted/50 focus-visible:outline-none
+                        [&[data-state=open]>svg]:rotate-90"
+                    >
+                      <ChevronRightIcon className="w-5 h-5 transition-transform" />
+                      <h1 className="header">Recommended Timetable</h1>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="[&[data-state=open]]:animate-slide-down [&[data-state=closed]]:animate-slide-up">
+                      <div className={styles.timetableWrapper}>
+                        <Timetable
+                          lessons={arrangedOptimisedLessons}
+                          isVerticalOrientation={isVerticalOrientation}
+                          isScrolledHorizontally={
+                            this.state.isScrolledHorizontally
+                          }
+                          showTitle={isShowingTitle}
+                          onModifyCell={() => {}}
+                        />
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                  <Collapsible defaultOpen={true}>
+                    <CollapsibleTrigger
+                      className="flex items-center
+                          justify-between px-3 py-4 gap-1 mt-[1rem] rounded-md
+                          transition-colors hover:bg-muted/50
+                          focus-visible:outline-none
+                          [&[data-state=open]>svg]:rotate-90"
+                    >
+                      <ChevronRightIcon className="w-5 h-5 transition-transform" />
+                      <h1 className="header">
+                        Indicate your preferences (Note: You can select multiple
+                        timeslots)
+                      </h1>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="[&[data-state=open]]:animate-slide-down [&[data-state=closed]]:animate-slide-up">
+                      <div
+                        className={styles.timetableWrapper}
+                        onScroll={this.onScroll}
+                        ref={this.timetableRef}
+                      >
+                        <Timetable
+                          lessons={arrangedLessonsWithModifiableFlag}
+                          isVerticalOrientation={isVerticalOrientation}
+                          isScrolledHorizontally={
+                            this.state.isScrolledHorizontally
+                          }
+                          showTitle={isShowingTitle}
+                          onModifyCell={this.modifyCell}
+                        />
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
                 </>
               )}
             </div>
             <div
-              className={classnames({
+              className={classnames("mt-[1rem]", {
                 "col-md-12": !isVerticalOrientation,
                 "col-md-4": isVerticalOrientation,
               })}

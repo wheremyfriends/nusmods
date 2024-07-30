@@ -8,7 +8,6 @@
 
 .timetableWrapper {
   composes: scrollable from global;
-  margin-bottom: 1rem;
   // Disable horizontal overscroll only to prevent navigating to previous page
   overscroll-behavior-x: none;
 
