@@ -31,8 +31,11 @@ import config from "config";
 import styles from "./TimetableModulesTable.scss";
 import ModuleTombstone from "./ModuleTombstone";
 import { moduleOrders } from "./ModulesTableFooter";
+import { apolloClient } from "./TimetableContent";
+import { setColor } from "utils/graphql";
 
 export type Props = {
+  roomID: roomID;
   userID: UserID;
   semester: Semester;
   readOnly: boolean;
@@ -151,8 +154,15 @@ export const TimetableModulesTableComponent: React.FC<Props> = (props) => {
   };
 
   const renderModule = (module: ModuleWithColor) => {
-    const { semester, readOnly, tombstone, resetTombstone, undoTombstone } =
-      props;
+    const {
+      roomID,
+      userID,
+      semester,
+      readOnly,
+      tombstone,
+      resetTombstone,
+      undoTombstone,
+    } = props;
 
     if (tombstone && tombstone.moduleCode === module.moduleCode) {
       return (
@@ -182,7 +192,15 @@ export const TimetableModulesTableComponent: React.FC<Props> = (props) => {
             color={module.colorIndex}
             isHidden={module.hiddenInTimetable}
             onChooseColor={(colorIndex: ColorIndex) => {
-              props.selectModuleColor(semester, module.moduleCode, colorIndex);
+              setColor(
+                apolloClient,
+                roomID,
+                userID,
+                semester,
+                module.moduleCode,
+                colorIndex,
+              );
+              // props.selectModuleColor(semester, module.moduleCode, colorIndex);
             }}
           />
         </div>

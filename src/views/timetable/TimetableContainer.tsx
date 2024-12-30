@@ -31,11 +31,12 @@ import {
   resetAllTimetables,
   resetTimetable,
   selectLesson,
+  selectModuleColor,
 } from "actions/timetables";
 import { openNotification } from "actions/app";
 import { undo } from "actions/undoHistory";
 import { getModuleCondensed } from "selectors/moduleBank";
-import { fillColorMapping } from "utils/colors";
+import { colorLessonsByKey, fillColorMapping } from "utils/colors";
 import {
   generateRoomID,
   semesterForTimetablePage,
@@ -73,8 +74,15 @@ export function handleLessonChange(lessonChange: LessonChange) {
   // TODO: Check if request is intended for correct user via name
   const state = store.getState();
   const dispatch = store.dispatch;
-  const { action, userID, semester, moduleCode, lessonType, classNo } =
-    lessonChange;
+  const {
+    action,
+    userID,
+    semester,
+    moduleCode,
+    lessonType,
+    classNo,
+    colorIndex,
+  } = lessonChange;
 
   switch (action) {
     case Action.CREATE_LESSON: {
@@ -86,6 +94,7 @@ export function handleLessonChange(lessonChange: LessonChange) {
         )
       ) {
         dispatch(addModule(userID, semester, moduleCode)); // TODO: define typed dispatch
+        dispatch(selectModuleColor(semester, moduleCode, colorIndex));
       }
 
       dispatch(selectLesson(userID, semester, moduleCode, lessonType, classNo));
@@ -106,6 +115,13 @@ export function handleLessonChange(lessonChange: LessonChange) {
       dispatch(resetTimetable(userID, semester));
       return;
     }
+    case Action.SET_COLOR: {
+      // Presence of moduleCode should guarantee module is being/already added
+      // Prevents multiple adding
+      dispatch(selectModuleColor(semester, moduleCode, colorIndex));
+      return;
+    }
+
     default:
       return;
   }

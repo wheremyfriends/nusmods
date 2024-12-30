@@ -483,6 +483,7 @@ class TimetableContent extends React.Component<Props, State> {
     tombstone: TombstoneModule | null = null,
   ) => (
     <TimetableModulesTable
+      roomID={this.props.roomID}
       userID={this.props.userID}
       modules={modules.map(this.toModuleWithColor)}
       horizontalOrientation={horizontalOrientation}

@@ -113,6 +113,7 @@ export type LessonChange = {
   readonly moduleCode: ModuleCode;
   readonly lessonType: LessonType;
   readonly classNo: ClassNo;
+  readonly colorIndex: ColorIndex;
 };
 
 export type RoomUser = {
