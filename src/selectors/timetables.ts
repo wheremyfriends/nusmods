@@ -32,7 +32,7 @@ export const getSemesterTimetableMultiLessons = createSelector(
   (multiUserLessons) => (userID: UserID, semester: Semester | null) =>
     semester === null
       ? EMPTY_OBJECT
-      : multiUserLessons?.[userID]?.[semester] ?? EMPTY_OBJECT,
+      : (multiUserLessons?.[userID]?.[semester] ?? EMPTY_OBJECT),
 );
 
 /**
@@ -43,7 +43,7 @@ export const getSemesterTimetableMultiColors = createSelector(
   (colors) => (userID: UserID, semester: Semester | null) =>
     semester === null
       ? EMPTY_OBJECT
-      : colors?.[userID]?.[semester] ?? EMPTY_OBJECT,
+      : (colors?.[userID]?.[semester] ?? EMPTY_OBJECT),
 );
 /**
  * Extract semester timetable colors for a specific semester.
@@ -51,5 +51,5 @@ export const getSemesterTimetableMultiColors = createSelector(
 export const getSemesterTimetableColors = createSelector(
   ({ timetables }: State) => timetables.colors,
   (colors) => (semester: Semester | null) =>
-    semester === null ? EMPTY_OBJECT : colors[semester] ?? EMPTY_OBJECT,
+    semester === null ? EMPTY_OBJECT : (colors[semester] ?? EMPTY_OBJECT),
 );
