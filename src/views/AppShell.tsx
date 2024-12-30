@@ -1,16 +1,14 @@
-import { FC, useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AuthUser } from "types/accounts";
 
 import { Helmet } from "react-helmet";
-import { Link, NavLink, useHistory, useLocation } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useDispatch, useSelector, useStore } from "react-redux";
 import classnames from "classnames";
-import { each } from "lodash";
 import { DARK_MODE } from "types/settings";
 import type { Semester } from "types/modules";
 import type { SemTimetableConfig } from "types/timetables";
 
-import weekText from "utils/weekText";
 import { captureException } from "utils/error";
 import { openNotification } from "actions/app";
 import { fetchModuleList as fetchModuleListAction } from "actions/moduleBank";
@@ -18,13 +16,11 @@ import {
   fetchTimetableModules as fetchTimetableModulesAction,
   validateTimetable,
 } from "actions/timetables";
-import Navtabs from "views/layout/Navtabs";
 import Notification from "views/components/notfications/Notification";
 import ErrorBoundary from "views/errors/ErrorBoundary";
 import ErrorPage from "views/errors/ErrorPage";
 import ApiError from "views/errors/ApiError";
 import { isIOS } from "bootstrapping/browser";
-import Logo from "img/nusmods-logo.svg";
 import type { Dispatch } from "types/redux";
 import type { State } from "types/state";
 import type { Actions } from "types/actions";
@@ -34,7 +30,7 @@ import KeyboardShortcuts from "./components/KeyboardShortcuts";
 
 import styles from "./AppShell.scss";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronsDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 import { AuthContext } from "./account/AuthContext";
 import { apolloClient, getUser, logoutUser } from "utils/graphql";
@@ -42,8 +38,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
