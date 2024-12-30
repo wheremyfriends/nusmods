@@ -129,11 +129,13 @@ export type HiddenModulesMap = { [semester: string]: ModuleCode[] };
 export type FocusModulesMap = { [semester: string]: ModuleCode | undefined };
 export type MultiUserHiddenModulesMap = { [userID: UserID]: HiddenModulesMap };
 export type MultiUserFocusModulesMap = { [userID: UserID]: FocusModulesMap };
+export type MultiUserSemesterColorMap = { [userID: UserID]: SemesterColorMap };
 
 export type TimetablesState = {
   readonly multiUserLessons: MultiUserTimetableConfig;
   readonly multiUserFocus: MultiUserFocusModulesMap;
   readonly editingType: EditingType | null;
+  readonly multiUserColors: MultiUserSemesterColorMap;
   readonly colors: SemesterColorMap;
   readonly multiUserHidden: MultiUserHiddenModulesMap;
   readonly academicYear: string;

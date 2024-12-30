@@ -45,11 +45,11 @@ export type Props = {
   tombstone: TombstoneModule | null; // Placeholder for a deleted module
 
   // Actions
-  selectModuleColor: (
-    semester: Semester,
-    moduleCode: ModuleCode,
-    colorIndex: ColorIndex,
-  ) => void;
+  // selectModuleColor: (
+  //   semester: Semester,
+  //   moduleCode: ModuleCode,
+  //   colorIndex: ColorIndex,
+  // ) => void;
   hideLessonInTimetable: (
     userID: UserID,
     semester: Semester,
@@ -264,7 +264,7 @@ export default connect(
     moduleTableOrder: state.settings.moduleTableOrder,
   }),
   {
-    selectModuleColor,
+    // selectModuleColor,
     hideLessonInTimetable,
     showLessonInTimetable,
     focusLessonInTimetable,

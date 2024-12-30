@@ -398,6 +398,7 @@ export function setHiddenImported(hiddenModules: ModuleCode[]) {
 
 export const SELECT_MODULE_COLOR = "SELECT_MODULE_COLOR" as const;
 export function selectModuleColor(
+  userID: UserID,
   semester: Semester,
   moduleCode: ModuleCode,
   colorIndex: ColorIndex,
@@ -405,6 +406,7 @@ export function selectModuleColor(
   return {
     type: SELECT_MODULE_COLOR,
     payload: {
+      userID,
       semester,
       moduleCode,
       colorIndex,

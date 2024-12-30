@@ -20,6 +20,7 @@ import Navtabs from "views/layout/Navtabs";
 import { selectSemester } from "actions/settings";
 import {
   getSemesterTimetableColors,
+  getSemesterTimetableMultiColors,
   getSemesterTimetableMultiLessons,
 } from "selectors/timetables";
 import {
@@ -94,7 +95,8 @@ export function handleLessonChange(lessonChange: LessonChange) {
         )
       ) {
         dispatch(addModule(userID, semester, moduleCode)); // TODO: define typed dispatch
-        dispatch(selectModuleColor(semester, moduleCode, colorIndex));
+
+        dispatch(selectModuleColor(userID, semester, moduleCode, colorIndex));
       }
 
       dispatch(selectLesson(userID, semester, moduleCode, lessonType, classNo));
@@ -118,7 +120,7 @@ export function handleLessonChange(lessonChange: LessonChange) {
     case Action.SET_COLOR: {
       // Presence of moduleCode should guarantee module is being/already added
       // Prevents multiple adding
-      dispatch(selectModuleColor(semester, moduleCode, colorIndex));
+      dispatch(selectModuleColor(userID, semester, moduleCode, colorIndex));
       return;
     }
 
@@ -175,6 +177,10 @@ export const TimetableContainerComponent: FC = () => {
   const isAuth = activeUser?.isAuth ?? false;
 
   const multiTimetable = useSelector(getSemesterTimetableMultiLessons)(
+    userID,
+    semester,
+  );
+  const multiColors = useSelector(getSemesterTimetableMultiColors)(
     userID,
     semester,
   );
@@ -269,8 +275,8 @@ export const TimetableContainerComponent: FC = () => {
 
   const displayedMultiTimetable = multiTimetable;
   const filledColors = useMemo(
-    () => fillColorMapping(displayedMultiTimetable, colors),
-    [colors, displayedMultiTimetable],
+    () => fillColorMapping(displayedMultiTimetable, multiColors),
+    [multiColors, displayedMultiTimetable],
   );
   const readOnly = false;
 
