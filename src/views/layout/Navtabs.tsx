@@ -1,9 +1,14 @@
-import { useEffect, useState, MouseEvent, type FC, useContext } from "react";
+import { useEffect, useState, type FC, useContext } from "react";
 import { useDispatch } from "react-redux";
 import classnames from "classnames";
 import { UserPlus, User, Trash, Edit } from "react-feather";
 
-import ContextMenu from "views/components/ContextMenu";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 
 import styles from "./Navtabs.scss";
 import { apolloClient } from "utils/graphql";
@@ -12,7 +17,6 @@ import { RoomUser } from "types/timetables";
 import { Action } from "actions/constants";
 import { switchUser } from "actions/settings";
 import store from "entry/main";
-import { ListItemIcon, ListItemText, MenuItem } from "@mui/material";
 import RenameUserModal from "views/components/RenameUserModal";
 import DeleteUserModal from "views/components/DeleteUserModal";
 import { deleteTimetableUser } from "actions/timetables";
@@ -34,7 +38,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 export const NAVTAB_HEIGHT = 48;
 
 export const UPDATE_USER = gql`
@@ -72,9 +75,9 @@ const Navtabs: FC<{
   const dispatch = useDispatch();
 
   const [users, setUsers] = useState<{ [key: number]: RoomUser }>([]);
-  const [contextMenuAnchor, setContextMenuAnchor] = useState<
-    HTMLElement | undefined
-  >(undefined);
+  // const [contextMenuAnchor, setContextMenuAnchor] = useState<
+  //   HTMLElement | undefined
+  // >(undefined);
   const [isRenameUserModalOpen, setIsRenameUserModalOpen] =
     useState<boolean>(false);
   const [isDelUserModalOpen, setIsDelUserModalOpen] = useState<boolean>(false);
@@ -130,13 +133,13 @@ const Navtabs: FC<{
     return () => sub.unsubscribe();
   }, [roomID]);
 
-  function handleContextMenu(user: RoomUser) {
-    return (e: MouseEvent<HTMLElement>) => {
-      e.preventDefault();
-      setContextMenuAnchor(e.currentTarget);
-      setCurEditUser(user);
-    };
-  }
+  // function handleContextMenu(user: RoomUser) {
+  //   return (e: MouseEvent<HTMLElement>) => {
+  //     e.preventDefault();
+  //     setContextMenuAnchor(e.currentTarget);
+  //     setCurEditUser(user);
+  //   };
+  // }
 
   function handleRenameUser(newName: string) {
     if (curEditUser !== undefined)
@@ -158,20 +161,48 @@ const Navtabs: FC<{
 
   const navUsers = Object.values(users).map((user) => {
     return (
-      <a
-        key={user.userID}
-        className={
-          getActiveUserID(roomID) === user.userID
-            ? classnames(styles.link, styles.linkActive)
-            : styles.link
-        }
-        onContextMenu={handleContextMenu(user)}
-        onClick={handleSwitchUser(user)}
-      >
-        <User className="shrink-0" />
-        <span className={cn("truncate", styles.title)}>{user.name}</span>
-        {authUser?.userID === user.userID && <span>(You)</span>}
-      </a>
+      <ContextMenu>
+        <ContextMenuTrigger>
+          <a
+            key={user.userID}
+            className={
+              getActiveUserID(roomID) === user.userID
+                ? classnames(styles.link, styles.linkActive)
+                : styles.link
+            }
+            // onContextMenu={handleContextMenu(user)}
+            onClick={handleSwitchUser(user)}
+          >
+            <User className="shrink-0" />
+            <span className={cn("truncate", styles.title)}>{user.name}</span>
+            {authUser?.userID === user.userID && <span>(You)</span>}
+          </a>
+        </ContextMenuTrigger>
+        <ContextMenuContent className="z-[100000]">
+          <ContextMenuItem
+            onClick={() => {
+              setIsRenameUserModalOpen(true);
+              setCurEditUser(user);
+            }}
+          >
+            <div className="flex gap-x-1 items-center">
+              <Edit />
+              Rename
+            </div>
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={() => {
+              setIsDelUserModalOpen(true);
+              setCurEditUser(user);
+            }}
+          >
+            <div className="flex gap-x-1 items-center">
+              <Trash />
+              Delete
+            </div>
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
     );
   });
 
@@ -193,8 +224,7 @@ const Navtabs: FC<{
         }}
         onSubmit={handleDeleteUser}
       />
-
-      <ContextMenu
+      {/*<ContextMenu
         element={contextMenuAnchor}
         onClose={() => setContextMenuAnchor(undefined)}
       >
@@ -225,7 +255,7 @@ const Navtabs: FC<{
             <ListItemText>Remove</ListItemText>
           </MenuItem>,
         ]}
-      </ContextMenu>
+      </ContextMenu> */}
       <nav className={cn("flex flex-col justify-start h-full")}>
         {authUser &&
           (Object.values(users)
@@ -287,15 +317,14 @@ const Navtabs: FC<{
         </div>
         <Select
           onValueChange={(userID) => {
-            // TODO: Make this more efficient
             dispatch(switchUser(users[parseInt(userID)], roomID));
           }}
           value={String(getActiveUserID(roomID))}
         >
           <SelectTrigger className="mx-[2rem] flex md:hidden">
-            <SelectValue placeholder="Placeholder" />
+            <SelectValue className="truncate" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="w-[90vw]">
             <SelectGroup>
               {Object.values(users).map((user) => (
                 <SelectItem key={user.userID} value={String(user.userID)}>
