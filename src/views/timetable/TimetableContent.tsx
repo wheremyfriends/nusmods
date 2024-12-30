@@ -73,6 +73,7 @@ import venues from "data/venues";
 import ExamCalendar from "./ExamCalendar";
 import { getMainDefinition } from "@apollo/client/utilities";
 import {
+  apolloClient,
   createLesson,
   deleteLesson,
   deleteModule,
