@@ -6,8 +6,11 @@ import SwitchWithText from "./SwitchWithText";
 import { TimetableGeneratorConfig } from "types/timetables";
 import { useDispatch, useSelector } from "react-redux";
 import { updateTimetableGenConf } from "actions/timetables";
-import { subscribeToConfigChanges, updateConfig } from "utils/graphql";
-import { apolloClient } from "views/timetable/TimetableContent";
+import {
+  apolloClient,
+  subscribeToConfigChanges,
+  updateConfig,
+} from "utils/graphql";
 import { RoomContext } from "views/timetable/RoomContext";
 import { State } from "types/state";
 

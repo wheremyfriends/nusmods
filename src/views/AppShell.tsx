@@ -37,8 +37,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronsDown } from "lucide-react";
 
 import { AuthContext } from "./account/AuthContext";
-import { getUser, logoutUser } from "utils/graphql";
-import { apolloClient } from "./timetable/TimetableContent";
+import { apolloClient, getUser, logoutUser } from "utils/graphql";
 import {
   DropdownMenu,
   DropdownMenuContent,

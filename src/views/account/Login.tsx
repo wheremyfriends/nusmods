@@ -3,8 +3,7 @@ import React, { useContext } from "react";
 import { useHistory } from "react-router-dom";
 import Input from "views/components/Input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { loginUser, registerUser } from "utils/graphql";
-import { apolloClient } from "views/timetable/TimetableContent";
+import { apolloClient, loginUser, registerUser } from "utils/graphql";
 import { AuthContext } from "./AuthContext";
 import { Alert } from "views/components/Alert";
 

@@ -1,5 +1,6 @@
 import React, { FC } from "react";
-import TimetableContent, { apolloClient } from "./TimetableContent";
+import TimetableContent from "./TimetableContent";
+import { apolloClient } from "utils/graphql";
 import { Semester } from "types/modules";
 import SemesterSwitcher from "views/components/semester-switcher/SemesterSwitcher";
 import { deleteTimetableUser, resetAllTimetables } from "actions/timetables";

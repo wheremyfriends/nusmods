@@ -1,19 +1,17 @@
 import { useEffect, useState, MouseEvent, type FC, useContext } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import classnames from "classnames";
 import { UserPlus, User, Trash, Edit } from "react-feather";
 
-import type { State } from "types/state";
 import ContextMenu from "views/components/ContextMenu";
 
 import styles from "./Navtabs.scss";
-import { apolloClient } from "views/timetable/TimetableContent";
-import { ApolloClient, gql } from "@apollo/client";
-import { RoomUser, UserChange } from "types/timetables";
+import { apolloClient } from "utils/graphql";
+import { gql } from "@apollo/client";
+import { RoomUser } from "types/timetables";
 import { Action } from "actions/constants";
 import { switchUser } from "actions/settings";
 import store from "entry/main";
-import { UserID } from "types/modules";
 import { ListItemIcon, ListItemText, MenuItem } from "@mui/material";
 import RenameUserModal from "views/components/RenameUserModal";
 import DeleteUserModal from "views/components/DeleteUserModal";

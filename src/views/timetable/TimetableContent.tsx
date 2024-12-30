@@ -86,50 +86,6 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon } from "lucide-react";
 
-let url = "";
-let wsURL = "";
-if (process.env.NODE_ENV === "production") {
-  url = `https://${window.location.hostname}/graphql`;
-  wsURL = `wss://${window.location.hostname}/graphql`;
-} else {
-  url = `http://${window.location.hostname}:4000/graphql`;
-  wsURL = `ws://${window.location.hostname}:4000/graphql`;
-}
-
-// TODO: Proper URL variable
-const wsLink = new GraphQLWsLink(
-  createClient({
-    url: wsURL,
-  }),
-);
-
-const httpLink = new HttpLink({
-  uri: url,
-  credentials: "include",
-});
-
-// The split function takes three parameters:
-//
-// * A function that's called for each operation to execute
-// * The Link to use for an operation if the function returns a "truthy" value
-// * The Link to use for an operation if the function returns a "falsy" value
-const splitLink = split(
-  ({ query }) => {
-    const definition = getMainDefinition(query);
-    return (
-      definition.kind === "OperationDefinition" &&
-      definition.operation === "subscription"
-    );
-  },
-  wsLink,
-  httpLink,
-);
-
-export const apolloClient = new ApolloClient({
-  link: splitLink,
-  cache: new InMemoryCache(),
-});
-
 type ModifiedCell = {
   className: string;
   position: ClientRect;
