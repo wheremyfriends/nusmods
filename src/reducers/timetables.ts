@@ -374,6 +374,10 @@ function timetables(
           state.multiUserHidden[userID][semester],
           action,
         );
+
+        if (state.multiUserFocus[userID][semester] == moduleCode) {
+          draft.multiUserFocus[userID][semester] = undefined;
+        }
       });
     }
 
