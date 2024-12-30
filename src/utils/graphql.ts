@@ -2,6 +2,7 @@ import { ApolloClient, NormalizedCacheObject, gql } from "@apollo/client";
 import { AuthUser } from "types/accounts";
 import { ClassNo, LessonType, ModuleCode } from "types/modules";
 import {
+  ColorIndex,
   LessonChange,
   TimetableGeneratorConfig,
   UserChange,
@@ -380,6 +381,49 @@ export async function updateConfig(
   }
 }
 
+export async function setColor(
+  apolloClient: ApolloClient<NormalizedCacheObject>,
+  roomID: string | undefined,
+  userID: number,
+  semester: number,
+  moduleCode: string,
+  colorIndex: ColorIndex,
+) {
+  const query = gql`
+    mutation SetColor(
+      $roomID: String
+      $userID: Int!
+      $semester: Int!
+      $moduleCode: String!
+      $colorIndex: Int!
+    ) {
+      setColor(
+        roomID: $roomID
+        semester: $semester
+        userID: $userID
+        moduleCode: $moduleCode
+        colorIndex: $colorIndex
+      )
+    }
+  `;
+
+  try {
+    await apolloClient.mutate({
+      mutation: query,
+      variables: {
+        roomID,
+        userID,
+        semester,
+        moduleCode,
+        colorIndex,
+      },
+    });
+  } catch (err) {
+    console.error("SET_COLOUR error: ", err.message);
+    alert(err.message);
+  }
+}
+
 export function subscribeToLessonChanges(
   apolloClient: ApolloClient<NormalizedCacheObject>,
   roomID: string,
@@ -394,6 +438,7 @@ export function subscribeToLessonChanges(
         moduleCode
         lessonType
         classNo
+        colorIndex
       }
     }
   `;

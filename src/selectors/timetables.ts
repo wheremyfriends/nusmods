@@ -38,6 +38,16 @@ export const getSemesterTimetableMultiLessons = createSelector(
 /**
  * Extract semester timetable colors for a specific semester.
  */
+export const getSemesterTimetableMultiColors = createSelector(
+  ({ timetables }: State) => timetables.multiUserColors,
+  (colors) => (userID: UserID, semester: Semester | null) =>
+    semester === null
+      ? EMPTY_OBJECT
+      : (colors?.[userID]?.[semester] ?? EMPTY_OBJECT),
+);
+/**
+ * Extract semester timetable colors for a specific semester.
+ */
 export const getSemesterTimetableColors = createSelector(
   ({ timetables }: State) => timetables.colors,
   (colors) => (semester: Semester | null) =>

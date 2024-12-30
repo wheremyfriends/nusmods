@@ -190,6 +190,7 @@ export const defaultTimetableState: TimetablesState = {
   colors: {},
   multiUserHidden: {},
   multiUserFocus: {},
+  multiUserColors: {},
   academicYear: config.academicYear,
   archive: {},
   timetableGeneratorConfig: {
@@ -302,6 +303,7 @@ function timetables(
         draft.colors = {};
         draft.multiUserHidden = {};
         draft.multiUserFocus = {};
+        draft.multiUserColors = {};
       });
     }
 
@@ -310,17 +312,33 @@ function timetables(
 
       return produce(state, (draft) => {
         draft.editingType = null;
-        draft.multiUserLessons[userID] = { [semester]: {} };
+        draft.multiUserLessons[userID][semester] = {};
         // draft.colors[semester] = DEFAULT_SEM_COLOR_MAP; // TODO: Reference count
-        draft.multiUserHidden[userID] = { [semester]: DEFAULT_HIDDEN_STATE };
-        draft.multiUserFocus[userID] = { [semester]: undefined };
+        draft.multiUserHidden[userID][semester] = DEFAULT_HIDDEN_STATE;
+        draft.multiUserFocus[userID][semester] = undefined;
+        draft.multiUserColors[userID][semester] = {};
       });
     }
 
     case ADD_MODULE: {
       const { userID, semester, moduleCode } = action.payload;
       return produce(state, (draft) => {
-        draft.colors[semester] = semColors(state.colors[semester], action);
+        if (draft.multiUserColors[userID]?.[semester] === undefined)
+          state.multiUserColors[userID] = {
+            ...state.multiUserColors[userID],
+            [semester]: {},
+          };
+
+        if (state.multiUserColors[userID]?.[semester] === undefined)
+          state.multiUserColors[userID] = {
+            ...state.multiUserColors[userID],
+            [semester]: {},
+          };
+
+        draft.multiUserColors[userID][semester] = semColors(
+          state.multiUserColors[userID][semester],
+          action,
+        );
 
         if (draft.multiUserHidden[userID]?.[semester] === undefined)
           draft.multiUserHidden[userID] = { [semester]: [] };
@@ -348,18 +366,40 @@ function timetables(
           draft.multiUserLessons[userID][semester],
           moduleCode,
         );
-        draft.colors[semester] = semColors(state.colors[semester], action);
+        draft.multiUserColors[userID][semester] = semColors(
+          state.multiUserColors[userID][semester],
+          action,
+        );
         draft.multiUserHidden[userID][semester] = semHiddenModules(
           state.multiUserHidden[userID][semester],
           action,
         );
+
+        if (state.multiUserFocus[userID][semester] == moduleCode) {
+          draft.multiUserFocus[userID][semester] = undefined;
+        }
       });
     }
 
     case SELECT_MODULE_COLOR: {
-      const { semester, moduleCode } = action.payload;
+      const { userID, semester, moduleCode } = action.payload;
       return produce(state, (draft) => {
-        draft.colors[semester] = semColors(state.colors[semester], action);
+        if (draft.multiUserColors[userID]?.[semester] === undefined)
+          state.multiUserColors[userID] = {
+            ...state.multiUserColors[userID],
+            [semester]: {},
+          };
+
+        if (state.multiUserColors[userID]?.[semester] === undefined)
+          state.multiUserColors[userID] = {
+            ...state.multiUserColors[userID],
+            [semester]: {},
+          };
+
+        draft.multiUserColors[userID][semester] = semColors(
+          state.multiUserColors[userID][semester],
+          action,
+        );
       });
     }
 
