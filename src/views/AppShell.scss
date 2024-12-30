@@ -30,13 +30,6 @@ $logo-vert-padding: 0.875rem;
   padding: $vert-padding $grid-gutter-width * 0.5;
 }
 
-.weekText {
-  padding-left: $grid-gutter-width * 0.5;
-  font-size: $font-size-xs;
-  line-height: 1.15;
-  text-align: right;
-}
-
 @include media-breakpoint-up(xl) {
   .brand {
     // Padding to match navtab left padding
@@ -45,16 +38,5 @@ $logo-vert-padding: 0.875rem;
 
   .navRight {
     padding: $vert-padding $grid-gutter-width * 0.5 $vert-padding 2rem;
-  }
-}
-
-@include media-breakpoint-down(xs) {
-  .navRight {
-    display: none;
-  }
-
-  .brand {
-    flex: 1;
-    padding: $logo-vert-padding 0;
   }
 }
