@@ -68,17 +68,23 @@ export async function createUser(
 ) {
   const CREATE_USER = gql`
     mutation CreateUser($roomID: String!) {
-      createUser(roomID: $roomID)
+      createUser(roomID: $roomID) {
+        name
+        userID
+        roomID
+      }
     }
   `;
 
   try {
-    await apolloClient.mutate({
-      mutation: CREATE_USER,
-      variables: {
-        roomID,
-      },
-    });
+    return (
+      await apolloClient.mutate({
+        mutation: CREATE_USER,
+        variables: {
+          roomID,
+        },
+      })
+    ).data?.createUser;
   } catch (err) {
     console.error("CREATE_USER error: ", err.message);
   }

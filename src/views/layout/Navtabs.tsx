@@ -31,7 +31,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -250,6 +249,7 @@ const Navtabs: FC<{
           ))}
         <Select
           onValueChange={(userID) => {
+            // TODO: Make this more efficient
             let user = users.find(
               (val, _, __) => parseInt(userID) === val.userID,
             );
@@ -257,7 +257,7 @@ const Navtabs: FC<{
               dispatch(switchUser(user, roomID));
             }
           }}
-          defaultValue={String(authUser?.userID)}
+          value={String(getActiveUserID(roomID))}
         >
           <SelectTrigger className="mx-[2rem] flex md:hidden">
             <SelectValue placeholder="Placeholder" />
@@ -265,18 +265,22 @@ const Navtabs: FC<{
           <SelectContent>
             <SelectGroup>
               {users.map((user) => (
-                <SelectItem value={String(user.userID)}>{user.name}</SelectItem>
+                <SelectItem key={user.userID} value={String(user.userID)}>
+                  {user.name +
+                    (user.userID === authUser?.userID ? " (You)" : "")}
+                </SelectItem>
               ))}
             </SelectGroup>
           </SelectContent>
         </Select>
         <div className="overflow-auto hidden md:block">{navUsers}</div>
-        <div className={styles.divider} />
+        <div className={cn(styles.divider, "hidden md:block")} />
         <a
-          className={styles.link}
+          className={cn(styles.link, "hidden md:block")}
           aria-label="New User"
           onClick={async () => {
-            await createUser(apolloClient, roomID);
+            let user = await createUser(apolloClient, roomID);
+            dispatch(switchUser(user, roomID));
           }}
         >
           <UserPlus />

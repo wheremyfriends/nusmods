@@ -10,7 +10,6 @@
   text-align: center;
   color: var(--gray-mid);
   transition: color 0.15s;
-  display: block;
   padding: 0.5rem;
   flex-direction: column;
 
@@ -40,17 +39,16 @@
   max-width: 100%;
 }
 
-.hiddenOnMobile {
-  @include media-breakpoint-down(sm) {
-    display: none;
-  }
-}
+/* .hiddenOnMobile { */
+/*   @include media-breakpoint-down(sm) { */
+/*     display: none; */
+/*   } */
+/* } */
 
 .divider {
   $size: 70%;
   $margin: 0.3rem;
 
-  composes: hiddenOnMobile;
   opacity: 0.6;
   flex: 0 0 1px;
   margin: $margin ((100% - $size) * 0.5) 0;
