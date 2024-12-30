@@ -31,11 +31,10 @@ import config from "config";
 import styles from "./TimetableModulesTable.scss";
 import ModuleTombstone from "./ModuleTombstone";
 import { moduleOrders } from "./ModulesTableFooter";
-import { apolloClient } from "./TimetableContent";
-import { setColor } from "utils/graphql";
+import { apolloClient, setColor } from "utils/graphql";
 
 export type Props = {
-  roomID: roomID;
+  roomID: string;
   userID: UserID;
   semester: Semester;
   readOnly: boolean;

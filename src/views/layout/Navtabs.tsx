@@ -1,20 +1,22 @@
-import { useEffect, useState, MouseEvent, type FC, useContext } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState, type FC, useContext } from "react";
+import { useDispatch } from "react-redux";
 import classnames from "classnames";
 import { UserPlus, User, Trash, Edit } from "react-feather";
 
-import type { State } from "types/state";
-import ContextMenu from "views/components/ContextMenu";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 
 import styles from "./Navtabs.scss";
-import { apolloClient } from "views/timetable/TimetableContent";
-import { ApolloClient, gql } from "@apollo/client";
-import { RoomUser, UserChange } from "types/timetables";
+import { apolloClient } from "utils/graphql";
+import { gql } from "@apollo/client";
+import { RoomUser } from "types/timetables";
 import { Action } from "actions/constants";
 import { switchUser } from "actions/settings";
 import store from "entry/main";
-import { UserID } from "types/modules";
-import { ListItemIcon, ListItemText, MenuItem } from "@mui/material";
 import RenameUserModal from "views/components/RenameUserModal";
 import DeleteUserModal from "views/components/DeleteUserModal";
 import { deleteTimetableUser } from "actions/timetables";
@@ -28,7 +30,14 @@ import {
 import { cn } from "@/lib/utils";
 import { AuthContext } from "views/account/AuthContext";
 import { Button } from "@/components/ui/button";
-
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 export const NAVTAB_HEIGHT = 48;
 
 export const UPDATE_USER = gql`
@@ -65,10 +74,10 @@ const Navtabs: FC<{
 
   const dispatch = useDispatch();
 
-  const [users, setUsers] = useState<RoomUser[]>([]);
-  const [contextMenuAnchor, setContextMenuAnchor] = useState<
-    HTMLElement | undefined
-  >(undefined);
+  const [users, setUsers] = useState<{ [key: number]: RoomUser }>([]);
+  // const [contextMenuAnchor, setContextMenuAnchor] = useState<
+  //   HTMLElement | undefined
+  // >(undefined);
   const [isRenameUserModalOpen, setIsRenameUserModalOpen] =
     useState<boolean>(false);
   const [isDelUserModalOpen, setIsDelUserModalOpen] = useState<boolean>(false);
@@ -84,32 +93,33 @@ const Navtabs: FC<{
 
       switch (action) {
         case Action.CREATE_USER: {
-          setUsers((users) => [...users, curUser]);
+          setUsers((users) => {
+            return { ...users, [curUser.userID]: curUser };
+          });
           if (getActiveUserID(roomID) === -1) {
             dispatch(switchUser(curUser, roomID));
           }
           return;
         }
         case Action.UPDATE_USER: {
-          setUsers((users) =>
-            users.map((user) => {
-              if (user.userID === curUser.userID) return curUser;
-              return user;
-            }),
-          );
+          setUsers((users) => {
+            return { ...users, [curUser.userID]: curUser };
+          });
           return;
         }
         case Action.DELETE_USER: {
           setUsers((users) => {
-            const filteredUsers = users.filter(
-              (user) => user.userID !== curUser.userID,
-            );
+            const { [curUser.userID]: user, ...filteredUsers } = users;
+            // const filteredUsers = users.filter(
+            //   (user) => user.userID !== curUser.userID,
+            // );
+
             // Switch to first user if current active user is deleted
             if (
-              filteredUsers.length > 0 &&
+              Object.keys(filteredUsers).length > 0 &&
               getActiveUserID(roomID) === curUser.userID
             )
-              dispatch(switchUser(filteredUsers[0], roomID));
+              dispatch(switchUser(Object.values(filteredUsers)[0], roomID));
             return filteredUsers;
           });
           dispatch(deleteTimetableUser(curUser.userID));
@@ -123,13 +133,13 @@ const Navtabs: FC<{
     return () => sub.unsubscribe();
   }, [roomID]);
 
-  function handleContextMenu(user: RoomUser) {
-    return (e: MouseEvent<HTMLElement>) => {
-      e.preventDefault();
-      setContextMenuAnchor(e.currentTarget);
-      setCurEditUser(user);
-    };
-  }
+  // function handleContextMenu(user: RoomUser) {
+  //   return (e: MouseEvent<HTMLElement>) => {
+  //     e.preventDefault();
+  //     setContextMenuAnchor(e.currentTarget);
+  //     setCurEditUser(user);
+  //   };
+  // }
 
   function handleRenameUser(newName: string) {
     if (curEditUser !== undefined)
@@ -144,27 +154,55 @@ const Navtabs: FC<{
   }
 
   function handleSwitchUser(user: RoomUser) {
-    return (e: React.MouseEvent<HTMLAnchorElement, globalThis.MouseEvent>) => {
+    return (_: React.MouseEvent<HTMLAnchorElement, globalThis.MouseEvent>) => {
       dispatch(switchUser(user, roomID));
     };
   }
 
-  const navUsers = users.map((user) => {
+  const navUsers = Object.values(users).map((user) => {
     return (
-      <a
-        key={user.userID}
-        className={
-          getActiveUserID(roomID) === user.userID
-            ? classnames(styles.link, styles.linkActive)
-            : styles.link
-        }
-        onContextMenu={handleContextMenu(user)}
-        onClick={handleSwitchUser(user)}
-      >
-        <User className="shrink-0" />
-        <span className={cn("truncate", styles.title)}>{user.name}</span>
-        {authUser?.userID === user.userID && <span>(You)</span>}
-      </a>
+      <ContextMenu>
+        <ContextMenuTrigger>
+          <a
+            key={user.userID}
+            className={
+              getActiveUserID(roomID) === user.userID
+                ? classnames(styles.link, styles.linkActive)
+                : styles.link
+            }
+            // onContextMenu={handleContextMenu(user)}
+            onClick={handleSwitchUser(user)}
+          >
+            <User className="shrink-0" />
+            <span className={cn("truncate", styles.title)}>{user.name}</span>
+            {authUser?.userID === user.userID && <span>(You)</span>}
+          </a>
+        </ContextMenuTrigger>
+        <ContextMenuContent className="z-[100000]">
+          <ContextMenuItem
+            onClick={() => {
+              setIsRenameUserModalOpen(true);
+              setCurEditUser(user);
+            }}
+          >
+            <div className="flex gap-x-1 items-center">
+              <Edit />
+              Rename
+            </div>
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={() => {
+              setIsDelUserModalOpen(true);
+              setCurEditUser(user);
+            }}
+          >
+            <div className="flex gap-x-1 items-center">
+              <Trash />
+              Delete
+            </div>
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
     );
   });
 
@@ -186,7 +224,7 @@ const Navtabs: FC<{
         }}
         onSubmit={handleDeleteUser}
       />
-      <ContextMenu
+      {/*<ContextMenu
         element={contextMenuAnchor}
         onClose={() => setContextMenuAnchor(undefined)}
       >
@@ -204,7 +242,7 @@ const Navtabs: FC<{
             <ListItemText>Rename</ListItemText>
           </MenuItem>,
           <MenuItem
-            disabled={users.length <= 1}
+            disabled={Object.keys(users).length <= 1}
             key="delete"
             onClick={() => {
               setContextMenuAnchor(undefined);
@@ -217,10 +255,12 @@ const Navtabs: FC<{
             <ListItemText>Remove</ListItemText>
           </MenuItem>,
         ]}
-      </ContextMenu>
+      </ContextMenu> */}
       <nav className={cn("flex flex-col justify-start h-full")}>
         {authUser &&
-          (users.map((u) => u.userID).includes(authUser.userID) ? (
+          (Object.values(users)
+            .map((u) => u.userID)
+            .includes(authUser.userID) ? (
             <Button
               className="mx-[2rem] my-3"
               variant="danger"
@@ -241,13 +281,68 @@ const Navtabs: FC<{
               Join
             </Button>
           ))}
-        <div className="overflow-auto">{navUsers}</div>
-        <div className={styles.divider} />
+
+        {/* Mobile View */}
+        <div className="flex gap-x-1 mx-[2rem] mb-2 md:hidden">
+          <Button
+            variant="success"
+            className="flex-1"
+            onClick={async () => {
+              let user = await createUser(apolloClient, roomID);
+              dispatch(switchUser(user, roomID));
+            }}
+          >
+            Add
+          </Button>
+          <Button
+            variant="secondary"
+            className="flex-1"
+            onClick={() => {
+              setIsRenameUserModalOpen(true);
+              setCurEditUser(users[getActiveUserID(roomID)]);
+            }}
+          >
+            Rename
+          </Button>
+          <Button
+            className="flex-1"
+            variant="danger"
+            onClick={() => {
+              setIsDelUserModalOpen(true);
+              setCurEditUser(users[getActiveUserID(roomID)]);
+            }}
+          >
+            Delete
+          </Button>
+        </div>
+        <Select
+          onValueChange={(userID) => {
+            dispatch(switchUser(users[parseInt(userID)], roomID));
+          }}
+          value={String(getActiveUserID(roomID))}
+        >
+          <SelectTrigger className="mx-[2rem] flex md:hidden">
+            <SelectValue className="truncate" />
+          </SelectTrigger>
+          <SelectContent className="w-[90vw]">
+            <SelectGroup>
+              {Object.values(users).map((user) => (
+                <SelectItem key={user.userID} value={String(user.userID)}>
+                  {user.name +
+                    (user.userID === authUser?.userID ? " (You)" : "")}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+        <div className="overflow-auto hidden md:block">{navUsers}</div>
+        <div className={cn(styles.divider, "hidden md:block")} />
         <a
-          className={styles.link}
+          className={cn(styles.link, "hidden md:block")}
           aria-label="New User"
           onClick={async () => {
-            await createUser(apolloClient, roomID);
+            let user = await createUser(apolloClient, roomID);
+            dispatch(switchUser(user, roomID));
           }}
         >
           <UserPlus />

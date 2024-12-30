@@ -27,8 +27,7 @@ import {
   validateTimetableModules,
 } from "utils/timetables";
 import { getModuleTimetable } from "utils/modules";
-import { createLesson } from "utils/graphql";
-import { apolloClient } from "views/timetable/TimetableContent";
+import { apolloClient, createLesson } from "utils/graphql";
 
 // Actions that should not be used directly outside of thunks
 export const SET_TIMETABLE = "SET_TIMETABLE" as const;

@@ -17,7 +17,7 @@ $logo-vert-padding: 0.875rem;
 
 .brand {
   display: flex;
-  padding: $logo-vert-padding $grid-gutter-width;
+  padding-left: 1.5em;
 }
 
 .brandLogo {
@@ -27,7 +27,7 @@ $logo-vert-padding: 0.875rem;
 .navRight {
   display: flex;
   align-items: center;
-  padding: $vert-padding $grid-gutter-width * 0.5;
+  padding-right: 0.5em;
 }
 
 @include media-breakpoint-up(xl) {

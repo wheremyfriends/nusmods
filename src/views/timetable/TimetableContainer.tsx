@@ -49,7 +49,8 @@ import deferComponentRender from "views/hocs/deferComponentRender";
 import SemesterSwitcher from "views/components/semester-switcher/SemesterSwitcher";
 import LoadingSpinner from "views/components/LoadingSpinner";
 import useScrollToTop from "views/hooks/useScrollToTop";
-import TimetableContent, { apolloClient } from "./TimetableContent";
+import TimetableContent from "./TimetableContent";
+import { apolloClient } from "utils/graphql";
 
 import styles from "./TimetableContainer.scss";
 import { ApolloClient, gql } from "@apollo/client";

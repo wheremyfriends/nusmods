@@ -10,8 +10,7 @@ import RemoveRoomModal from "views/components/RemoveRoomModal";
 import { removeRoom } from "actions/app";
 import CreateRoomModal from "views/components/CreateRoomModal";
 import { AuthContext } from "views/account/AuthContext";
-import { deleteUser, getRooms } from "utils/graphql";
-import { apolloClient } from "views/timetable/TimetableContent";
+import { apolloClient, deleteUser, getRooms } from "utils/graphql";
 import LeaveRoomModal from "views/components/LeaveRoomModal";
 
 export default function RecentRooms() {
