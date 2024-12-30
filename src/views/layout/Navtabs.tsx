@@ -71,7 +71,7 @@ const Navtabs: FC<{
 
   const dispatch = useDispatch();
 
-  const [users, setUsers] = useState<RoomUser[]>([]);
+  const [users, setUsers] = useState<{ [key: number]: RoomUser }>([]);
   const [contextMenuAnchor, setContextMenuAnchor] = useState<
     HTMLElement | undefined
   >(undefined);
@@ -90,32 +90,33 @@ const Navtabs: FC<{
 
       switch (action) {
         case Action.CREATE_USER: {
-          setUsers((users) => [...users, curUser]);
+          setUsers((users) => {
+            return { ...users, [curUser.userID]: curUser };
+          });
           if (getActiveUserID(roomID) === -1) {
             dispatch(switchUser(curUser, roomID));
           }
           return;
         }
         case Action.UPDATE_USER: {
-          setUsers((users) =>
-            users.map((user) => {
-              if (user.userID === curUser.userID) return curUser;
-              return user;
-            }),
-          );
+          setUsers((users) => {
+            return { ...users, [curUser.userID]: curUser };
+          });
           return;
         }
         case Action.DELETE_USER: {
           setUsers((users) => {
-            const filteredUsers = users.filter(
-              (user) => user.userID !== curUser.userID,
-            );
+            const { [curUser.userID]: user, ...filteredUsers } = users;
+            // const filteredUsers = users.filter(
+            //   (user) => user.userID !== curUser.userID,
+            // );
+
             // Switch to first user if current active user is deleted
             if (
-              filteredUsers.length > 0 &&
+              Object.keys(filteredUsers).length > 0 &&
               getActiveUserID(roomID) === curUser.userID
             )
-              dispatch(switchUser(filteredUsers[0], roomID));
+              dispatch(switchUser(Object.values(filteredUsers)[0], roomID));
             return filteredUsers;
           });
           dispatch(deleteTimetableUser(curUser.userID));
@@ -155,7 +156,7 @@ const Navtabs: FC<{
     };
   }
 
-  const navUsers = users.map((user) => {
+  const navUsers = Object.values(users).map((user) => {
     return (
       <a
         key={user.userID}
@@ -192,6 +193,7 @@ const Navtabs: FC<{
         }}
         onSubmit={handleDeleteUser}
       />
+
       <ContextMenu
         element={contextMenuAnchor}
         onClose={() => setContextMenuAnchor(undefined)}
@@ -210,7 +212,7 @@ const Navtabs: FC<{
             <ListItemText>Rename</ListItemText>
           </MenuItem>,
           <MenuItem
-            disabled={users.length <= 1}
+            disabled={Object.keys(users).length <= 1}
             key="delete"
             onClick={() => {
               setContextMenuAnchor(undefined);
@@ -226,7 +228,9 @@ const Navtabs: FC<{
       </ContextMenu>
       <nav className={cn("flex flex-col justify-start h-full")}>
         {authUser &&
-          (users.map((u) => u.userID).includes(authUser.userID) ? (
+          (Object.values(users)
+            .map((u) => u.userID)
+            .includes(authUser.userID) ? (
             <Button
               className="mx-[2rem] my-3"
               variant="danger"
@@ -247,15 +251,44 @@ const Navtabs: FC<{
               Join
             </Button>
           ))}
+
+        {/* Mobile View */}
+        <div className="flex gap-x-1 mx-[2rem] mb-2 md:hidden">
+          <Button
+            variant="success"
+            className="flex-1"
+            onClick={async () => {
+              let user = await createUser(apolloClient, roomID);
+              dispatch(switchUser(user, roomID));
+            }}
+          >
+            Add
+          </Button>
+          <Button
+            variant="secondary"
+            className="flex-1"
+            onClick={() => {
+              setIsRenameUserModalOpen(true);
+              setCurEditUser(users[getActiveUserID(roomID)]);
+            }}
+          >
+            Rename
+          </Button>
+          <Button
+            className="flex-1"
+            variant="danger"
+            onClick={() => {
+              setIsDelUserModalOpen(true);
+              setCurEditUser(users[getActiveUserID(roomID)]);
+            }}
+          >
+            Delete
+          </Button>
+        </div>
         <Select
           onValueChange={(userID) => {
             // TODO: Make this more efficient
-            let user = users.find(
-              (val, _, __) => parseInt(userID) === val.userID,
-            );
-            if (user !== undefined) {
-              dispatch(switchUser(user, roomID));
-            }
+            dispatch(switchUser(users[parseInt(userID)], roomID));
           }}
           value={String(getActiveUserID(roomID))}
         >
@@ -264,7 +297,7 @@ const Navtabs: FC<{
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              {users.map((user) => (
+              {Object.values(users).map((user) => (
                 <SelectItem key={user.userID} value={String(user.userID)}>
                   {user.name +
                     (user.userID === authUser?.userID ? " (You)" : "")}
