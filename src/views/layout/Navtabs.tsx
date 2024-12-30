@@ -26,6 +26,15 @@ import {
 import { cn } from "@/lib/utils";
 import { AuthContext } from "views/account/AuthContext";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const NAVTAB_HEIGHT = 48;
 
@@ -142,7 +151,7 @@ const Navtabs: FC<{
   }
 
   function handleSwitchUser(user: RoomUser) {
-    return (e: React.MouseEvent<HTMLAnchorElement, globalThis.MouseEvent>) => {
+    return (_: React.MouseEvent<HTMLAnchorElement, globalThis.MouseEvent>) => {
       dispatch(switchUser(user, roomID));
     };
   }
@@ -239,7 +248,29 @@ const Navtabs: FC<{
               Join
             </Button>
           ))}
-        <div className="overflow-auto">{navUsers}</div>
+        <Select
+          onValueChange={(userID) => {
+            let user = users.find(
+              (val, _, __) => parseInt(userID) === val.userID,
+            );
+            if (user !== undefined) {
+              dispatch(switchUser(user, roomID));
+            }
+          }}
+          defaultValue={String(authUser?.userID)}
+        >
+          <SelectTrigger className="mx-[2rem] flex md:hidden">
+            <SelectValue placeholder="Placeholder" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {users.map((user) => (
+                <SelectItem value={String(user.userID)}>{user.name}</SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+        <div className="overflow-auto hidden md:block">{navUsers}</div>
         <div className={styles.divider} />
         <a
           className={styles.link}
