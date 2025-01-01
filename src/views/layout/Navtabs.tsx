@@ -122,7 +122,7 @@ const Navtabs: FC<{
               dispatch(switchUser(Object.values(filteredUsers)[0], roomID));
             return filteredUsers;
           });
-          dispatch(deleteTimetableUser(curUser.userID));
+          // dispatch(deleteTimetableUser(curUser.userID));
           return;
         }
       }
