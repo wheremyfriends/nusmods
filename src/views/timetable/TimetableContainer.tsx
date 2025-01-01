@@ -65,6 +65,7 @@ import {
 } from "utils/graphql";
 import { AuthContext } from "views/account/AuthContext";
 import { handleProtocols } from "graphql-ws";
+import React from "react";
 
 type Params = {
   roomID: string;
@@ -192,6 +193,10 @@ export const TimetableContainerComponent: FC = () => {
   const dispatch = useDispatch();
 
   const [users, setUsers] = useState<number[]>([]);
+
+  // For managing data races
+  const [loaded, setLoaded] = useState(false);
+
   // Resubscribe if roomID changes
   useEffect(() => {
     // Clear the state first                                                                                                               ║
@@ -207,12 +212,17 @@ export const TimetableContainerComponent: FC = () => {
       });
     });
 
+    setLoaded(true);
     return () => {
       sub.unsubscribe();
     };
   }, [roomID]);
 
   useEffect(() => {
+    if (!loaded) {
+      return;
+    }
+
     if (!userID) {
       return;
     }
@@ -264,7 +274,7 @@ export const TimetableContainerComponent: FC = () => {
         dispatch(deleteTimetableUser(id));
       });
     };
-  }, [roomID, userID, users]);
+  }, [loaded, roomID, userID, users]);
 
   // Not needed as modules are fetched on demand
   const isLoading = useMemo(() => {
