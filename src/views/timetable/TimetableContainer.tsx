@@ -195,7 +195,6 @@ export const TimetableContainerComponent: FC = () => {
   const [userRoomMapping, setUserRoomMapping] = useState<{
     [userID: number]: string;
   }>({});
-  console.log({ userRoomMapping });
 
   // Resubscribe if roomID changes
   useEffect(() => {
@@ -270,22 +269,13 @@ export const TimetableContainerComponent: FC = () => {
 
     return () => {
       subscriptions.then((subs) => subs?.forEach((s) => s.unsubscribe()));
-      console.log("Deleting");
-      console.log({ userRoomMapping });
       Object.entries(userRoomMapping)
         .filter(([_, val]) => val !== roomID)
-        .forEach(([key, val]) => {
-          console.log({ key, val });
-
+        .forEach(([key, _]) => {
           dispatch(deleteTimetableUser(parseInt(key)));
         });
-
-      // Clean up the mapping
-      setUserRoomMapping((mapping) => {
-        return _.pickBy(mapping, (value) => value === roomID);
-      });
     };
-  }, [roomID, userID]);
+  }, [roomID, userID, userRoomMapping]);
 
   // Not needed as modules are fetched on demand
   const isLoading = useMemo(() => {
