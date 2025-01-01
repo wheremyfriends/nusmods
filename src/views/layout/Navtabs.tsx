@@ -122,7 +122,7 @@ const Navtabs: FC<{
               dispatch(switchUser(Object.values(filteredUsers)[0], roomID));
             return filteredUsers;
           });
-          // dispatch(deleteTimetableUser(curUser.userID));
+          dispatch(deleteTimetableUser(curUser.userID));
           return;
         }
       }
@@ -161,7 +161,7 @@ const Navtabs: FC<{
 
   const navUsers = Object.values(users).map((user) => {
     return (
-      <ContextMenu>
+      <ContextMenu key={user.userID}>
         <ContextMenuTrigger>
           <a
             key={user.userID}

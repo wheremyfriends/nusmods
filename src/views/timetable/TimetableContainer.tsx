@@ -192,30 +192,31 @@ export const TimetableContainerComponent: FC = () => {
 
   const dispatch = useDispatch();
 
-  const [users, setUsers] = useState<number[]>([]);
-
-  // For managing data races
-  const [loaded, setLoaded] = useState(false);
+  const [userRoomMapping, setUserRoomMapping] = useState<{
+    [userID: number]: string;
+  }>({});
+  console.log({ userRoomMapping });
 
   // Resubscribe if roomID changes
-  // useEffect(() => {
-  //   // Clear the state first                                                                                                               ║
-  //   dispatch(resetAllTimetables());
-  //   const sub = subscribeToLessonChanges(apolloClient, roomID, (inp) => {
-  //     handleLessonChange(inp);
-  //
-  //     setUsers((usersCur) => {
-  //       if (usersCur.includes(inp.userID)) {
-  //         return usersCur;
-  //       }
-  //       return [...usersCur, inp.userID];
-  //     });
-  //   });
-  //
-  //   return () => {
-  //     sub.unsubscribe();
-  //   };
-  // }, [roomID]);
+  useEffect(() => {
+    // Clear the state first                                                                                                               ║
+    dispatch(resetAllTimetables());
+
+    const sub = subscribeToLessonChanges(apolloClient, roomID, (inp) => {
+      handleLessonChange(inp);
+      setUserRoomMapping((mapping) => {
+        console.log(`Adding user ${inp.userID}`);
+        return {
+          ...mapping,
+          [inp.userID]: roomID,
+        };
+      });
+    });
+
+    return () => {
+      sub.unsubscribe();
+    };
+  }, [roomID]);
 
   useEffect(() => {
     if (!userID) {
@@ -223,40 +224,66 @@ export const TimetableContainerComponent: FC = () => {
     }
 
     // Reset all time tables first
-    dispatch(resetAllTimetables());
+    // dispatch(resetAllTimetables());
 
     // Subscribe to additional rooms, other than the original one
     const subscriptions = getRooms(apolloClient, userID).then((rooms) => {
       if (!rooms) return;
 
-      return rooms.flatMap((subscriptionRoomID) => {
-        const sub1 = subscribeToLessonChanges(
-          apolloClient,
-          subscriptionRoomID,
-          (lessonChange) => {
-            handleLessonChange(lessonChange);
-          },
-        );
-        const sub2 = subscribeToUserChanges(
-          apolloClient,
-          subscriptionRoomID,
-          (userChange) => {
-            const { action, userID: changeUserID } = userChange;
+      return rooms
+        .filter((subscriptionRoomID) => subscriptionRoomID != roomID)
+        .flatMap((subscriptionRoomID) => {
+          const sub1 = subscribeToLessonChanges(
+            apolloClient,
+            subscriptionRoomID,
+            (lessonChange) => {
+              handleLessonChange(lessonChange);
+              setUserRoomMapping((mapping) => {
+                if (lessonChange.userID in mapping) {
+                  return mapping;
+                }
+                console.log(`Adding user ${lessonChange.userID}`);
+                return {
+                  ...mapping,
+                  [lessonChange.userID]: subscriptionRoomID,
+                };
+              });
+            },
+          );
+          const sub2 = subscribeToUserChanges(
+            apolloClient,
+            subscriptionRoomID,
+            (userChange) => {
+              const { action, userID: changeUserID } = userChange;
 
-            switch (action) {
-              case Action.DELETE_USER: {
-                dispatch(deleteTimetableUser(changeUserID));
+              switch (action) {
+                case Action.DELETE_USER: {
+                  dispatch(deleteTimetableUser(changeUserID));
+                }
               }
-            }
-          },
-        );
+            },
+          );
 
-        return [sub1, sub2];
-      });
+          return [sub1, sub2];
+        });
     });
 
     return () => {
       subscriptions.then((subs) => subs?.forEach((s) => s.unsubscribe()));
+      console.log("Deleting");
+      console.log({ userRoomMapping });
+      Object.entries(userRoomMapping)
+        .filter(([_, val]) => val !== roomID)
+        .forEach(([key, val]) => {
+          console.log({ key, val });
+
+          dispatch(deleteTimetableUser(parseInt(key)));
+        });
+
+      // Clean up the mapping
+      setUserRoomMapping((mapping) => {
+        return _.pickBy(mapping, (value) => value === roomID);
+      });
     };
   }, [roomID, userID]);
 
