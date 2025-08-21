@@ -161,7 +161,7 @@ const Navtabs: FC<{
 
   const navUsers = Object.values(users).map((user) => {
     return (
-      <ContextMenu>
+      <ContextMenu key={user.userID}>
         <ContextMenuTrigger>
           <a
             key={user.userID}

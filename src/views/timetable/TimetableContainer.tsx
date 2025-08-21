@@ -65,6 +65,7 @@ import {
 } from "utils/graphql";
 import { AuthContext } from "views/account/AuthContext";
 import { handleProtocols } from "graphql-ws";
+import React from "react";
 
 type Params = {
   roomID: string;
@@ -191,19 +192,23 @@ export const TimetableContainerComponent: FC = () => {
 
   const dispatch = useDispatch();
 
-  const [users, setUsers] = useState<number[]>([]);
+  const [userRoomMapping, setUserRoomMapping] = useState<{
+    [userID: number]: string;
+  }>({});
+
   // Resubscribe if roomID changes
   useEffect(() => {
     // Clear the state first                                                                                                               ║
     dispatch(resetAllTimetables());
+
     const sub = subscribeToLessonChanges(apolloClient, roomID, (inp) => {
       handleLessonChange(inp);
-
-      setUsers((usersCur) => {
-        if (usersCur.includes(inp.userID)) {
-          return usersCur;
-        }
-        return [...usersCur, inp.userID];
+      setUserRoomMapping((mapping) => {
+        console.log(`Adding user ${inp.userID}`);
+        return {
+          ...mapping,
+          [inp.userID]: roomID,
+        };
       });
     });
 
@@ -217,38 +222,42 @@ export const TimetableContainerComponent: FC = () => {
       return;
     }
 
-    let userIDs = new Set<number>(); // UserID of extra users
+    // Reset all time tables first
+    // dispatch(resetAllTimetables());
 
     // Subscribe to additional rooms, other than the original one
     const subscriptions = getRooms(apolloClient, userID).then((rooms) => {
       if (!rooms) return;
+
       return rooms
-        .filter((room) => roomID !== room)
-        .flatMap((roomID) => {
+        .filter((subscriptionRoomID) => subscriptionRoomID != roomID)
+        .flatMap((subscriptionRoomID) => {
           const sub1 = subscribeToLessonChanges(
             apolloClient,
-            roomID,
+            subscriptionRoomID,
             (lessonChange) => {
-              if (users.includes(lessonChange.userID)) {
-                return;
-              }
-
-              userIDs.add(lessonChange.userID);
               handleLessonChange(lessonChange);
+              setUserRoomMapping((mapping) => {
+                if (lessonChange.userID in mapping) {
+                  return mapping;
+                }
+                console.log(`Adding user ${lessonChange.userID}`);
+                return {
+                  ...mapping,
+                  [lessonChange.userID]: subscriptionRoomID,
+                };
+              });
             },
           );
           const sub2 = subscribeToUserChanges(
             apolloClient,
-            roomID,
+            subscriptionRoomID,
             (userChange) => {
               const { action, userID: changeUserID } = userChange;
 
               switch (action) {
                 case Action.DELETE_USER: {
-                  if (users.includes(changeUserID)) return;
-
                   dispatch(deleteTimetableUser(changeUserID));
-                  return;
                 }
               }
             },
@@ -260,11 +269,13 @@ export const TimetableContainerComponent: FC = () => {
 
     return () => {
       subscriptions.then((subs) => subs?.forEach((s) => s.unsubscribe()));
-      userIDs.forEach((id) => {
-        dispatch(deleteTimetableUser(id));
-      });
+      Object.entries(userRoomMapping)
+        .filter(([_, val]) => val !== roomID)
+        .forEach(([key, _]) => {
+          dispatch(deleteTimetableUser(parseInt(key)));
+        });
     };
-  }, [roomID, userID, users]);
+  }, [roomID, userID, userRoomMapping]);
 
   // Not needed as modules are fetched on demand
   const isLoading = useMemo(() => {

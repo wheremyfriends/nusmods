@@ -329,17 +329,6 @@ function timetables(
             [semester]: {},
           };
 
-        if (state.multiUserColors[userID]?.[semester] === undefined)
-          state.multiUserColors[userID] = {
-            ...state.multiUserColors[userID],
-            [semester]: {},
-          };
-
-        draft.multiUserColors[userID][semester] = semColors(
-          state.multiUserColors[userID][semester],
-          action,
-        );
-
         if (draft.multiUserHidden[userID]?.[semester] === undefined)
           draft.multiUserHidden[userID] = { [semester]: [] };
 
